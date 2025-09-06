@@ -7,7 +7,6 @@ class InputManager
 {
 public:
 
-
 	/// <summary>
 	/// コントローラー認識番号
 	/// </summary>
@@ -136,15 +135,15 @@ public:
 	/// <summary>
 	/// インスタンス削除
 	/// </summary>
-	void Release(void);
+	void Destroy(void);
 
 #pragma region キーボード入力
 
 	/// <summary>
 	/// 判定を行うキーを追加
 	/// </summary>
-	/// <param name="keyType">追加対象</param>
-	void AddKey(int type);
+	/// <param name="type">追加対象</param>
+	void AddKey(unsigned int type);
 
 	/// <summary>
 	/// 判定を行うキーをクリア
@@ -156,64 +155,68 @@ public:
 	/// </summary>
 	/// <param name="keyType">判定するキー</param>
 	/// <returns>入力しているか否か</returns>
-	bool KeyIsNew(int type) const;
+	bool KeyIsNew(unsigned int keyType) const { return FindKey(keyType).inputNew; };
 
 	/// <summary>
 	/// キーを入力した瞬間の判定
 	/// </summary>
 	/// <param name="keyType">判定するキー</param>
 	/// <returns>キー入力したか否か</returns>
-	bool KeyIsTrgDown(int keyType) const;
+	bool KeyIsTrgDown(unsigned int keyType) const { return FindKey(keyType).trgDown; };
 
 	/// <summary>
 	/// キーを離した瞬間の判定
 	/// </summary>
 	/// <param name="keyType">判定するキー</param>
 	/// <returns>キーを離したか否か</returns>
-	bool KeyIsTrgUp(int keyType) const; // constで読み取り専用化
+	bool KeyIsTrgUp(unsigned int keyType) const { return FindKey(keyType).trgUp; };
 
 	/// <summary>
 	/// 全てのキーの入力判定
 	/// </summary>
 	/// <returns></returns>
-	bool KeyIsNewAll(void)const;
+	bool KeyIsNewAll(void) const;
+
 #pragma endregion
 
 #pragma region マウス入力
+
+	/// <summary>
+	/// 判定を行うキーを追加
+	/// </summary>
+	/// <param name="type">追加対象</param>
+	void AddMouse(unsigned int type);
+
 	/// <summary>
 	/// マウス座標の取得
 	/// </summary>
 	/// <returns>マウス座標</returns>
-	Vector2 GetMousePos(void) const; // constで読み取り専用化
+	Vector2 GetMousePos(void) const;
 
 	/// <summary>
-	/// マウスクリック状態を取得
-	/// </summary>
-	int GetMouse(void) const; // constで読み取り専用化
-
-	/// <summary>
-	/// 左クリック入力処理
+	/// マウス入力処理
 	/// </summary>
 	/// <returns>左クリックしたか否か</returns>
-	bool IsClickMouseLeft(void) const;
+	bool MouseIsNew(unsigned int keyType) const { return FindMouse(keyType).inputNew; };
 
 	/// <summary>
-	/// 右クリック入力処理
+	/// マウスクリックを入力した瞬間の判定
 	/// </summary>
-	/// <returns>右クリックしたか否か</returns>
-	bool IsClickMouseRight(void) const;
+	/// <param name="type">判定するキー</param>
+	/// <returns>キー入力したか否か</returns>
+	bool MouseIsTrgDown(unsigned int keyType) const { return FindMouse(keyType).trgDown; };
 
 	/// <summary>
-	/// 左クリックした瞬間の判定
+	/// マウスクリックを離した瞬間の判定
 	/// </summary>
-	/// <returns>左クリックを入力したか否か</returns>
-	bool IsTrgClickMouseLeft(void) const;
+	/// <param name="keyType">判定するキー</param>
+	/// <returns>キーを離したか否か</returns>
+	bool MouseIsTrgUp(unsigned int keyType) const { return FindMouse(keyType).trgUp; };
 
 	/// <summary>
-	/// 右クリックした瞬間の判定
+	/// マウスの回転量を取得(正の値：上(奥)方向)
 	/// </summary>
-	/// <returns>右クリックを入力したか否か</returns>
-	bool IsTrgClickMouseRight(void) const;
+	int GetMouseWheelRot(void) { return GetMouseWheelRotVol(); };
 
 #pragma endregion
 
@@ -337,6 +340,7 @@ public:
 
 #pragma endregion
 
+
 private:
 
 	// シングルトンインスタンス
@@ -345,7 +349,7 @@ private:
 	// キー情報
 	struct Key
 	{
-		int keyType;	   // キーの種類
+		int keyType;   // キーの種類
 		bool inputOld; // 1フレーム前の入力状態
 		bool inputNew; // 現フレームの入力状態
 		bool trgDown;  // 現フレームで入力されたか否か
@@ -378,6 +382,9 @@ private:
 	Vector2 mousePos_; // マウスカーソル位置
 	int mouseInput_;   // マウスボタン入力状態
 
+	// マウスホイール回転量
+	float mouseWheelRot_;
+
 
 	/*　コントローラのメンバ変数　*/
 
@@ -400,51 +407,40 @@ private:
 	/// <summary>
 	/// コピーコンストラクタ
 	/// </summary>
-	InputManager(const InputManager& other);
+	InputManager(const InputManager& other) = default;
 
 	/// <summary>
 	/// 通常デストラクタ
 	/// </summary>
 	~InputManager(void) = default;
 
+
 	/// <summary>
 	/// 配列内から対象のキーの入力を取得
 	/// </summary>
 	/// <param name="keyType">探索するキーの種類</param>
 	/// <returns>キーの情報(定数)</returns>
-	const InputManager::Key& FindKey(int keyType) const;
-
-	/// <summary>
-	/// 配列内から対象のマウスボタンの入力を取得
-	/// </summary>
-	/// <param name="keyType">探索するマウスボタンの種類</param>
-	/// <returns>マウスボタンの情報(定数)</returns>
-	const InputManager::Mouse& FindMouse(int mouseType) const;
+	const InputManager::Key& FindKey(unsigned int keyType) const;
 
 	/// <summary>
 	/// 判定する入力キーを割り当て
 	/// </summary>
 	void SetInputKey(void);
 
-	/// <summary>
-	/// 情報配列からキー情報を取得
-	/// </summary>
-	/// <param name="keyType">取得する対象</param>
-	/// <returns>キー情報</returns>
-	InputManager::Key& FindKey(int keyType);
-
 #pragma region マウスメンバ変数
+
+	/// <summary>
+	/// 配列内から対象のマウスボタンの入力を取得
+	/// </summary>
+	/// <param name="keyType">探索するマウスボタンの種類</param>
+	/// <returns>マウスボタンの情報(定数)</returns>
+	const InputManager::Mouse& FindMouse(unsigned int mouseType) const;
+
 	/// <summary>
 	/// 判定するマウスを割り当て
 	/// </summary>
 	void SetInputMouse(void);
 
-	/// <summary>
-	/// 情報配列からマウス情報を取得
-	/// </summary>
-	/// <param name="mouseType">取得する対象</param>
-	/// <returns>マウス情報</returns>
-	InputManager::Mouse& FindMouse(int mouseType);
 #pragma endregion
 
 #pragma region コントローラ識別

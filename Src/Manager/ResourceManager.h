@@ -4,17 +4,24 @@
 #include <string>
 class Resource;
 
+/// <summary>
+/// リソース管理マネージャ
+/// </summary>
 class ResourceManager
 {
 public:
 
+	/// <summary>
+	/// リソース識別列挙
+	/// </summary>
 	enum SRC
 	{
-		NONE = 0,
+		NONE = -1,
 
 		/*　エフェクトリソース　*/
 
 		/*　画像リソース　*/
+		IMAGE_PAD,
 
 		/*　3Dモデルリソース　*/
 		TEMP_MODEL,
@@ -22,13 +29,28 @@ public:
 	};
 
 
-	const std::string PATH_CSV_FILE = "Data/CSV/";       // CSVファイルパス
-	const std::string PATH_EFFECT	= "Data/Effect/";    // エフェクトファイルパス
-	const std::string PATH_FONT		= "Data/Font/";	     // フォントファイルパス
-	const std::string PATH_IMAGE	= "Data/Image/";     // 画像ファイルパス
-	const std::string PATH_MODEL	= "Data/Model/";     // 3Dモデルファイルパス
-	const std::string PATH_BGM      = "Data/Sound/BGM/"; // BGMファイルパス
-	const std::string PATH_SE		= "Data/Sound/SE/";  // 効果音ファイルパス
+	/*　各ハンドルパス　*/
+
+	// エフェクトファイルパス
+	static const std::string PATH_EFFECT;
+
+	// フォントファイルパス
+	static const std::string PATH_FONT;
+
+	// 画像ファイルパス
+	static const std::string PATH_IMAGE;
+
+	// 3Dモデルファイルパス
+	static const std::string PATH_MODEL;
+
+	// BGMファイルパス
+	static const std::string PATH_BGM;
+
+	// 効果音ファイルパス
+	static const std::string PATH_SE;
+
+	// 動画ファイルパス
+	static const std::string PATH_MOVIE;
 
 
 
@@ -67,6 +89,12 @@ public:
 	Resource Load(SRC src);
 
 	/// <summary>
+	/// リソースのハンドルを取得
+	/// </summary>
+	/// <param name="src">読み込み対象</param>
+	int LoadHandleId(SRC src);
+
+	/// <summary>
 	/// 3Dモデル重複利用時の読み込み
 	/// </summary>
 	/// <param name="src">読み込み対象</param>
@@ -78,7 +106,7 @@ public:
 private:
 
 	//静的インスタンス
-	static ResourceManager* manager_;
+	static ResourceManager* instance_;
 
 	// リソース管理対象
 	std::map<SRC, Resource> resourcesMap_;

@@ -70,6 +70,12 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -117,12 +123,13 @@
       <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(DXLIB_DIR)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -132,8 +139,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Src\Application.h" />
+    <ClInclude Include="Src\Common\Camera.h" />
+    <ClInclude Include="Src\Common\Fader.h" />
     <ClInclude Include="Src\Common\Font.h" />
     <ClInclude Include="Src\Common\FrameRate.h" />
+    <ClInclude Include="Src\Common\GameExit.h" />
     <ClInclude Include="Src\Object\Status\StatusData.h" />
     <ClInclude Include="Src\main.h" />
     <ClInclude Include="Src\Manager\InputManager.h" />
@@ -143,17 +153,24 @@
     <ClInclude Include="Src\Manager\Sound.h" />
     <ClInclude Include="Src\Manager\SoundManager.h" />
     <ClInclude Include="Src\Object\CharaBase.h" />
+    <ClInclude Include="Src\Object\Status\StatusEnemy.h" />
+    <ClInclude Include="Src\Object\Status\StatusPlayer.h" />
+    <ClInclude Include="Src\Object\Status\StatusWeapon.h" />
     <ClInclude Include="Src\Scene\GameScene.h" />
     <ClInclude Include="Src\Scene\SceneBase.h" />
     <ClInclude Include="Src\Scene\TitleScene.h" />
     <ClInclude Include="Src\Utility\AsoUtility.h" />
     <ClInclude Include="Src\Utility\Quaternion.h" />
+    <ClInclude Include="Src\Utility\UtilityCommon.h" />
     <ClInclude Include="Src\Utility\Vector2.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Application.cpp" />
+    <ClCompile Include="Src\Common\Camera.cpp" />
+    <ClCompile Include="Src\Common\Fader.cpp" />
     <ClCompile Include="Src\Common\Font.cpp" />
     <ClCompile Include="Src\Common\FrameRate.cpp" />
+    <ClCompile Include="Src\Common\GameExit.cpp" />
     <ClCompile Include="Src\Object\Status\StatusData.cpp" />
     <ClCompile Include="Src\main.cpp" />
     <ClCompile Include="Src\Manager\InputManager.cpp" />
@@ -163,11 +180,15 @@
     <ClCompile Include="Src\Manager\Sound.cpp" />
     <ClCompile Include="Src\Manager\SoundManager.cpp" />
     <ClCompile Include="Src\Object\CharaBase.cpp" />
+    <ClCompile Include="Src\Object\Status\StatusEnemy.cpp" />
+    <ClCompile Include="Src\Object\Status\StatusPlayer.cpp" />
+    <ClCompile Include="Src\Object\Status\StatusWeapon.cpp" />
     <ClCompile Include="Src\Scene\GameScene.cpp" />
     <ClCompile Include="Src\Scene\SceneBase.cpp" />
     <ClCompile Include="Src\Scene\TitleScene.cpp" />
     <ClCompile Include="Src\Utility\AsoUtility.cpp" />
     <ClCompile Include="Src\Utility\Quaternion.cpp" />
+    <ClCompile Include="Src\Utility\UtilityCommon.cpp" />
     <ClCompile Include="Src\Utility\Vector2.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

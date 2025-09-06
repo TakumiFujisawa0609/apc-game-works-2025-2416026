@@ -1,162 +1,219 @@
-/* ---------------------
-　アプリケーションクラス
- ----------------------- */
-
-#include "Common/FrameRate.h"
-//#include "Common/Font.h"
-#include "Common/SaveFile.h"
-
-#include "Manager/SceneManager.h"
-#include "Manager/ResourceManager.h"
-
 #include "Application.h"
-
 #include <DxLib.h>
+#include <EffekseerForDXLib.h>
+#include <cassert>
+#include <memory>
+
+#include "./Common/GameExit.h"
+#include "./Common/FrameRate.h"
+#include "./Common/Font.h"
+#include "./Object/Status/StatusData.h"
+#include "./Manager/InputManager.h"
+#include "./Manager/SceneManager.h"
+#include "./Manager/ResourceManager.h"
+#include "./Manager/SoundManager.h"
 
 
-Application* Application::manager_ = nullptr; // シングルトンインスタンス
+// シングルトンインスタンス
+Application* Application::instance_ = nullptr;
 
 
-/// <summary>
-/// インスタンス生成処理
-/// </summary>
 void Application::CreateManager(void)
 {
-	// インスタンス未生成時 生成
-	if (manager_ == nullptr) manager_ = new Application();
+	/* インスタンス生成処理 */
 
-	manager_->Init(); // 初期化処理
+	// インスタンス未生成時 生成
+	if (instance_ == nullptr) instance_ = new Application();
+
+	instance_->Init(); // 初期化処理
 }
 
-/// <summary>
-/// デフォルトコンストラクタ(private)
-/// </summary>
 Application::Application(void)
 {
-	
+	// デフォルトコンストラクタ(private)
 }
 
-/// <summary>
-/// インスタンス取得処理
-/// </summary>
-/// <returns>アプリケーションマネージャ</returns>
-Application& Application::GetInstance(void)
-{
-	return *manager_;
-}
-
-
-/// <summary>
-/// 初期化処理
-/// </summary>
 void Application::Init(void)
 {
-	/*  システム処理  */
+	/* 初期化処理 */
 
-	SetWindowText("BaseProject～"); //タイトル
-	SetGraphMode(SCREEN_SIZE_X, SCREEN_SIZE_Y, 32); //画面サイズ設定
-	ChangeWindowMode(true);							//(false：フルスクリーン)
+	// システム処理
+
+	// ゲーム名
+	SetWindowText(GAME_NAME);
+
+	//画面サイズ設定
+	SetGraphMode(SCREEN_SIZE_X, SCREEN_SIZE_Y, 32);
+
+	// ウィンドウの状態の設定
+	ChangeWindowMode(true);
+
+	// DX_LIB_11の使用
+	SetUseDirect3DVersion(DX_DIRECT3D_11);
+
+	//垂直同期を切る
+	SetWaitVSyncFlag(false);
 
 	// DX_LIB初期化処理
-	if (DxLib_Init() == -1) OutputDebugString("DxLibが初期化されていません");
+	if (DxLib_Init() == -1) assert("\nDxLibが初期化されていません");
 
 
-	SetWaitVSyncFlag(false); //垂直同期を切る
+	// エフェクト初期化処理
+	InitEffecseer();
 
-	FrameRate::CreateManager();		  // フレームレートマネージャ生成
-	SceneManager::CreateInstance();	  // シーンマネージャー生成
-	ResourceManager::CreateInstance(); // リソースマネージャ生成
+	// 入力制御初期化
+	SetUseDirectInputFlag(true);
 
-	// セーブファイル読み込み処理
-//	if (SaveFile::GetInstance()->LoadCSV() == false) _isError = true;
+	// マネージャー生成
+	CreateManagers();
+
+	// 終了メニュー
+	exit_ = std::make_unique<GameExit>();
+	exit_->Init();
+
+	// ゲーム可能処理
+	isGame_ = true;
+
+
+	Font& font = Font::GetInstance();
+
+	// フォント割り当て
+	font.AddFont(Font::FONT_GAME, Font::GAME_FONT_NAME, Font::FONT_GAME_PATH,
+				 Font::GAME_FONT_SIZE, Font::GAME_FONT_WIDTH, Font::FONT_TYPE_EDGE);
+
+	// デフォルトフォント割り当て
+	font.SetDefaultFont(Font::FONT_GAME);
+}
+void Application::CreateManagers(void)
+{
+	// 入力マネージャ
+	InputManager::CreateInstance();
+
+	// ステータスデータ
+	StatusData::CreateInstance();
+
+	// リソースマネージャ生成
+	ResourceManager::CreateInstance();
+
+	// フレームレートマネージャ生成
+	FrameRate::CreateInstance();
+
+	// 音声マネージャー生成
+	SoundManager::CreateInstance();
+
+	// シーンマネージャー生成
+	SceneManager::CreateInstance();
+
+	//フォントマネージャー生成
+	Font::CreateInstance();
 }
 
-/// <summary>
-/// 実行処理
-/// </summary>
+
 void Application::Run(void)
 {
-	FrameRate& frameRate	   = FrameRate::GetInstance();	  // fps管理マネージャ
-	SceneManager& sceneManager = SceneManager::GetInstance(); // シーン管理マネージャ
+	/*　実行処理　*/
+	
+	// fps管理マネージャ
+	FrameRate& fps = FrameRate::GetInstance();
+
+	// シーン管理マネージャ
+	SceneManager& scene = SceneManager::GetInstance();
+
+	// 入力マネージャ
+	InputManager& input = InputManager::GetInstance();
 
 
-	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0)
+	while (ProcessMessage() == 0 && isGame_)
 	{
-		frameRate.Update(); // フレームレート更新処理
+		// フレームレート更新処理
+		fps.Update();
 
 		//フレームレート制限
-		if (frameRate.GetLimitFrameRate() == false)
+		if (fps.GetLimitFrameRate() == false)
 		{
-			frameRate.SetFrameRate();
+			// フレームレート割り当て
+			fps.SetFrameRate();
 
-			sceneManager.Update();
-			/*
-			SaveFile* save = SaveFile::GetInstance();
+			// 入力マネージャ更新
+			input.Update();
 
-			float score = save->GetScore(0, SaveFile::SAVE_TYPE::SCORE_NUM);
-
-			if (CheckHitKey(KEY_INPUT_SPACE))
+			if (!exit_->GetIsActiveMenu())
 			{
-				score += 1.0f;
-				OutputDebugString("スコア増加");
-
-				save->SetScore(0, SaveFile::SAVE_TYPE::SCORE_NUM, score);
-				OutputDebugString("スコア割り当て");
-			}
-			if (CheckHitKey(KEY_INPUT_RETURN))
-			{
-				save->SaveCSV(); // セーブ
-
-				if (save->LoadCSV() == false)
-				{
-					_isError = true;
-				}
-				OutputDebugString("\nスコア保存・読み込み");
-
+				// シーン更新
+				scene.Update();
 			}
 
-			save->SetScore(0, SaveFile::SAVE_TYPE::SCORE_NUM, score);
-			*/
-			Draw(); // 描画処理
+			if (isActiveExitMenu_)
+			{
+				exit_->Update();
+			}
+			
+			// 描画処理
+			Draw();
 		}
 	}
 }
 
-void Application::InitEffecseer(void)
-{
-}
-
-/// <summary>
-/// 描画処理
-/// </summary>
 void Application::Draw(void)
 {
+	/* 描画処理 */
+	SetDrawScreen(DX_SCREEN_BACK);
 	ClearDrawScreen(); // 描画した画像を解放
+
+	// シーン描画
+	SceneManager::GetInstance().Draw();
+
+	// 終了メニュー
+	exit_->Draw();
+
 #ifdef _DEBUG
 	FrameRate::GetInstance().Draw(); // フレームレート描画
 #endif
 
-	//SaveFile::GetInstance()->Draw();
-
-	ScreenFlip();	   //裏画面を表にコピー
+	ScreenFlip(); // 裏画面を表にコピー
 }
 
-/// <summary>
-/// インスタンス削除処理
-/// </summary>
-/// <param name=""></param>
 void Application::Destroy(void)
 {
-	ResourceManager::GetInstance().Release(); // リソースマネージャ削除
-	SceneManager::GetInstance().Release();	  // シーンマネージャ削除処理
-	FrameRate::GetInstance().Release();		  // フレームレートマネージャ削除処理
+	/*　インスタンス削除処理　*/
 
-	//SaveFile::GetInstance()->Release(); //セーブファイル解放
+	// フォントファイルの解放
+	Font::GetInstance().Destroy();
 
-	// フォントファイル解放
-	//Font::GetInstance()->Release();
+	// シーンマネージャ
+	SceneManager::GetInstance().Destroy();
 
-	DxLib_End(); //DXライブラリ終了
+	// フレームレートマネージャ
+	FrameRate::GetInstance().Destroy();
 
-	delete manager_; // アプリケーションマネージャ削除
+	// 入力マネージャ
+	InputManager::GetInstance().Destroy();
+
+	// 音声マネージャ
+	SoundManager::GetInstance().Destroy();
+
+	// リソースマネージャー
+	ResourceManager::GetInstance().Destroy();
+
+	// ステータスデータ
+	StatusData::GetInstance()->Destroy();
+
+
+	Effkseer_End();
+
+	DxLib_End();
+
+	// アプリケーション削除
+	delete instance_;
+}
+
+void Application::InitEffecseer(void)
+{
+	if (Effekseer_Init(8000) == -1)
+	{
+		DxLib_End();
+	}
+
+	SetChangeScreenModeGraphicsSystemResetFlag(FALSE);
+	Effekseer_SetGraphicsDeviceLostCallbackFunctions();
 }

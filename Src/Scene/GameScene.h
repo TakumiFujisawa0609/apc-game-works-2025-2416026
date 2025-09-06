@@ -11,6 +11,9 @@ public:
 	// デストラクタ
 	~GameScene(void) = default;
 
+	// 初回ロード
+	void Load(void) override;
+
 	// 初期化
 	void Init(void) override;
 

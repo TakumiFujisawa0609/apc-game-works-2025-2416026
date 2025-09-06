@@ -20,13 +20,13 @@ public:
 	/// <summary>
 	/// 明示的にインスタンス生成
 	/// </summary>
-	static void CreateManager(void);
+	static void CreateInstance(void);
 
 	/// <summary>
 	/// 静的インスタンス生成
 	/// </summary>
 	/// <returns>フレームレートマネージャ</returns>
-	static FrameRate& GetInstance(void) { return *manager_;  };
+	static FrameRate& GetInstance(void) { return *instance_;  };
 
 	/// <summary>
 	/// 更新処理
@@ -41,7 +41,7 @@ public:
 	/// <summary>
 	/// インスタンス削除処理
 	/// </summary>
-	void Release(void);
+	void Destroy(void);
 
 	/// <summary>
 	/// フレームレート割り当て
@@ -52,18 +52,18 @@ public:
 	/// フレームレート制限 判定
 	/// </summary>
 	/// <returns>制御するか否か</returns>
-	bool GetLimitFrameRate(void);
+	bool GetLimitFrameRate(void) { return ((curTime_ - lateTime_) < FRAME_RATE); };
 
 
 private:
 
 
-	static FrameRate* manager_; // 静的インスタンス
+	static FrameRate* instance_; // 静的インスタンス
 
 	int curTime_;  // 現在の時間
 	int lateTime_; // 前フレーム実行時間
 
-	int counter_;	 // フレームカウンタ
+	int frameCnt_;	 // フレームカウンタ
 	int updateTime_; // フレーム更新時間
 
 	float viewFramelate_; // フレームレート(描画用)

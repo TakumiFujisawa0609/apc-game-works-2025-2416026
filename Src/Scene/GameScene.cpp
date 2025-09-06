@@ -6,6 +6,11 @@ GameScene::GameScene(void)
 
 }
 
+void GameScene::Load(void)
+{
+
+}
+
 void GameScene::Init(void)
 {
 

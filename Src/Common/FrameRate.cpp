@@ -1,21 +1,23 @@
 #include "FrameRate.h"
 #include <DxLib.h>
 
-FrameRate* FrameRate::manager_ = nullptr; // シングルトンインスタンス
+// シングルトンインスタンス
+FrameRate* FrameRate::instance_ = nullptr;
+
 
 FrameRate::FrameRate(void)
 {
 	curTime_ = lateTime_ = 0;
 
-	counter_ = updateTime_ = 0;
+	frameCnt_ = updateTime_ = 0;
 
 	viewFramelate_ = 0;
 }
 
-void FrameRate::CreateManager(void)
+void FrameRate::CreateInstance(void)
 {
 	// インスタンス未生成時に生成する
-	if (manager_ == nullptr) manager_ = new FrameRate();
+	if (instance_ == nullptr) instance_ = new FrameRate();
 }
 
 
@@ -36,14 +38,16 @@ void FrameRate::Draw(void)
 }
 
 
-void FrameRate::Release(void)
+void FrameRate::Destroy(void)
 {
-	if (manager_ == nullptr)
+	if (instance_ == nullptr)
 	{
+#ifdef _DEBUG
 		OutputDebugString("\nマネージャが生成されていません。\n");
+#endif
 		return;
 	}
-	delete manager_;
+	delete instance_;
 }
 
 
@@ -51,7 +55,7 @@ void FrameRate::SetFrameRate(void)
 {
 	lateTime_ = curTime_; // 前フレームの時間 割り当て
 
-	counter_++; // フレームカウント増加
+	frameCnt_++;
 
 	// 現在時間との差分
 	int nDifTime = (curTime_ - updateTime_);
@@ -59,25 +63,14 @@ void FrameRate::SetFrameRate(void)
 	if (nDifTime > 1000)
 	{
 		// フレームレート単位変更(ミリ秒 → 秒)
-		float fFrameCount = static_cast<float>(counter_ * 1000);
+		float fFrameCount = static_cast<float>(frameCnt_ * 1000);
 
 		// 描画フレーム単位 取得
 		viewFramelate_ = (fFrameCount / nDifTime);
 
-		counter_ = 0; // フレームカウント 初期化
+		frameCnt_ = 0;
 
 		// フレームレート 更新
 		updateTime_ = curTime_;
 	}
-}
-
-bool FrameRate::GetLimitFrameRate(void)
-{
-	/*　フレームレート制限するか否か　*/
-	if ((curTime_ - lateTime_) >= FRAME_RATE)
-	{
-		return false;
-	}
-
-	return true;
 }

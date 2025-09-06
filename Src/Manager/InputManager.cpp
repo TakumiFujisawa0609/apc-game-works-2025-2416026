@@ -41,103 +41,76 @@ void InputManager::Init(void)
 
 void InputManager::SetInputKey(void)
 {
-	InputManager::GetInstance().AddKey(KEY_INPUT_RETURN);
-	InputManager::GetInstance().AddKey(KEY_INPUT_SPACE);
-	InputManager::GetInstance().AddKey(KEY_INPUT_X);
+	AddKey(KEY_INPUT_RETURN);
+	AddKey(KEY_INPUT_SPACE);
+	AddKey(KEY_INPUT_X);
 
 	// プレイヤー１
-	InputManager::GetInstance().AddKey(KEY_INPUT_W);
-	InputManager::GetInstance().AddKey(KEY_INPUT_A);
-	InputManager::GetInstance().AddKey(KEY_INPUT_S);
-	InputManager::GetInstance().AddKey(KEY_INPUT_D);
-	InputManager::GetInstance().AddKey(KEY_INPUT_C);
-	InputManager::GetInstance().AddKey(KEY_INPUT_V);
-	InputManager::GetInstance().AddKey(KEY_INPUT_Z);
-
-	// プレイヤー２
-	InputManager::GetInstance().AddKey(KEY_INPUT_O);
-	InputManager::GetInstance().AddKey(KEY_INPUT_L);
-	InputManager::GetInstance().AddKey(KEY_INPUT_K);
-	InputManager::GetInstance().AddKey(KEY_INPUT_SEMICOLON);
-	InputManager::GetInstance().AddKey(KEY_INPUT_N);
-	InputManager::GetInstance().AddKey(KEY_INPUT_M);
-	InputManager::GetInstance().AddKey(KEY_INPUT_SLASH);
-
+	AddKey(KEY_INPUT_W);
+	AddKey(KEY_INPUT_A);
+	AddKey(KEY_INPUT_S);
+	AddKey(KEY_INPUT_D);
+	AddKey(KEY_INPUT_C);
+	AddKey(KEY_INPUT_V);
+	AddKey(KEY_INPUT_Z);
 
 	// 
-	InputManager::GetInstance().AddKey(KEY_INPUT_UP);
-	InputManager::GetInstance().AddKey(KEY_INPUT_DOWN);
-	InputManager::GetInstance().AddKey(KEY_INPUT_LEFT);
-	InputManager::GetInstance().AddKey(KEY_INPUT_RIGHT);
+	AddKey(KEY_INPUT_UP);
+	AddKey(KEY_INPUT_DOWN);
+	AddKey(KEY_INPUT_LEFT);
+	AddKey(KEY_INPUT_RIGHT);
 
-	InputManager::GetInstance().AddKey(KEY_INPUT_ESCAPE);
-	InputManager::GetInstance().AddKey(KEY_INPUT_LSHIFT);
-	InputManager::GetInstance().AddKey(KEY_INPUT_RSHIFT);
-
-
+	AddKey(KEY_INPUT_ESCAPE);
+	AddKey(KEY_INPUT_LSHIFT);
+	AddKey(KEY_INPUT_RSHIFT);
 }
 
 void InputManager::SetInputMouse(void)
 {
-	InputManager;; Mouse mouse;
+	// 左クリック
+	AddMouse(MOUSE_INPUT_LEFT);
 
-	/* 左クリック */
-	mouse = InputManager::Mouse();
-	mouse.type = MOUSE_INPUT_LEFT;
-	mouse.inputOld = false;
-	mouse.inputNew = false;
-	mouse.trgDown = false;
-	mouse.trgUp = false;
-	// 配列に格納
-	mouses_.emplace(mouse.type, mouse);
+	// 右クリック
+	AddMouse(MOUSE_INPUT_RIGHT);
 
-	/* 右クリック */
-	mouse = InputManager::Mouse();
-	mouse.type = MOUSE_INPUT_RIGHT;
-	mouse.inputOld = false;
-	mouse.inputNew = false;
-	mouse.trgDown = false;
-	mouse.trgUp = false;
-	// 配列に格納
-	mouses_.emplace(mouse.type, mouse);
-
-	/* 中央クリック */
-	mouse = InputManager::Mouse();
-	mouse.type = MOUSE_INPUT_MIDDLE;
-	mouse.inputOld = false;
-	mouse.inputNew = false;
-	mouse.trgDown = false;
-	mouse.trgUp = false;
-	// 配列に格納
-	mouses_.emplace(mouse.type, mouse);
+	// 中央クリック
+	AddMouse(MOUSE_INPUT_MIDDLE);
 }
 
 
 void InputManager::Update(void)
 {
-	/* キーボード入力判定 */
-	for (auto& key : keys_)
+	// キーボード入力判定
+	for (auto& k : keys_)
 	{
-		key.second.inputOld = key.second.inputNew;
-		key.second.inputNew = CheckHitKey(key.second.keyType);
-		key.second.trgDown = (key.second.inputNew && !key.second.inputOld);
-		key.second.trgUp = (!key.second.inputNew && key.second.inputOld);
+		Key& key = k.second;
+
+		key.inputOld = key.inputNew;
+		key.inputNew = CheckHitKey(key.keyType);
+		key.trgDown = ( key.inputNew && !key.inputOld);
+		key.trgUp   = (!key.inputNew && key.inputOld);
 	}
+
 
 	// マウス判定
 	mouseInput_ = GetMouseInput();
-	GetMousePoint(&mousePos_.x, &mousePos_.y); //マウス座標取得
 
-	/* マウス入力判定 */
+	//マウス座標取得
+	GetMousePoint(&mousePos_.x, &mousePos_.y);
+
+
+	// マウス入力判定
 	for (auto& m : mouses_)
 	{
-		m.second.inputOld = m.second.inputNew;
-		m.second.inputNew = (mouseInput_ == m.second.type);
-		m.second.trgDown = (m.second.inputNew && !m.second.inputOld);
-		m.second.trgUp = (!m.second.inputNew && m.second.inputOld);
+		Mouse& mouse = m.second;
+
+		mouse.inputOld = mouse.inputNew;
+		mouse.inputNew = ((GetMouseInput() & mouse.type) != 0);
+		mouse.trgDown = ( mouse.inputNew && !mouse.inputOld);
+		mouse.trgUp   = (!mouse.inputNew && mouse.inputOld);
 	}
 
-	/* ゲームパッド入力判定更新 */
+	// ゲームパッド入力判定更新
 	SetPadInState(JOYPAD_NO::KEY_PAD1);
 	SetPadInState(JOYPAD_NO::PAD1);
 	SetPadInState(JOYPAD_NO::PAD2);
@@ -145,7 +118,7 @@ void InputManager::Update(void)
 	SetPadInState(JOYPAD_NO::PAD4);
 }
 
-void InputManager::Release(void)
+void InputManager::Destroy(void)
 {
 	keys_.clear();	 // 入力キー配列 解放
 	mouses_.clear(); // マウス入力配列 解放
@@ -156,42 +129,20 @@ void InputManager::Release(void)
 
 #pragma region キーボード処理
 
-void InputManager::AddKey(int type)
+void InputManager::AddKey(unsigned int type)
 {
 	/* 判定を行うキーを追加 */
-	InputManager::Key keyInfo = InputManager::Key();
+
+	Key keyInfo = InputManager::Key();
+
 	keyInfo.keyType = type;
 	keyInfo.inputOld = false;
 	keyInfo.inputNew = false;
-	keyInfo.trgUp = false;
+	keyInfo.trgUp   = false;
 	keyInfo.trgDown = false;
 
 	// 入力キー配列に格納
 	keys_.emplace(type, keyInfo);
-}
-
-bool InputManager::KeyIsNew(int keyType) const
-{
-	// 判定するキーが未割当時、false
-	if (keyType == -1) return false;
-
-	return FindKey(keyType).inputNew;
-}
-
-bool InputManager::KeyIsTrgDown(int keyType) const
-{
-	// 判定するキーが未割当時、false
-	if (keyType == -1) return false;
-
-	return FindKey(keyType).trgDown;
-}
-
-bool InputManager::KeyIsTrgUp(int keyType) const
-{
-	// 判定するキーが未割当時、false
-	if (keyType == -1) return false;
-
-	return FindKey(keyType).trgUp;
 }
 
 bool InputManager::KeyIsNewAll(void) const
@@ -214,40 +165,57 @@ bool InputManager::KeyIsNewAll(void) const
 	return isInput;
 }
 
-const InputManager::Key& InputManager::FindKey(int keyType) const
+const InputManager::Key& InputManager::FindKey(unsigned int keyType) const
 {
-	// 配列内を探索
 	auto it = keys_.find(keyType);
 	if (it != keys_.end())
 	{
-		return it->second; // キーの情報を返す
+		// キーの情報を返す
+		return it->second;
 	}
 
 #ifdef _DEBUG
 	OutputDebugString("\nキーの情報がありません。\nInputManagerで割り当て処理を行ってください\n");
-	assert(false); // 例外スロー
 #endif
-	return keyInfoEmpty_; // 空のキー情報を返す
+
+	// 空のキー情報を返す
+	return keyInfoEmpty_;
 }
 
 #pragma endregion
 
+#pragma region マウス処理
 
-/// <summary>
-/// 情報配列からマウス情報を取得
-/// </summary>
-/// <param name="mouseType">取得する対象</param>
-/// <returns>マウス情報</returns>
-InputManager::Mouse& InputManager::FindMouse(int mouseType)
+void InputManager::AddMouse(unsigned int type)
 {
-	// 配列内を探索
+	Mouse mouse = InputManager::Mouse();
+
+	mouse.type = type;
+	mouse.inputOld = false;
+	mouse.inputNew = false;
+	mouse.trgDown = false;
+	mouse.trgUp   = false;
+	// 配列に格納
+	mouses_.emplace(mouse.type, mouse);
+}
+
+const InputManager::Mouse& InputManager::FindMouse(unsigned int mouseType) const
+{
 	auto it = mouses_.find(mouseType);
 	if (it != mouses_.end())
 	{
-		// 配列内にあるときにマウスの情報を返す
+		// マウスの情報を返す
 		return it->second;
 	}
+#ifdef _DEBUG
+	OutputDebugString("\nマウスの情報がありません。\nInputManagerで割り当て処理を行ってください\n");
+#endif
+
+	// 空のキー情報を返す
+	return mouseInfoEmpty_;
 }
+
+#pragma endregion 
 
 
 #pragma region コントローラ処理
@@ -286,7 +254,6 @@ void InputManager::SetPadInState(JOYPAD_NO jPadNum)
 		stateNow.IsTrgUpAlgKey[i] = (!stateNow.IsNewAlgKey[i] && stateNow.IsOldAlgKey[i]);
 	}
 }
-
 
 InputManager::JOYPAD_IN_STATE& InputManager::GetPadInputState(JOYPAD_NO padNum)
 {

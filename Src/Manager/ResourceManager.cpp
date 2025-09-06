@@ -1,53 +1,49 @@
 
 #include "Resource.h"
 #include "ResourceManager.h"
-#include "../Application.h"
 #include <DxLib.h>
+#include <string>
+#include "../Application.h"
 
-ResourceManager* ResourceManager::manager_ = nullptr;
+ResourceManager* ResourceManager::instance_ = nullptr;
 
-/// <summary>
-/// インスタンス生成
-/// </summary>
+// ファイルパスの割り当て
+const std::string ResourceManager::PATH_EFFECT = "Data/Effect/";
+const std::string ResourceManager::PATH_FONT   = "Data/Font/";
+const std::string ResourceManager::PATH_IMAGE  = "Data/Image/";
+const std::string ResourceManager::PATH_MODEL  = "Data/Model/";
+const std::string ResourceManager::PATH_SE     = "Data/Sound/SE/";
+const std::string ResourceManager::PATH_BGM    = "Data/Sound/BGM/";
+const std::string ResourceManager::PATH_MOVIE  = "Data/Movie/";
+
+
 void ResourceManager::CreateInstance(void)
 {
-	if (manager_ == nullptr)
+	if (instance_ == nullptr)
 	{
-		manager_ = new ResourceManager();
+		instance_ = new ResourceManager();
 	}
 
-	manager_->Init(); // マネージャ初期化
+	instance_->Init(); // マネージャ初期化
 }
 
-/// <summary>
-/// インスタンス取得処理
-/// </summary>
 ResourceManager& ResourceManager::GetInstance(void)
 {
-	return *manager_;
+	/*　インスタンス取得処理　*/
+	return *instance_;
 }
 
-/// <summary>
-/// デフォルトコンストラクタ
-/// </summary>
-/// <param name=""></param>
 ResourceManager::ResourceManager(void)
 {
 	
 }
 
 
-/// <summary>
-/// 初期化処理
-/// </summary>/// <returns>正常に動作したか否か</returns>
 void ResourceManager::Init(void)
 {
 	SetResource(); // リソース取得
 }
 
-/// <summary>
-/// リソースを取得する処理
-/// </summary>
 void ResourceManager::SetResource(void)
 {
 	Resource res;
@@ -59,43 +55,40 @@ void ResourceManager::SetResource(void)
 	resourcesMap_.emplace(SRC::MODEL_BEAR, res);
 }
 
-/// <summary>
-/// 解放処理
-/// </summary>
+
 void ResourceManager::Release(void)
 {
+	/* メモリ解放処理 */
+
 	if (loadedMap_.empty()) return;
 
 	for (auto& p : loadedMap_) 
 	{
-		p.second->Release(); // 読み込み済みリソース解放
-		delete p.second;	 // リソース要素削除
+		// 読み込み済みリソース解放
+		p.second->Release(); 
+		delete p.second;
 	}
 
-	loadedMap_.clear(); // 読み込み済みリソースリストをクリア
+	// 読み込み済みリソースリストをクリア
+	loadedMap_.clear(); 
 }
 
-/// <summary>
-/// インスタンス削除処理
-/// </summary>
 void ResourceManager::Destroy(void)
 {
+	/*　インスタンス削除処理　*/
+
 	Release(); // リソースマネージャ解放
 
 	if (!resourcesMap_.empty())
 	{
-		resourcesMap_.clear(); // リソースリストをクリア(空の時は行わない)
+		// リソースリストをクリア(空の時は行わない)
+		resourcesMap_.clear();
 	}
 
-	delete manager_; // インスタンス削除
+	delete instance_; // インスタンス削除
 }
 
 
-/// <summary>
-/// リソースのロード
-/// </summary>
-/// <param name="src">読み込み対象</param>
-/// <returns>リソース</returns>
 Resource ResourceManager::Load(SRC src)
 {
 	Resource* res = _Load(src); // 読み込み処理
@@ -107,11 +100,12 @@ Resource ResourceManager::Load(SRC src)
 	return *res;
 }
 
-/// <summary>
-/// 読み込み処理
-/// </summary>
-/// <param name="src">読み込み対象</param>
-/// <returns>リソース</returns>
+int ResourceManager::LoadHandleId(SRC src)
+{
+	/*　ハンドルIDの取得処理　*/
+	return Load(src).GetHandleId();
+}
+
 Resource* ResourceManager::_Load(SRC src)
 {
 	// 読み込み済みリストを検索
@@ -140,14 +134,12 @@ Resource* ResourceManager::_Load(SRC src)
 	return ret;
 }
 
-/// <summary>
-/// 3Dモデル重複利用時の読み込み
-/// </summary>
-/// <param name="src">読み込み対象</param>
-/// <returns>重複するモデルのハンドル</returns>
 int ResourceManager::LoadModelDuplicate(SRC src)
 {
-	Resource* resource = _Load(src); // 読み込み処理
+	/* 3Dモデル重複利用時の読み込み */
+
+	// 読み込み処理
+	Resource* resource = _Load(src);
 
 	// 読み込み失敗
 	if (resource == nullptr) return -1;

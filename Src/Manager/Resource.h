@@ -7,8 +7,6 @@ class Resource
 {
 public:
 
-	/* --- <<< 列挙型定義 >>> --- */
-
 	enum class LOAD_TYPE
 	{
 		NONE,
@@ -26,14 +24,14 @@ public:
 	Resource(void);
 
 	/// <summary>
-	/// コンストラクタ(オーバーロード)
+	/// コンストラクタ
 	/// </summary>
 	/// <param name="type">読み込むファイルの種類</param>
 	/// <param name="path">ファイルパス(読み取り専用)</param>
 	Resource(LOAD_TYPE type, const std::string &path);
 
 	/// <summary>
-	/// 複数画像時のコンストラクタ(オーバーロード)
+	/// 複数画像時のコンストラクタ
 	/// </summary>
 	/// <param name="type">読み込むファイルの種類</param>
 	/// <param name="path">ファイルパス(読み取り専用)</param>
@@ -47,6 +45,7 @@ public:
 	/// デストラクタ
 	/// </summary>
 	~Resource(void) = default;
+
 
 	/// <summary>
 	/// 読み込み処理
@@ -93,7 +92,9 @@ private:
 	
 	int handleId_;		// 単一読み込みハンドルID
 
+
 	/* 複数画像読み込み用 */
+
 	int* handleIds_; // 複数Idのポインタ
 	int numX_;		 // 横画像数
 	int numY_;		 // 縦画像数
@@ -102,5 +103,4 @@ private:
 
 	// モデル複製用リスト
 	std::vector<int> duplicationModelIds_;
-	
 };

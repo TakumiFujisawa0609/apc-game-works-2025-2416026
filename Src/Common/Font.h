@@ -49,7 +49,7 @@ public:
 	/// <summary>
 	/// デストラクタ
 	/// </summary>
-	~Font();
+	~Font(void);
 
 	// インスタンスを明示的に生成
 	static void CreateInstance(void);

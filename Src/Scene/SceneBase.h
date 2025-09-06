@@ -8,10 +8,10 @@ public:
 	SceneBase(void);
 
 	// デフォルトデストラクタ
-	virtual ~SceneBase(void) = 0;
+	virtual ~SceneBase(void) = default;
 
-	// リソース読み込み処理
-	virtual void Load(void);
+	// 初回リソース読み込み処理
+	virtual void Load(void) = 0;
 
 	// 初期化処理
 	virtual void Init(void) = 0;
