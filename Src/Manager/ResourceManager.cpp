@@ -4,6 +4,9 @@
 #include <DxLib.h>
 #include <string>
 #include "../Application.h"
+#include "../Object/Status/StatusData.h"
+#include "../Object/Status/StatusEnemy.h"
+#include "../Object/Status/StatusWeapon.h"
 
 ResourceManager* ResourceManager::instance_ = nullptr;
 
@@ -24,7 +27,7 @@ void ResourceManager::CreateInstance(void)
 		instance_ = new ResourceManager();
 	}
 
-	instance_->Init(); // マネージャ初期化
+	instance_->Load(); // マネージャ初期化
 }
 
 ResourceManager& ResourceManager::GetInstance(void)
@@ -39,20 +42,42 @@ ResourceManager::ResourceManager(void)
 }
 
 
-void ResourceManager::Init(void)
+void ResourceManager::Load(void)
 {
 	SetResource(); // リソース取得
 }
 
 void ResourceManager::SetResource(void)
 {
+	
+	StatusData& data = StatusData::GetInstance();
 	Resource res;
+	int max = 0;
+	int src = 0;
 
-	res = Resource(Resource::LOAD_TYPE::MODEL, PATH_MODEL + "Temp/Temp.mv1");
-	resourcesMap_.emplace(SRC::TEMP_MODEL, res);
+	// プレイヤー
+	res = Resource(Resource::LOAD_TYPE::MODEL, PATH_MODEL + data.GetHandlePathPlayer());
+	resourcesMap_.emplace(static_cast<SRC>(src), res);
+	src++;
 
-	res = Resource(Resource::LOAD_TYPE::MODEL, PATH_MODEL + "Player/Bear.mv1");
-	resourcesMap_.emplace(SRC::MODEL_BEAR, res);
+	// 敵
+	max = static_cast<int>(StatusEnemy::TYPE::MAX);
+	for (int i = 0; i < max; i++)
+	{
+		res = Resource(Resource::LOAD_TYPE::MODEL, PATH_MODEL + data.GetHandlePathEnemy(i));
+		resourcesMap_.emplace(static_cast<SRC>(src), res);
+		src++;
+	}
+
+	// 武器
+	max = static_cast<int>(StatusWeapon::TYPE::MAX);
+	for (int i = 0; i < max; i++)
+	{
+		res = Resource(Resource::LOAD_TYPE::MODEL, PATH_MODEL + data.GetHandlePathWeapon(i));
+		resourcesMap_.emplace(static_cast<SRC>(src), res);
+		src++;
+	}
+	
 }
 
 

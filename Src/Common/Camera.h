@@ -2,6 +2,7 @@
 #include "../Utility/Quaternion.h"
 #include <DxLib.h>
 #include <vector>
+#include <memory>
 
 class Player;
 class StageTutorial;
@@ -18,9 +19,9 @@ public:
 	/// </summary>
 	enum class MODE
 	{
-		NONE,
-		FIXEX_POINT,  // 定点カメラモード
-		FLLOW,        // 追従モード
+		NONE = -1,
+		FIXEX_POINT, // 定点カメラモード
+		FLLOW,       // 追従モード
 	};
 
 	// カメラ移動速度
@@ -51,19 +52,28 @@ public:
 
 
 	/// <summary>
-	/// デフォルトコンストラクタ
+	/// インスタンス生成
 	/// </summary>
-	Camera(void);
+	static void CreateInstance(void);
 
 	/// <summary>
-	/// デフォルトデストラクタ
+	/// インスタンス取得
 	/// </summary>
-	~Camera(void) = default;
+	static Camera& GetInstance(void) { return *instance_; };
+
+
+	/// <summary>
+	/// 初回読み込み処理
+	/// </summary>
+	void Load(void);
 
 	/// <summary>
 	/// 初期化処理
 	/// </summary>
-	void Init(void);
+	/// <para name="mode">カメラ状態</param>
+	/// <param name="pos">位置</param>
+	/// <param name="angleY">角度</param>
+	void Init(MODE mode, const VECTOR& pos = {}, float angleY = 0.0f);
 
 	/// <summary>
 	/// 更新処理
@@ -84,6 +94,11 @@ public:
 	/// メモリ解放処理
 	/// </summary>
 	void Release(void);
+
+	/// <summary>
+	/// インスタンス削除
+	/// </summary>
+	void Destroy(void);
 
 
 	/// <summary>
@@ -119,6 +134,13 @@ public:
 					  float freeTime = 0.0f, const VECTOR& targetPos = {});
 
 	/// <summary>
+	/// カメラモード変更
+	/// </summary>
+	/// <param name="mode"></param>
+	/// <param name="pos"></param>
+	void SetCameraMode(MODE mode, const VECTOR& pos = {});
+
+	/// <summary>
 	/// 追従対象の設定
 	/// </summary>
 	/// <param name="target">追尾対象の座標</param>
@@ -126,11 +148,6 @@ public:
 	
 	//対象同士の中間座標
 	void SetCameraTarget(void);
-	
-	/// <summary>
-	///対象同士の中間座標リストに割り当て
-	/// </summary>
-	void SetCameraTargetList(VECTOR* pos);
 
 	/// <summary>
 	/// カメラ移動制限割り当て
@@ -142,11 +159,14 @@ public:
 
 private:
 
+	static Camera* instance_;
+
 	// カメラ状態
 	MODE mode_;
 
 
 	std::vector<VECTOR*> targetsPos_;
+	//std::shared_ptr<VECTOR> target_;
 
 	VECTOR pos_;	// カメラ位置
 	float zoomPos_; // ズーム位置
@@ -163,6 +183,17 @@ private:
 	VECTOR posLimitMax_;
 
 	VECTOR* trackingTarget_;
+
+
+	// デフォルトコンストラクタ
+	Camera(void);
+
+	// デフォルトデストラクタ
+	~Camera(void) = default;
+
+	// デフォルトコピーコンストラクタ
+	Camera(const Camera& other) = default;
+
 
 	/// <summary>
 	/// ズーム倍率割り当て

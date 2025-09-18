@@ -4,13 +4,16 @@
 #include <cassert>
 #include <memory>
 
+#include "./Common/Camera.h"
 #include "./Common/GameExit.h"
 #include "./Common/FrameRate.h"
 #include "./Common/Font.h"
 #include "./Object/Status/StatusData.h"
 #include "./Manager/InputManager.h"
 #include "./Manager/SceneManager.h"
+#include "./Manager/EffectManager.h"
 #include "./Manager/ResourceManager.h"
+#include "./Manager/Resource.h"
 #include "./Manager/SoundManager.h"
 
 
@@ -18,7 +21,7 @@
 Application* Application::instance_ = nullptr;
 
 
-void Application::CreateManager(void)
+void Application::CreateInstance(void)
 {
 	/* インスタンス生成処理 */
 
@@ -89,6 +92,9 @@ void Application::CreateManagers(void)
 	// 入力マネージャ
 	InputManager::CreateInstance();
 
+	// カメラ
+	Camera::CreateInstance();
+
 	// ステータスデータ
 	StatusData::CreateInstance();
 
@@ -101,8 +107,12 @@ void Application::CreateManagers(void)
 	// 音声マネージャー生成
 	SoundManager::CreateInstance();
 
+	// エフェクトマネージャー生成
+	EffectManager::CreateInstance();
+
 	// シーンマネージャー生成
 	SceneManager::CreateInstance();
+
 
 	//フォントマネージャー生成
 	Font::CreateInstance();
@@ -122,6 +132,8 @@ void Application::Run(void)
 	// 入力マネージャ
 	InputManager& input = InputManager::GetInstance();
 
+	// カメラ
+	Camera& camera = Camera::GetInstance();
 
 	while (ProcessMessage() == 0 && isGame_)
 	{
@@ -136,6 +148,9 @@ void Application::Run(void)
 
 			// 入力マネージャ更新
 			input.Update();
+
+			// カメラ更新
+			camera.Update();
 
 			if (!exit_->GetIsActiveMenu())
 			{
@@ -183,11 +198,18 @@ void Application::Destroy(void)
 	// シーンマネージャ
 	SceneManager::GetInstance().Destroy();
 
+	// エフェクトマネージャー
+	EffectManager::GetInstance().Destroy();
+
 	// フレームレートマネージャ
 	FrameRate::GetInstance().Destroy();
 
+	// カメラ
+	Camera::GetInstance().Destroy();
+
 	// 入力マネージャ
 	InputManager::GetInstance().Destroy();
+
 
 	// 音声マネージャ
 	SoundManager::GetInstance().Destroy();
@@ -196,7 +218,7 @@ void Application::Destroy(void)
 	ResourceManager::GetInstance().Destroy();
 
 	// ステータスデータ
-	StatusData::GetInstance()->Destroy();
+	StatusData::GetInstance().Destroy();
 
 
 	Effkseer_End();

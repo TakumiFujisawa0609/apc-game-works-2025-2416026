@@ -21,7 +21,7 @@ void SceneManager::CreateInstance(void)
 	if (instance_ == nullptr) instance_ = new SceneManager();
 
 	// 初期化処理
-	instance_->Init();
+	instance_->Load();
 }
 
 SceneManager::SceneManager(void)
@@ -33,11 +33,11 @@ SceneManager::SceneManager(void)
 
 	isChangeScene_ = false; // 遷移フラグ
 
-	Init(); // 初期化処理
+	Load(); // 初期化処理
 }
 
 
-void SceneManager::Init(void)
+void SceneManager::Load(void)
 {
 	/*　初期化処理　*/
 
@@ -55,6 +55,7 @@ void SceneManager::Init(void)
 	// 現在時間取得
 	preTime_ = std::chrono::system_clock::now();
 
+
 	// ヒットストップ初期化
 	InitPerform();
 
@@ -67,7 +68,7 @@ void SceneManager::Init3D(void)
 	/*　3D初期化処理　*/
 
 	// 背景色割り当て
-	SetBackgroundColor(0, 0, 0);
+	SetBackgroundColor(255, 255, 255);
 
 	// Zバッファを有効にする
 	SetUseZBuffer3D(true);

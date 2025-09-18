@@ -16,16 +16,22 @@ public:
 	/// </summary>
 	enum SRC
 	{
-		NONE = -1,
+		/*　3Dモデルリソース　*/
+		// プレイヤー
+		MODEL_PLAYER = 0,
+		// 敵
+		MODEL_SKELETON_WARRIOR = 1,
+		MODEL_SKELETON_MAGE,
+
+		// 武器
+		MODEL_WEAPON,
 
 		/*　エフェクトリソース　*/
 
 		/*　画像リソース　*/
 		IMAGE_PAD,
 
-		/*　3Dモデルリソース　*/
-		TEMP_MODEL,
-		MODEL_BEAR,
+		
 	};
 
 
@@ -62,13 +68,12 @@ public:
 	/// <summary>
 	/// インスタンス取得処理
 	/// </summary>
-	/// <returns>リソースマネージャ</returns>
 	static ResourceManager& GetInstance(void);
 
 	/// <summary>
 	/// 初期化処理
 	/// </summary>
-	void Init(void);
+	void Load(void);
 
 	/// <summary>
 	/// 解放処理

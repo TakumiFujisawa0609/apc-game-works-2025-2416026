@@ -56,9 +56,9 @@ public:
 	}
 
 
-	std::string GetName(void) { return name_; }
+	std::string& GetName(void) { return name_; }
 
-	std::string GetHandlePath(void) { return handlePath_; }
+	std::string& GetHandlePath(void) { return handlePath_; }
 
 	int GetMaxHp(void) { return hp_; }
 

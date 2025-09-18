@@ -10,7 +10,7 @@
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) 
 {
 	// アプリケーションマネージャ 生成
-	Application::CreateManager();
+	Application::CreateInstance();
 
 	// マネージャ取得
 	Application& app = Application::GetInstance();

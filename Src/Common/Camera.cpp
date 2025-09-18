@@ -5,6 +5,14 @@
 #include <EffekseerForDXLib.h>
 #include <DxLib.h>
 
+Camera* Camera::instance_ = nullptr;
+
+void Camera::CreateInstance(void)
+{
+	if (instance_ == nullptr) instance_ = new Camera();
+	instance_->Load();
+}
+
 Camera::Camera(void)
 {
 	pos_ = {};
@@ -17,17 +25,29 @@ Camera::Camera(void)
 
 	targetsPos_.clear();
 
-	Init();
+	Load();
 }
 
 
-/*　初期化処理　*/
-void Camera::Init(void)
+void Camera::Load(void)
 {
 	rot_ = Quaternion::Identity();
+
+}
+
+void Camera::Init(MODE mode, const VECTOR& pos, float angleY)
+{
+	mode_ = mode;
+
+	pos_ = pos;
+
+	rot_ = Quaternion::Euler(0.0f, AsoUtility::Deg2Rad(angleY), 0.0f);
+
 	#ifdef _DEBUG
 	rot_.Euler(0.0f, 45.0f, 0.0f);
-#endif
+	#endif
+
+	ResetTrackingTarget();
 }
 
 void Camera::Update(void)
@@ -156,6 +176,12 @@ void Camera::Release(void)
 	}
 }
 
+void Camera::Destroy(void)
+{
+	Release();
+
+	delete instance_;
+}
 
 VECTOR Camera::GetPos(void) const
 {
@@ -189,19 +215,39 @@ void Camera::SetCameraPos(const VECTOR& pos, const VECTOR& angle,
 	}
 }
 
-void Camera::SetTrackingTarget(VECTOR* target)
+void Camera::SetCameraMode(MODE mode, const VECTOR& pos)
 {
-	trackingTarget_ = target;
-
-	// 追尾状態にする
-	mode_ = MODE::FLLOW;
+	// モード割り当て
+	mode_ = mode;
+	pos_ = ((!AsoUtility::EqualsVZero(pos)) ? pos : pos_);
 }
 
-void Camera::SetCameraTargetList(VECTOR* pos)
+void Camera::SetTrackingTarget(VECTOR* target)
 {
-	// リストに格納
-	targetsPos_.emplace_back(pos);
+	int check = 0;
 
+	// リストに格納
+	targetsPos_.emplace_back(target);
+
+	for (auto& targetPos : targetsPos_)
+	{
+		VECTOR pos = *targetPos;
+
+		if (check > 0)
+		{
+			// １つの対象を割り当て
+			targetPos_ = pos;
+		}
+		else
+		{
+			// 中央座標を割り当て
+			// targetPos_ = 中央座標
+
+			//MATRIX mat = AsoUtility::GetMatrixRotateXYZ(rot_.);
+		}
+
+		check++;
+	}
 	// 追尾状態にする
 	mode_ = MODE::FLLOW;
 }
@@ -209,7 +255,7 @@ void Camera::SetCameraTargetList(VECTOR* pos)
 void Camera::ResetTrackingTarget(void)
 {
 	// 追尾位置を初期化
-	trackingTarget_ = {};
+	trackingTarget_ = nullptr;
 
 	// 追尾位置リストを初期化
 	targetsPos_.clear();
@@ -236,7 +282,7 @@ void Camera::SetPosLimit(VECTOR min, VECTOR max)
 void Camera::SetCameraTarget(void)
 {
 	// リストが無いとき、処理終了
-	if (targetsPos_.empty())
+	if (!targetsPos_.empty())
 	{
 #ifdef _DEBUG
 		OutputDebugString("\nカメラの追尾対象がありません\ns");
@@ -245,26 +291,26 @@ void Camera::SetCameraTarget(void)
 	}
 
 
-	//for (const VECTOR* vec : targetsPos_)
-	//{
-	//	if (AsoUtility::EqualsVZero(*vec))
-	//	{
-	//		targetPos_ = VAdd(targetPos_, *vec);
-	//	}
-	//	else
-	//	{
-	//		VECTOR diff = {};
+	for (const VECTOR* vec : targetsPos_)
+	{
+		if (AsoUtility::EqualsVZero(*vec))
+		{
+			targetPos_ = VAdd(targetPos_, *vec);
+		}
+		else
+		{
+			VECTOR diff = {};
 
-	//		// ２つの座標間のベクトル割り当て
-	//		diff = VSub(targetPos_, *vec);
+			// ２つの座標間のベクトル割り当て
+			diff = VSub(targetPos_, *vec);
 
-	//		// ２つの座標間のベクトルの半分
-	//		VECTOR harfDiff = VScale(diff, 0.5f);
+			// ２つの座標間のベクトルの半分
+			VECTOR harfDiff = VScale(diff, 0.5f);
 
-	//		// ２つの座標間の中心座標
-	//		targetPos_ = VAdd(*vec, harfDiff);
-	//	}
-	//}
+			// ２つの座標間の中心座標
+			targetPos_ = VAdd(*vec, harfDiff);
+		}
+	}
 
 	 // 追尾対象が2つ以上ある場合、中間点を計算
 	if (targetsPos_.size() >= 2) {

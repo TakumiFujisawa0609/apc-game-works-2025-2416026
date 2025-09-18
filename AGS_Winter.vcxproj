@@ -140,10 +140,17 @@
   <ItemGroup>
     <ClInclude Include="Src\Application.h" />
     <ClInclude Include="Src\Common\Camera.h" />
+    <ClInclude Include="Src\Common\ConfigController.h" />
     <ClInclude Include="Src\Common\Fader.h" />
     <ClInclude Include="Src\Common\Font.h" />
     <ClInclude Include="Src\Common\FrameRate.h" />
     <ClInclude Include="Src\Common\GameExit.h" />
+    <ClInclude Include="Src\Manager\CollisionManager.h" />
+    <ClInclude Include="Src\Manager\EffectManager.h" />
+    <ClInclude Include="Src\Object\AnimationController.h" />
+    <ClInclude Include="Src\Object\Enemy\Enemy.h" />
+    <ClInclude Include="Src\Object\Object.h" />
+    <ClInclude Include="Src\Object\Player.h" />
     <ClInclude Include="Src\Object\Status\StatusData.h" />
     <ClInclude Include="Src\main.h" />
     <ClInclude Include="Src\Manager\InputManager.h" />
@@ -152,7 +159,6 @@
     <ClInclude Include="Src\Manager\SceneManager.h" />
     <ClInclude Include="Src\Manager\Sound.h" />
     <ClInclude Include="Src\Manager\SoundManager.h" />
-    <ClInclude Include="Src\Object\CharaBase.h" />
     <ClInclude Include="Src\Object\Status\StatusEnemy.h" />
     <ClInclude Include="Src\Object\Status\StatusPlayer.h" />
     <ClInclude Include="Src\Object\Status\StatusWeapon.h" />
@@ -167,10 +173,17 @@
   <ItemGroup>
     <ClCompile Include="Src\Application.cpp" />
     <ClCompile Include="Src\Common\Camera.cpp" />
+    <ClCompile Include="Src\Common\ConfigController.cpp" />
     <ClCompile Include="Src\Common\Fader.cpp" />
     <ClCompile Include="Src\Common\Font.cpp" />
     <ClCompile Include="Src\Common\FrameRate.cpp" />
     <ClCompile Include="Src\Common\GameExit.cpp" />
+    <ClCompile Include="Src\Manager\CollisionManager.cpp" />
+    <ClCompile Include="Src\Manager\EffectManager.cpp" />
+    <ClCompile Include="Src\Object\AnimationController.cpp" />
+    <ClCompile Include="Src\Object\Enemy\Enemy.cpp" />
+    <ClCompile Include="Src\Object\Object.cpp" />
+    <ClCompile Include="Src\Object\Player.cpp" />
     <ClCompile Include="Src\Object\Status\StatusData.cpp" />
     <ClCompile Include="Src\main.cpp" />
     <ClCompile Include="Src\Manager\InputManager.cpp" />
@@ -179,7 +192,6 @@
     <ClCompile Include="Src\Manager\SceneManager.cpp" />
     <ClCompile Include="Src\Manager\Sound.cpp" />
     <ClCompile Include="Src\Manager\SoundManager.cpp" />
-    <ClCompile Include="Src\Object\CharaBase.cpp" />
     <ClCompile Include="Src\Object\Status\StatusEnemy.cpp" />
     <ClCompile Include="Src\Object\Status\StatusPlayer.cpp" />
     <ClCompile Include="Src\Object\Status\StatusWeapon.cpp" />

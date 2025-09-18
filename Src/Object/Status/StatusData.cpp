@@ -4,12 +4,12 @@
 #include <sstream>
 #include <array>
 #include <string>
+#include <memory>
 #include <cassert>
 
 #include "./StatusPlayer.h"
 #include "./StatusEnemy.h"
 #include "./StatusWeapon.h"
-
 
 StatusData* StatusData::instance_ = nullptr;
 
@@ -23,15 +23,14 @@ void StatusData::CreateInstance(void)
 	instance_->Load();
 }
 
-StatusData* StatusData::GetInstance(void)
+StatusData& StatusData::GetInstance(void)
 {
 	if (instance_ == nullptr)
 	{
-		instance_ = new StatusData;
+		CreateInstance();
 	}
-	return instance_;
+	return *instance_;
 }
-
 
 void StatusData::Destroy(void)
 {
@@ -196,7 +195,7 @@ void StatusData::LoadWeapon(void)
 
 	// 行
 	std::string line;
-	std::string path = (PATH_CSV_FILE + PATH_ENEMY);
+	std::string path = (PATH_CSV_FILE + PATH_WEAPON);
 
 	// セーブファイルパス
 	std::ifstream file = std::ifstream(path);
@@ -302,4 +301,20 @@ void StatusData::SaveCSV(void)
 	OutputDebugString("\n正常に保存完了しました\n");
 #endif
 	*/
+}
+
+
+std::string& StatusData::GetHandlePathPlayer(void)
+{
+	return player_->GetHandlePath();
+}
+
+std::string& StatusData::GetHandlePathEnemy(int type)
+{
+	return enemy_[type]->GetHandlePath();
+}
+
+std::string& StatusData::GetHandlePathWeapon(int type)
+{
+	return weapon_[type]->GetHandlePath();
 }

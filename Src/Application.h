@@ -36,7 +36,7 @@ public:
 	/// <summary>
 	/// 明示的にインスタンス生成処理
 	/// </summary>
-	static void CreateManager(void);
+	static void CreateInstance(void);
 
 	/// <summary>
 	/// 静的インスタンス取得処理
@@ -86,19 +86,13 @@ private:
 	bool isActiveExitMenu_;
 
 
-	/// <summary>
-	/// デフォルトコンストラクタ
-	/// </summary>
+	// デフォルトコンストラクタ
 	Application(void);
 
-	/// <summary>
-	/// デフォルトのデストラクタ
-	/// </summary>
+	// デフォルトデストラクタ
 	~Application(void) = default;
 
-	/// <summary>
-	/// デフォルトのコピーコンストラクタ
-	/// </summary>
+	// デフォルトコピーコンストラクタ
 	Application(const Application&) = default;
 
 

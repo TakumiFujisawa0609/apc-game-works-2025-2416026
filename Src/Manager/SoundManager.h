@@ -11,58 +11,22 @@ public:
 	enum class SRC
 	{
 		BGM_TITLE,
-		BGM_TUTORIAL,
+		BGM_GAME,
 
 		SE_CLICK,  // クリック
 		SE_ATTACK, // 攻撃
-		SE_THROW,  // 投げる
-		SE_CATCH,  // つかむ
 		SE_KNOCK,  // 撃破
-		SE_RESET,  // 位置リセット
 	};
-
-	// タイトルBGM
-	static const std::string PATH_BGM_TITLE;
-
-	// チュートリアルBGM
-	static const std::string PATH_BGM_TUTORIAL;
-
-	// ゲームシーンBGM
-	static const std::string PATH_BGM_GAME;
-
-
-	// クリックSE
-	static const std::string PATH_SE_CLICK;
-
-	// 攻撃SE
-	static const std::string PATH_SE_ATTACK;
-
-	// 撃破SE
-	static const std::string PATH_SE_KNOCK;
-
-	// つかむSE
-	static const std::string PATH_SE_CATCH;
-
-	// 投げるSE
-	static const std::string PATH_SE_THROW;
-
-	// 撃破SE
-	static const std::string PATH_SE_KNOCKDOWN;
-
-	// リセットSE
-	static const std::string PATH_SE_RESET;
-
 
 
 	// マスターボリューム
 	static constexpr float VOLUME_MASTER_MAX = 255;
 
+	static constexpr float VOLUME_MASTER_NUM = (VOLUME_MASTER_MAX / 100);
+
 
 	// タイトルBGM音量
 	static constexpr float VOLUME_TITLE = 1.0f;
-
-	// チュートリアルBGM音量
-	static constexpr float VOLUME_TUTORIAL = 0.5f;
 
 	// ゲームシーンBGM音量
 	static constexpr float VOLUME_GAME = 0.5f;
@@ -74,17 +38,8 @@ public:
 	// 攻撃SEの音量
 	static constexpr float VOLUME_ATTACK = 0.9f;
 
-	// つかむSEの音量
-	static constexpr float VOLUME_CATCH = 0.9f;
-
-	// なげるSEの音量
-	static constexpr float VOLUME_THROW = 1.0f;
-
 	// 撃破SEの音量
 	static constexpr float VOLUME_KNOCK = 1.5f;
-
-	// 場外からもとに戻るSEの音量
-	static constexpr float VOLUME_RESET = 0.5f;
 
 
 
@@ -96,15 +51,13 @@ public:
 	/// <summary>
 	/// インスタンス取得処理
 	/// </summary>
-	/// <param name=""></param>
-	/// <returns></returns>
-	static SoundManager& GetInstance(void);
+	static SoundManager& GetInstance(void) { return *instance_; };
 
 
 	/// <summary>
 	/// 初期化処理
 	/// </summary>
-	void Init(void);
+	void Load(void);
 
 	/// <summary>
 	/// メモリ解放処理
@@ -173,17 +126,36 @@ public:
 	/// <summary>
 	/// 主音量割り当て
 	/// </summary>
-	void SetVolumeMaster(int master = 255);
+	void SetVolumeMaster(float master = 255.0f);
 
 	/// <summary>
 	/// 主音量取得
 	/// </summary>
-	int GetVolumeMaster(void);
-
+	float GetVolumeMaster(void) { return volumeMaster_; };
 
 
 
 private:
+
+	// タイトルBGM
+	static const std::string PATH_BGM_TITLE;
+
+	// ゲームシーンBGM
+	static const std::string PATH_BGM_GAME;
+
+
+	// クリックSE
+	static const std::string PATH_SE_CLICK;
+
+	// 攻撃SE
+	static const std::string PATH_SE_ATTACK;
+
+	// 撃破SE
+	static const std::string PATH_SE_KNOCK;
+
+	// 撃破SE
+	static const std::string PATH_SE_KNOCKDOWN;
+
 
 	// 静的インスタンス
 	static SoundManager* instance_;
@@ -209,14 +181,17 @@ private:
 	/// </summary>
 	SoundManager(const SoundManager& other) = default;
 
+	/// <summary>
+	/// 各音声割り当て処理
+	/// </summary>
+	void SetSounds(void);
 
 	/// <summary>
-	/// SE音声再生処理
+	/// 音声割り当て処理
 	/// </summary>
-	void SetSE(void);
-
-	/// <summary>
-	/// BGM音声再生処理
-	/// </summary>
-	void SetBGM(void);
+	/// <param name="src">種類</param>
+	/// <param name="path">パス</param>
+	/// <param name="type">再生タイプ</param>
+	/// <param name="maxVolume">最大音量</param>
+	void SetSound(SRC src, const std::string& path, Sound::TYPE type, float maxVolume);
 };

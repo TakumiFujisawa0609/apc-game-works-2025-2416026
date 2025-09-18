@@ -9,6 +9,14 @@ class StatusWeapon;
 
 class StatusData
 {
+private:
+
+	// 敵パラメータマップ
+	using EnemyMap = std::map<int, std::unique_ptr<StatusEnemy>>;
+
+	// 武器パラメータマップ
+	using WeaponMap = std::map<int, std::unique_ptr<StatusWeapon>>;
+
 public:
 
 	// ステータスの種類
@@ -21,28 +29,12 @@ public:
 		MAX,
 	};
 
-	// プレイヤー保存データ
-	enum class DATA_PLAYER
-	{
-		POWER, // 攻撃力
-		LUCK,  // 幸運
-		SPEED, // 移動速度
-		WEAPON_NUM,      // 武器番号
-		TIME_INVINCIBLE, // 無敵時間
-		TIME_PARRY,		 // パリィ時間
-		TIME_EVASION,    // 回避時間
-		ATTACK_RAMGE,    // 攻撃範囲
-
-		MAX,
-	};
-
-
 	// CSVファイルパス
 	const std::string PATH_CSV_FILE = "Data/CSV/";
 
 	// セーブデータのハンドル
 	const char* PATH_PLAYER = "PlayerData.csv";
-	const char* PATH_ENEMY  = "EnemyData.csv";
+	const char* PATH_ENEMY = "EnemyData.csv";
 	const char* PATH_WEAPON = "WeaponData.csv";
 
 
@@ -54,7 +46,7 @@ public:
 	/// <summary>
 	/// インスタンス取得処理
 	/// </summary>
-	static StatusData* GetInstance(void);
+	static StatusData& GetInstance(void);
 
 	/// <summary>
 	/// インスタンス削除処理
@@ -77,6 +69,36 @@ public:
 	/// <returns>正常動作できたか否か</returns>
 	void SaveCSV(void);
 
+	
+	/// <summary>
+	/// プレイヤーステータス参照
+	/// </summary>
+	StatusPlayer& GetPlayerStatus(void)const { return *player_; };
+
+	/// <summary>
+	/// 敵ステータス参照
+	/// </summary>
+	StatusEnemy& GetEnemyStatus(int target)const { return *enemy_.at(target).get(); };
+
+	/// <summary>
+	/// 敵ステータスマップ参照
+	/// </summary>
+	const EnemyMap& GetEnemyStatusMap(void)const { return enemy_; };
+
+	/// <summary>
+	/// 武器ステータス参照
+	/// </summary>
+	const StatusWeapon& GetWeaponStatus(int target)const { return *weapon_.at(target).get(); };
+
+	/// <summary>
+	/// ブキステータスマップ参照
+	/// </summary>
+	const WeaponMap& GetWeaponStatus(void)const { return weapon_; };
+
+	
+	std::string& GetHandlePathPlayer(void);
+	std::string& GetHandlePathEnemy(int type);
+	std::string& GetHandlePathWeapon(int type);
 
 private:
 
@@ -85,9 +107,10 @@ private:
 
 	// プレイヤーパラメータ
 	std::unique_ptr<StatusPlayer> player_;
-
+	
 	// 敵パラメータ
-	std::map<int, std::unique_ptr<StatusEnemy>> enemy_;
+	
+	EnemyMap enemy_;
 
 	// 武器パラメータ
 	std::map<int, std::unique_ptr<StatusWeapon>> weapon_;

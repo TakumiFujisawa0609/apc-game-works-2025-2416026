@@ -61,7 +61,7 @@ public:
 	/// <summary>
 	/// ‰Šú‰»ˆ—
 	/// </summary>
-	void Init(void);
+	void Load(void);
 
 	/// <summary>
 	/// XVˆ—

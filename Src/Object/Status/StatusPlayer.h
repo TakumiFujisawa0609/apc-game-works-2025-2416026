@@ -12,6 +12,7 @@ public:
 	{
 		START_NAME,  // 初期の名前
 		HANDLE_PATH, // モデルのハンドルパス
+		HP,    // HP
 		POWER, // 攻撃力
 		LUCK,  // 幸運
 		SPEED, // 移動速度
@@ -19,6 +20,7 @@ public:
 		TIME_INVINCIBLE, // 無敵時間
 		TIME_PARRY,		 // パリィ時間
 		TIME_EVASION,    // 回避時間
+		COMBO_MAG, 	     // コンボ倍率
 
 		MAX,
 	};
@@ -33,6 +35,7 @@ public:
 		startName_  = _loadString[static_cast<int>(PARAM::START_NAME)];
 		handlePath_ = _loadString[static_cast<int>(PARAM::HANDLE_PATH)];
 
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::HP)], hp_, 0);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::POWER)], power_, 0);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::LUCK)], luck_, 0);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::SPEED)], speed_, 0.0f);
@@ -40,12 +43,15 @@ public:
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::TIME_INVINCIBLE)], timeInv_, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::TIME_PARRY)], timeParry_, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::TIME_EVASION)], timeEvasion_, 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::COMBO_MAG)], comboMag_, 0.0f);
 	}
 
 
 	std::string& GetStartName(void) { return startName_; }
 
 	std::string& GetHandlePath(void) { return handlePath_; }
+
+	int GetHp(void) { return hp_; }
 
 	int GetPower(void) { return power_; }
 
@@ -70,12 +76,19 @@ public:
 	/// </summary>
 	float GetTimeEvasion(void) { return timeEvasion_; }
 
+	/// <summary>
+	/// コンボ倍率
+	/// </summary>
+	float GetComboMag(void) { return comboMag_; }
+	
 
 private:
 
 	std::string startName_;
 
 	std::string handlePath_;
+
+	int hp_;
 
 	int power_;
 
@@ -91,4 +104,7 @@ private:
 
 	// 回避時間
 	float timeInv_;
+
+	// コンボ倍率
+	float comboMag_;
 };
