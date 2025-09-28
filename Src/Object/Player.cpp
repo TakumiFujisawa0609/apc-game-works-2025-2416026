@@ -47,8 +47,7 @@ void Player::Init(const VECTOR& pos, float angleY)
 	float rotY = AsoUtility::Deg2Rad(angleY);
 	paramChara_.quaRot = Quaternion::Euler({ 0.0f, angleY, 0.0f });
 
-	paramChara_.pos = paramChara_.posStart;
-	paramChara_.prePos = pos;
+	paramChara_.pos = paramChara_.prePos = pos;
 
 	paramChara_.posChatch = AsoUtility::VECTOR_ZERO;
 	paramChara_.posChatch.y += CATCH_OFFSET;
@@ -84,22 +83,20 @@ void Player::SetParam(void)
 	// 角度初期化
 	paramChara_.quaRot = Quaternion::Identity();
 	paramChara_.quaRotLocal = Quaternion::Identity(); // ローカル回転初期化
-	paramChara_.quaRotLocal = Quaternion::Mult(
-		paramChara_.quaRotLocal,
-		Quaternion::AngleAxis(AsoUtility::Deg2Rad(0.0f), AsoUtility::AXIS_Y));
+	paramChara_.quaRotLocal = Quaternion::Mult(paramChara_.quaRotLocal,
+											   Quaternion::AngleAxis(START_MODEL_ANGLE_Y, AsoUtility::AXIS_Y));
 
 	VECTOR rotLocal = VAdd(AsoUtility::AXIS_X, AsoUtility::AXIS_Z);
 
-	paramChara_.quaRotLocal = Quaternion::Mult(
-		paramChara_.quaRotLocal,
-		Quaternion::AngleAxis(0.0f, rotLocal));
+	paramChara_.quaRotLocal = Quaternion::Mult(paramChara_.quaRotLocal,
+											   Quaternion::AngleAxis(0.0f, rotLocal));
 
 	// 着地判定
 	paramChara_.isGround = false;
 
 	paramChara_.scale = { MODEL_SIZE, MODEL_SIZE, MODEL_SIZE };
 
-	paramChara_.hp = status_.GetHp();
+	paramChara_.hp    = status_.GetHp();
 	paramChara_.power = status_.GetPower();
 	paramChara_.speed = status_.GetSpeed();
 
@@ -153,6 +150,11 @@ void Player::Update(void)
 	// 現在位置割り当て
 	paramChara_.prePos = paramChara_.pos;
 
+	float move = 1.0f;
+	if (input.KeyIsNew(KEY_INPUT_W)) { paramChara_.pos.z += move; }
+	if (input.KeyIsNew(KEY_INPUT_S)) { paramChara_.pos.z -= move; }
+	if (input.KeyIsNew(KEY_INPUT_A)) { paramChara_.pos.x -= move; }
+	if (input.KeyIsNew(KEY_INPUT_D)) { paramChara_.pos.x += move; }
 
 	switch (paramPlayer_.actionState)
 	{
@@ -225,15 +227,15 @@ void Player::Draw(void)
 void Player::DrawDebug(void)
 {
 #ifdef _DEBUG
-	/*
+	
 	// パラメータ描画
-	DrawFormatString(0, textY, 0xFFFFFF,"player：p(%.1f, %.1f, %.1f), ac(%.1f°,%.1f°,%.1f°),ground(%d), type(%d)"
+	DrawFormatString(0, 120, 0xFFFFFF,"player：p(%.1f, %.1f, %.1f), ac(%.1f°,%.1f°,%.1f°),ground(%d), type(%d)"
 					 ,paramChara_.pos.x, paramChara_.pos.y, paramChara_.pos.z
 					 ,paramChara_.velocity.x, paramChara_.velocity.y, paramChara_.velocity.z
-					 ,paramChara_.isGround, paramChara_.actionState);
+					 ,paramChara_.isGround, paramPlayer_.actionState);
 
 	// 向き描画
-	AsoUtility::DrawLineXYZ(paramChara_.pos, paramChara_.quaRot);*/
+	AsoUtility::DrawLineXYZ(paramChara_.pos, paramChara_.quaRot);
 #endif
 }
 
@@ -426,12 +428,12 @@ void Player::Move(void)
 			if (pad.AlgKeyY[left] < 0)
 			{
 				// 奥移動処理
-				paramChara_.velocity.z += _Move(&paramChara_.velocity.z, WEIGHT_SPEED_ACC);
+				paramChara_.velocity.z += _Move(&paramChara_.velocity.z, paramChara_.speed);
 			}
 			else
 			{
 				// 前移動処理
-				paramChara_.velocity.z += _Move(&paramChara_.velocity.z, -WEIGHT_SPEED_ACC);
+				paramChara_.velocity.z += _Move(&paramChara_.velocity.z, -paramChara_.speed);
 			}
 		}
 		else
@@ -445,12 +447,12 @@ void Player::Move(void)
 			if (pad.AlgKeyX[left] > 0)
 			{
 				// 右移動処理
-				paramChara_.velocity.x += _Move(&paramChara_.velocity.x, WEIGHT_SPEED_ACC);
+				paramChara_.velocity.x += _Move(&paramChara_.velocity.x, paramChara_.speed);
 			}
 			else
 			{
 				// 左移動処理
-				paramChara_.velocity.x += _Move(&paramChara_.velocity.x, -WEIGHT_SPEED_ACC);
+				paramChara_.velocity.x += _Move(&paramChara_.velocity.x, -paramChara_.speed);
 			}
 		}
 		else
@@ -477,13 +479,13 @@ void Player::Move(void)
 			if (input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_BACK]))
 			{
 				// 奥移動処理
-				paramChara_.velocity.z += _Move(&paramChara_.velocity.z, WEIGHT_SPEED_ACC);
+				paramChara_.velocity.z += _Move(&paramChara_.velocity.z, paramChara_.speed);
 			}
 
 			if (input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_FRONT]))
 			{
 				// 前移動処理
-				paramChara_.velocity.z += _Move(&paramChara_.velocity.z, -WEIGHT_SPEED_ACC);
+				paramChara_.velocity.z += _Move(&paramChara_.velocity.z, -paramChara_.speed);
 			}
 		}
 		else
@@ -496,13 +498,13 @@ void Player::Move(void)
 			if (input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_LEFT]))
 			{
 				// 左移動処理
-				paramChara_.velocity.x += _Move(&paramChara_.velocity.x, -WEIGHT_SPEED_ACC);
+				paramChara_.velocity.x += _Move(&paramChara_.velocity.x, -paramChara_.speed);
 			}
 
 			if (input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_RIGHT]))
 			{
 				// 右移動処理
-				paramChara_.velocity.x += _Move(&paramChara_.velocity.x, WEIGHT_SPEED_ACC);
+				paramChara_.velocity.x += _Move(&paramChara_.velocity.x, paramChara_.speed);
 			}
 		}
 		else
@@ -522,9 +524,9 @@ void Player::Move(void)
 		float length = sqrtf(len);
 
 		// 移動速度を超えたらスカラー倍する
-		if (length > SPEED_START)
+		if (length > paramChara_.speed)
 		{
-			float scale = (SPEED_START / length);
+			float scale = (paramChara_.speed / length);
 
 
 			paramChara_.velocity.x *= scale;

@@ -26,7 +26,7 @@ public:
 
 
 	// プレイヤー開始位置
-	static constexpr VECTOR POS_START_PLAYER = { -250.0f, 300.0f, 500.0f };
+	static constexpr VECTOR POS_START_PLAYER = { 0.0f, 0.0f, 0.0f };
 
 	// プレイヤー開始時の向き
 	static constexpr float ANGLE_START_PLAYER = 90.0f;

@@ -149,9 +149,6 @@ void Application::Run(void)
 			// 入力マネージャ更新
 			input.Update();
 
-			// カメラ更新
-			camera.Update();
-
 			if (!exit_->GetIsActiveMenu())
 			{
 				// シーン更新
@@ -174,6 +171,8 @@ void Application::Draw(void)
 	/* 描画処理 */
 	SetDrawScreen(DX_SCREEN_BACK);
 	ClearDrawScreen(); // 描画した画像を解放
+
+	Camera::GetInstance().SetBeforeDraw(); // カメラセット
 
 	// シーン描画
 	SceneManager::GetInstance().Draw();

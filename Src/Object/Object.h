@@ -86,7 +86,6 @@ protected:
 	{
 		VECTOR pos;		  // 位置
 		VECTOR prePos;	  // 前フレームの位置
-		VECTOR posStart;  // 開始位置
 		VECTOR posChatch; // つかみ位置
 
 
@@ -138,12 +137,6 @@ protected:
 	// 重力加算の重量変化する倍率
 	static constexpr float WEIGHT_POW_GRAVITY = -1.0f;
 
-	// 移動量上昇値
-	static constexpr float WEIGHT_SPEED_ACC = 0.5f;
-
-	// 移動量減少値
-	static constexpr float WEIGHT_SPEED_DEC = -1.0f;
-
 
 	// 重量の変化する間隔
 	static constexpr float WEIGHT_DELTA = 0.01f;
@@ -157,9 +150,6 @@ protected:
 
 	// 捕まれキャンセル時のジャンプ力
 	static constexpr float JUMP_CAUGHT = 15.0f;
-
-	// 初期移動速度
-	static constexpr float SPEED_START = 9.0f;
 
 	// 加速度上昇値
 	static constexpr float SPEED_ACC_POWER = 6.5f;
@@ -372,7 +362,7 @@ public:
 	/// <summary>
 	/// クォータニオン角の向き取得
 	/// </summary>
-	const Quaternion& GetRotation(void) const { return paramChara_.quaRot; };
+	Quaternion& GetRotation(void) { return paramChara_.quaRot; };
 
 	/// <summary>
 	/// ローカル座標のクォータニオン角の向き取得

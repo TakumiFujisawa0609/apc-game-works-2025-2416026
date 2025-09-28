@@ -165,7 +165,7 @@ bool InputManager::KeyIsNewAll(void) const
 	return isInput;
 }
 
-const InputManager::Key& InputManager::FindKey(unsigned int keyType) const
+const InputManager::Key& InputManager::FindKey(unsigned int keyType)const
 {
 	auto it = keys_.find(keyType);
 	if (it != keys_.end())
@@ -175,7 +175,8 @@ const InputManager::Key& InputManager::FindKey(unsigned int keyType) const
 	}
 
 #ifdef _DEBUG
-	OutputDebugString("\nキーの情報がありません。\nInputManagerで割り当て処理を行ってください\n");
+	OutputDebugString("\nキーの情報がありません。\nInputManager.SetInputKey()にて割り当ててください。\n");
+
 #endif
 
 	// 空のキー情報を返す

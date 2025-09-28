@@ -115,6 +115,7 @@ public:
 	static void DrawLineDir(const VECTOR& pos, const VECTOR& dir, int color, float len = 50.0f);
 	static void DrawLineXYZ(const VECTOR& pos, const Quaternion& rot, float len = 50.0f);
 
+
 	// オイラー角から回転行列XYZ順を取得
 	static MATRIX GetMatrixRotateXYZ(const VECTOR& euler);
 

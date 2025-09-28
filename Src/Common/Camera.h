@@ -22,14 +22,12 @@ public:
 		NONE = -1,
 		FIXEX_POINT, // 定点カメラモード
 		FLLOW,       // 追従モード
+		FOLLOW_AUTO_ZOOM,  // 追従モード[自動調整型]
 	};
-
-	// カメラ移動速度
-	static constexpr float SPEED =100.0f;
 
 	// カメラの初期角度
 	static constexpr VECTOR DEFAULT_ANGLES =
-	{ 30.0f * (DX_PI_F / 180.0f), 0.0f, 0.0f };
+	{ (30.0f * (DX_PI_F / 180.0f)), 0.0f, 0.0f };
 
 	// カメラ最小描画領域
 	static constexpr float CAMERA_NEAR = 20.0f;
@@ -38,18 +36,22 @@ public:
 	static constexpr float CAMERA_FAR = 4000.0f;
 
 
-	// 最大ズームインY
-	static constexpr float ZOOM_IN_MAX_Y = 500.0f;
-	// 最大ズームインZ
-	static constexpr float ZOOM_IN_MAX_Z = 650.0f;
-	// 最大ズームアウトY
-	static constexpr float ZOOM_OUT_MAX_Y = 800.0f;
-	// 最大ズームアウトZ
-	static constexpr float ZOOM_OUT_MAX_Z = 2500.0f;
+	// 最大ズームインローカル座標
+	static constexpr VECTOR ZOOM_IN_MAX = { 0.0f, 100.0f, 650.0f };
+
+	// 最大ズームアウトローカル座標
+	static constexpr VECTOR ZOOM_OUT_MAX = { 0.0f, 500.0f, 1000.0f };
 
 	// ズーム速度
 	static constexpr float ZOOM_SPEED = 2.0f;
 
+	// カメラ移動倍率(0～1.0)
+	static constexpr float CAMERA_FOLLOW_SPEED = 0.0f;
+
+	// 注視点への視点移動速度(0～1.0)
+	static constexpr float CAMERA_LOOK_SPEED = 0.0f;
+
+	static constexpr VECTOR CAMERA_DISTANCE = { 0.0f, 100.0f, 500.0f };
 
 	/// <summary>
 	/// インスタンス生成
@@ -76,14 +78,9 @@ public:
 	void Init(MODE mode, const VECTOR& pos = {}, float angleY = 0.0f);
 
 	/// <summary>
-	/// 更新処理
-	/// </summary>
-	void Update(void);
-
-	/// <summary>
 	/// 描画処理
 	/// </summary>
-	void Draw(void);
+	void SetBeforeDraw(void);
 	
 	/// <summary>
 	/// 描画処理
@@ -101,6 +98,8 @@ public:
 	void Destroy(void);
 
 
+	void UpdatePlayerTransform(VECTOR* pos, Quaternion* rot);
+
 	/// <summary>
 	/// 追従対象の初期化
 	/// </summary>
@@ -110,7 +109,7 @@ public:
 	/// カメラ位置取得
 	/// </summary>
 	/// <returns>現在カメラ位置</returns>
-	VECTOR GetPos(void) const;
+	const VECTOR& GetPos(void) const { return pos_.cameraPos;  };
 
 	/// <summary>
 	/// ズームイン
@@ -156,6 +155,7 @@ public:
 	/// <param name="max"></param>
 	void SetPosLimit(VECTOR min, VECTOR max);
 
+	const VECTOR& GetCameraPos(void) const { return pos_.cameraPos; }
 
 private:
 
@@ -168,21 +168,34 @@ private:
 	std::vector<VECTOR*> targetsPos_;
 	//std::shared_ptr<VECTOR> target_;
 
-	VECTOR pos_;	// カメラ位置
-	float zoomPos_; // ズーム位置
-	VECTOR targetPos_; // カメラ注視点
+	struct Zoom
+	{
+		float maltiple; // ズーム倍率
+		VECTOR pos;
+		VECTOR distance; // 注視点からカメラ位置までの距離
+	};
+	Zoom zoom_;
+
+	struct Pos
+	{
+		VECTOR cameraPos;	// カメラ位置
+
+		VECTOR target; // カメラ注視点
+		VECTOR playerPos; // プレイヤー位置
+
+		VECTOR limitMin;
+		VECTOR limitMax;
+
+		VECTOR moveMaltiple; // 移動倍率
+	};
+	Pos pos_;
+	
 	Quaternion rot_; // 回転度
+	Quaternion* playerRot_; // 回転度
 
 	// 追尾しない時間
 	float freeTime_;
-
-	VECTOR zoomPos;
-	VECTOR zoomPow;
-
-	VECTOR posLimitMin_;
-	VECTOR posLimitMax_;
-
-	VECTOR* trackingTarget_;
+	
 
 
 	// デフォルトコンストラクタ
@@ -205,4 +218,13 @@ private:
 	/// カメラ位置制限
 	/// </summary>
 	void PosLimit(void);
+
+	// カメラ移動処理
+	void DebugMove(void);
+
+	void SetBeforeDraw_FixexPoint(void);
+
+	void SetBeforeDraw_Follow(void);
+
+	void SetBeforeDraw_FollowZoom(void);
 };

@@ -68,7 +68,7 @@ void SceneManager::Init3D(void)
 	/*　3D初期化処理　*/
 
 	// 背景色割り当て
-	SetBackgroundColor(255, 255, 255);
+	SetBackgroundColor(BACK_COLOR.r, BACK_COLOR.g, BACK_COLOR.g);
 
 	// Zバッファを有効にする
 	SetUseZBuffer3D(true);
@@ -202,9 +202,9 @@ void SceneManager::DoChangeState(SCENE_ID nextScene)
 	waitSceneId_ = SCENE_ID::NONE; // 待機シーン状態 無効化
 }
 
-/*　各フェード処理　*/
 void SceneManager::Fade(void)
 {
+	/*　各フェード処理　*/
 	/*
 	Fader::FADE_STATE fState = fader_->GetState();
 
@@ -295,5 +295,5 @@ bool SceneManager::Performance(void)
 		}
 	}
 
-	return isStop;;
+	return isStop;
 }

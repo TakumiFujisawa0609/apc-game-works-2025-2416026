@@ -420,7 +420,7 @@ private:
 	/// </summary>
 	/// <param name="keyType">探索するキーの種類</param>
 	/// <returns>キーの情報(定数)</returns>
-	const InputManager::Key& FindKey(unsigned int keyType) const;
+	const InputManager::Key& FindKey(unsigned int keyType)const;
 
 	/// <summary>
 	/// 判定する入力キーを割り当て

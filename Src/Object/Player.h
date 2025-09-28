@@ -103,9 +103,7 @@ public:
 	static constexpr float CATCH_OFFSET = 75.0f;
 
 
-	// 回転を有効にする加速度の最小値
-	static constexpr float ROTATE_LOOK_VELOCITY_MIN = WEIGHT_SPEED_ACC;
-
+	static constexpr float START_MODEL_ANGLE_Y = (180.0f * (DX_PI_F / 180.0f));
 	// モデルの位置調整値
 	static constexpr VECTOR MODEL_OFFSET = { 0.0f, 0.0f, 0.0f };
 
@@ -186,10 +184,19 @@ public:
 	bool CheckActiveAttack(void) const;
 
 
+	/// <summary>
+	/// 行動状態
+	/// </summary>
 	void SetActionState(ACTION_STATE state);
 
+	/// <summary>
+	/// パリィ増加倍率割り当て
+	/// </summary>
 	void SetParryMag(float mag) { paramPlayer_.parryMag = mag; };
 
+	/// <summary>
+	/// パリィ時間割り当て
+	/// </summary>
 	void SetParryTime(float time) { paramPlayer_.parryTime = time; };
 
 	void SetDodgeMag(float mag) { paramPlayer_.dodgeMag = mag; };

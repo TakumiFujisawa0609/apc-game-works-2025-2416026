@@ -110,6 +110,9 @@ public:
 
 private:
 
+	// ”wŒiF
+	static constexpr COLOR_F BACK_COLOR = { 128,128,128 };
+
 	/// <summary>
 	/// ‰‰o
 	/// </summary>

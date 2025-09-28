@@ -277,7 +277,7 @@ float Object::_Move(const float* acc, float movePow)
 	// 移動量が正の値の時、軽さを含めた値を負にする
 	float speedAcc = ((movePow > 0.0f) ? SPEED_ACC_POWER : -SPEED_ACC_POWER);
 
-	float maxVelo = SPEED_START + SPEED_ACC_POWER;
+	float maxVelo = paramChara_.speed + SPEED_ACC_POWER;
 
 	// 移動量が負の値の時、最大加速度を負の値にする
 	maxVelo = ((movePow >= 0.0f) ? maxVelo : -maxVelo);
@@ -338,11 +338,11 @@ float Object::DecVelocityXZ(const float* acc)
 	if (*acc == 0.0f) return 0.0f;
 
 
-	float speedDec = (MOVE_DEC_POWER - WEIGHT_SPEED_DEC);
+	float speedDec = MOVE_DEC_POWER;
 
 	if (vel < 0.0f)
 	{
-		vel -= speedDec; // 減速処理
+		vel -= MOVE_DEC_POWER; // 減速処理
 
 		// 移動減少値がゼロクロス時
 		if (vel >= 0.0f)
@@ -353,7 +353,7 @@ float Object::DecVelocityXZ(const float* acc)
 	}
 	else
 	{
-		vel += speedDec;  // 減速処理
+		vel += MOVE_DEC_POWER;  // 減速処理
 
 		// 移動減少値がゼロクロス時
 		if (vel <= 0.0f)

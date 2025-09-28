@@ -57,7 +57,7 @@ void GameScene::ReInit(void)
 
 
 	// プレイヤー処理
-	player_->Init({}, 90.0f);
+	player_->Init(POS_START_PLAYER, 90.0f);
 	/*
 	colManager_->Init(gameStage_->GetStageModelHandle(), stage->GetStagePos(), stage->GetStageScale(),
 		gameStage_->GetDamageModelHandle(), stage->GetDamagePos(), stage->GetDamageScale());
@@ -67,7 +67,6 @@ void GameScene::ReInit(void)
 	// カメラ移動領域割り当て
 	Camera& camera = Camera::GetInstance();
 	camera.Init(Camera::MODE::FLLOW, player_->GetPos(), player_->GetRotationLocal().y);
-	//camera.SetPosLimit(stage->GetCameraMoveMin(), stage->GetCameraMoveMax());
 
 	// カメラ追従対象初期化
 	camera.SetTrackingTarget(&player_->GetPos());
@@ -85,6 +84,7 @@ void GameScene::Update(void)
 	// 当たり判定更新
 	colManager_->Update();
 
+
 	if (gameState_ == GAME_STATE::IDLE)
 	{
 		GameIdleProc();
@@ -101,6 +101,11 @@ void GameScene::Update(void)
 			SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::TITLE);
 		}
 	}
+
+	Camera& camera = Camera::GetInstance();
+	// カメラ位置更新
+	camera.UpdatePlayerTransform(&player_->GetPos(), &player_->GetRotation());
+	camera.SetTrackingTarget(&player_->GetPos());
 }
 
 void GameScene::Draw(void)
