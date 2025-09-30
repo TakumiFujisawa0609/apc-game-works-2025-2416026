@@ -107,11 +107,34 @@ public:
 	void SetPerform(PERFORM_TYPE type, float time,
 					int slowTerm = 2, float shakePowerX = 0.0f, float shakePowerY = 0.0f);
 
+	/// <summary>
+	/// グリッド線描画
+	/// </summary>
+	/// <param name=""></param>
+	void DrawGrid(void);
+
 
 private:
 
 	// 背景色
 	static constexpr COLOR_F BACK_COLOR = { 128,128,128 };
+
+
+	// 線の長さ
+	static constexpr float GRID_LEN = 3000.0f;
+
+	// 線の長さの半分
+	static constexpr float GRID_HLEN = (GRID_LEN / 2.0f);
+
+	// 線の間隔
+	static constexpr float GRID_TERM = 100.0f;
+
+	// 線の数
+	static const int GRID_NUM = static_cast<int>(GRID_LEN / GRID_TERM);
+
+	// 線の数の半分
+	static const int GRID_HNUM = GRID_NUM / 2;
+
 
 	/// <summary>
 	/// 演出

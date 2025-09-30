@@ -11,10 +11,10 @@ public:
 	const char* GAME_NAME = "無双クロニクル";
 
 	// 画面横サイズ
-	static constexpr int SCREEN_SIZE_X = (16 * 50);
+	static constexpr int SCREEN_SIZE_X = (16 * 100);
 
 	// 画面縦サイズ
-	static constexpr int SCREEN_SIZE_Y = (9 * 50);
+	static constexpr int SCREEN_SIZE_Y = (9 * 100);
 
 	// 画面横サイズ半分
 	static constexpr int SCREEN_HALF_X = (SCREEN_SIZE_X / 2);

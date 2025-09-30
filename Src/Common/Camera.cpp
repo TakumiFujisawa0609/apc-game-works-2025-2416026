@@ -2,6 +2,7 @@
 #include "../Manager/InputManager.h"
 #include "../Scene/GameScene.h"
 #include "../Utility/AsoUtility.h"
+#include "../Object/Player.h"
 #include <EffekseerForDXLib.h>
 #include <DxLib.h>
 
@@ -17,8 +18,10 @@ Camera::Camera(void)
 {
 	pos_ = {};
 	pos_.target = {};
-	targetsPos_.clear();
-	rot_ = Quaternion::Identity();
+	rot_.camera = Quaternion::Identity();
+	rot_.target = Quaternion::Identity();
+
+	follow_ = nullptr;
 
 	mode_ = MODE::NONE;
 
@@ -30,19 +33,22 @@ Camera::Camera(void)
 
 void Camera::Load(void)
 {
-	rot_ = Quaternion::Identity();
+	rot_.camera = Quaternion::Identity();
+	rot_.target = Quaternion::Identity();
 
 }
 
-void Camera::Init(MODE mode, const VECTOR& pos, float angleY)
+void Camera::Init(MODE mode, const VECTOR& pos, float angleY, Player* player)
 {
 	mode_ = mode;
 
 	pos_.cameraPos = pos;
 
+	follow_ = player;
+
 	zoom_.distance = CAMERA_DISTANCE;
 
-	rot_ = Quaternion::Euler(0.0f, AsoUtility::Deg2Rad(angleY), 0.0f);
+	rot_.camera = Quaternion::Euler(0.0f, AsoUtility::Deg2Rad(angleY), 0.0f);
 
 	ResetTrackingTarget();
 }
@@ -58,13 +64,13 @@ void Camera::SetBeforeDraw(void)
 	{
 #ifdef _DEBUG
 		SetBeforeDraw_FixexPoint();
+		DebugMove();
 #endif
 	}
 	break;
 
 	case Camera::MODE::FLLOW:
 	{
-		DebugMove();
 		SetBeforeDraw_Follow();
 	}
 	break;
@@ -82,15 +88,10 @@ void Camera::SetBeforeDraw(void)
 	}
 
 
-	if (mode_ == MODE::FLLOW)
+	if (mode_ != MODE::FLLOW)
 	{
 		//カメラセット
-		SetCameraPositionAndTarget_UpVecY(pos_.cameraPos,
-			pos_.target);
-	}
-	else
-	{
-		SetCameraPositionAndAngle(pos_.cameraPos, rot_.x, rot_.y, 0.0f);
+		SetCameraPositionAndAngle(pos_.cameraPos, rot_.camera.x, rot_.camera.y, 0.0f);
 	}
 
 	// 追尾位置
@@ -110,7 +111,7 @@ void Camera::DebugMove(void)
 	{
 		if (input.KeyIsNew(KEY_INPUT_LSHIFT)) { pos_.cameraPos.y += move; }
 
-		else if (input.KeyIsNew(KEY_INPUT_RSHIFT)) { rot_.x += AsoUtility::Deg2Rad(rot); }
+		else if (input.KeyIsNew(KEY_INPUT_RSHIFT)) { rot_.camera.x += AsoUtility::Deg2Rad(rot); }
 
 		else { pos_.cameraPos.z += move; }
 	}
@@ -118,19 +119,19 @@ void Camera::DebugMove(void)
 	{
 		if (input.KeyIsNew(KEY_INPUT_LSHIFT)) { pos_.cameraPos.y -= move; }
 
-		else if (input.KeyIsNew(KEY_INPUT_LCONTROL)) { rot_.x -= AsoUtility::Deg2Rad(rot); }
+		else if (input.KeyIsNew(KEY_INPUT_LCONTROL)) { rot_.camera.x -= AsoUtility::Deg2Rad(rot); }
 
 		else { pos_.cameraPos.z -= move; }
 	}
 	if (input.KeyIsNew(KEY_INPUT_RIGHT))
 	{
-		if (input.KeyIsNew(KEY_INPUT_LCONTROL)) { rot_.y += AsoUtility::Deg2Rad(rot); }
+		if (input.KeyIsNew(KEY_INPUT_LCONTROL)) { rot_.camera.y += AsoUtility::Deg2Rad(rot); }
 
 		else { pos_.cameraPos.x += move; }
 	}
 	if (input.KeyIsNew(KEY_INPUT_LEFT))
 	{
-		if (input.KeyIsNew(KEY_INPUT_LCONTROL)) { rot_.y -= AsoUtility::Deg2Rad(rot); }
+		if (input.KeyIsNew(KEY_INPUT_LCONTROL)) { rot_.camera.y -= AsoUtility::Deg2Rad(rot); }
 
 		else { pos_.cameraPos.x -= move; }
 	}
@@ -141,55 +142,85 @@ void Camera::SetBeforeDraw_FixexPoint(void)
 	// 定点カメラ
 	SetCameraPositionAndAngle(
 		pos_.cameraPos,
-		rot_.ToEuler().x,
-		rot_.ToEuler().y,
-		rot_.ToEuler().z
+		rot_.camera.ToEuler().x,
+		rot_.camera.ToEuler().y,
+		rot_.camera.ToEuler().z
 	);
 }
 
 void Camera::SetBeforeDraw_Follow(void)
 {
-	// カメラの移動
-	// カメラの回転行列を作成
-	MATRIX mat = MGetIdent();
-	mat = MMult(mat, MGetRotX(.x));
-	mat = MMult(mat, MGetRotY(angles_.y));
-	//mat = MMult(mat, MGetRotZ(angles_.z));
+	if (follow_ == nullptr) return;
 
-	// 注視点の移動
-	VECTOR followPos = follow_->GetPos();
-	VECTOR targetLocalRotPos = VTransform(FOLLOW_TARGET_LOCAL_POS, mat);
-	targetPos_ = VAdd(followPos, targetLocalRotPos);
+	// 回転処理
+	BeforeDrawProc();
 
-	// カメラの移動
-	// 相対座標を回転させて、回転後の相対座標を取得する
-	VECTOR cameraLocalRotPos = VTransform(FOLLOW_CAMERA_LOCAL_POS, mat);
+	float offset = 100.0f;
+	VECTOR pPos = follow_->GetPos();
+	VECTOR forward = rot_.camera.GetForward();
+	VECTOR target = VAdd(pos_.cameraPos, VScale(forward, offset));
+	VECTOR up = rot_.camera.GetUp();
 
-	// 相対座標からワールド座標に直して、カメラ座標とする
-	pos_ = VAdd(followPos, cameraLocalRotPos);
+	// カメラ地点割り当て
+	SetCameraPositionAndTargetAndUpVec(pos_.cameraPos, target, up);
+}
 
-	// カメラの上方向を計算
-	VECTOR up = VTransform(AsoUtility::DIR_U, mat);
-
-	// カメラの設定(位置と注視点による制御)
-	SetCameraPositionAndTargetAndUpVec(
-		pos_,
-		targetPos_,
-		up
-	);
+void Camera::BeforeDrawProc(void)
+{
+	float smoothPow = 0.15f;
+	VECTOR pPos = follow_->GetPos();
+	VECTOR pAngle = follow_->GetRotationEuler();
+	Quaternion pRot = follow_->GetRotation();
 	
-	//pos_.cameraUp = upDir;
 
-	//SetCameraPositionAndTarget_UpVecY(pos_.cameraPos, pos_.target);
+	// カメラの回転を適用してオフセットを回転
+	VECTOR rotOffset = rot_.camera.PosAxis(CAMERA_DISTANCE);
 
-	// カメラの設定(位置と注視点による制御)
-	SetCameraPositionAndTargetAndUpVec(
-		pos_.cameraPos,
-		pos_.target,
-		upDir
-	);
-	// 位置制限
-	//PosLimit();
+	// プレイヤー位置に回転したオフセットを加算
+	VECTOR idealPos = VAdd(pPos, zoom_.distance);
+
+	// 現在位置を理想位置に滑らかに移動
+	pos_.cameraPos = VAdd(pos_.cameraPos, VScale(VSub(idealPos, pos_.cameraPos), smoothPow));
+
+
+	// カメラを滑らかに補間
+	rot_.camera = Quaternion::Slerp(rot_.camera, rot_.target, smoothPow);
+}
+
+void Camera::_UpdateCameraRot(void)
+{
+	float smoothPow = 0.15f;
+	InputManager& input = InputManager::GetInstance();
+	float rotPow = (AsoUtility::Deg2Rad(2.5f));
+	VECTOR rotInput = {};
+
+	if (GetJoypadNum() == 0)
+	{
+		if (input.KeyIsNew(KEY_INPUT_LEFT)) { rotInput.y += rotPow; }
+		if (input.KeyIsNew(KEY_INPUT_RIGHT)) { rotInput.y -= rotPow; }
+	}
+	else
+	{
+		VECTOR dir = input.GetAlgKeyDirXZ(1, InputManager::JOYPAD_ALGKEY::RIGHT);
+		rotInput.y += (dir.x * rotPow);
+	}
+
+	if (!AsoUtility::EqualsVZero(rotInput))
+	{
+		// 相対的な回転を適用
+		Quaternion deltaRot = Quaternion::Euler(rotInput);
+		rot_.target = rot_.target.Mult(deltaRot);
+	}
+	else
+	{
+		VECTOR pAngles = follow_->GetRotationEuler();
+		Quaternion pRot = Quaternion::Euler(0.0f, pAngles.y, 0.0f);
+		Quaternion backRot = Quaternion::Euler(0.0f, -DX_PI_F, 0.0f);
+		Quaternion idealRot = pRot.Mult(backRot);
+
+		// 滑らかにプレイヤーを追尾
+		rot_.target = Quaternion::Slerp(rot_.target, idealRot, smoothPow);
+	}
 }
 
 void Camera::SetBeforeDraw_FollowZoom(void)
@@ -213,13 +244,16 @@ void Camera::SetBeforeDraw_FollowZoom(void)
 void Camera::DrawDebug(void)
 {
 #ifdef _DEBUG
-	/*
-	DrawFormatString(0, 80, 0xFFFFFF, "camera Pos(%.1f, %.1f, %.1f), Rot(%.1f,%.1f°,%.1f°,%.1f°)"
-					 , pos_.x, pos_.y, pos_.z,
-					 rot_.w, AsoUtility::Rad2Deg(rot_.x),AsoUtility::Rad2Deg(rot_.y),AsoUtility::Rad2Deg(rot_.z));
-	DrawFormatString(0, 96, 0xFFFFFF, "camera targetPos(%.1f, %.1f, %.1f)", targetPos_.x, targetPos_.y, targetPos_.z);
-	DrawFormatString(0, 112, 0xFFFFFF, "zoom Pow(%.1f, %.1f, %.1f)", zoomPow.x, zoomPow.y, zoomPow.z);
-	*/
+	
+	DrawFormatString(0, 16, 0xFFFFFF, "camera Pos(%.1f, %.1f, %.1f), QuaRot(%.1f, %.1f ,%.1f ,%.1f)"
+					 , pos_.cameraPos.x, pos_.cameraPos.y, pos_.cameraPos.z,
+					 rot_.camera.w, AsoUtility::Rad2Deg(rot_.camera.x),AsoUtility::Rad2Deg(rot_.camera.y),AsoUtility::Rad2Deg(rot_.camera.z));
+
+	DrawFormatString(0, 32, 0xFFFFFF, "target Pos(%.1f, %.1f, %.1f), QuaRot(%.1f, %.1f ,%.1f ,%.1f)", pos_.target.x, pos_.target.y, pos_.target.z,
+					 rot_.target.w, AsoUtility::Rad2Deg(rot_.target.x), AsoUtility::Rad2Deg(rot_.target.y), AsoUtility::Rad2Deg(rot_.target.z));
+
+	//DrawFormatString(0, 112, 0xFFFFFF, "zoom Pow(%.1f, %.1f, %.1f)", zoomPow.x, zoomPow.y, zoomPow.z);
+	
 #endif
 }
 
@@ -241,8 +275,8 @@ void Camera::Destroy(void)
 
 void Camera::UpdatePlayerTransform(VECTOR* pos, Quaternion* rot)
 {
-	targetsPos_.emplace_back(&pos);
-	playerRot_ = rot;
+	targetsPos_.push_back(pos);
+	rot_.player = rot;
 }
 
 
@@ -256,7 +290,7 @@ void Camera::SetCameraPos(const VECTOR& pos, const VECTOR& angle,
 	pos_.cameraPos = pos;
 
 	// 角度割り当て
-	rot_ = Quaternion::Euler(angle);
+	rot_.camera = Quaternion::Euler(angle);
 
 	if (!AsoUtility::EqualsVZero(targetPos))
 	{

@@ -269,38 +269,29 @@ void Object::KnockBack(const VECTOR& targetPos, float invTime,
 	paramChara_.velocity = VAdd(paramChara_.velocity, knockVelo);
 }
 
-float Object::_Move(const float* acc, float movePow)
+float Object::_Move(const float* _curVelo, float _movePow, float _maxVelo)
 {
 	// 現在移動量
 	float velocity = 0.0f;
 
-	// 移動量が正の値の時、軽さを含めた値を負にする
-	float speedAcc = ((movePow > 0.0f) ? SPEED_ACC_POWER : -SPEED_ACC_POWER);
-
-	float maxVelo = paramChara_.speed + SPEED_ACC_POWER;
-
-	// 移動量が負の値の時、最大加速度を負の値にする
-	maxVelo = ((movePow >= 0.0f) ? maxVelo : -maxVelo);
-
-
 	// 移動加算量が0時、処理終了
-	if (movePow == 0.0f) return 0.0f;
+	if (_movePow == 0.0f) return 0.0f;
 
 
 	// 移動方向と反対に移動時
-	if (*acc < 0.0f && movePow > 0.0f ||
-		*acc > 0.0f && movePow < 0.0f)
+	if (*_curVelo < 0.0f && _movePow > 0.0f ||
+		*_curVelo > 0.0f && _movePow < 0.0f)
 	{
 		// 移動量に加速度を渡す
-		velocity = -(*acc);
+		velocity = -(*_curVelo);
 	}
 
 	// 加速度が移動量を移動制限がかからない時、移動量が
-	if (*acc < maxVelo && movePow > 0.0f ||
-		*acc > maxVelo && movePow < 0.0f)
+	if (*_curVelo < _maxVelo && _movePow > 0.0f ||
+		*_curVelo > _maxVelo && _movePow < 0.0f)
 	{
 		//移動量で移動量を増減
-		velocity += (movePow + speedAcc);
+		velocity += _movePow;
 	}
 
 

@@ -51,7 +51,7 @@ public:
 	// 注視点への視点移動速度(0～1.0)
 	static constexpr float CAMERA_LOOK_SPEED = 0.0f;
 
-	static constexpr VECTOR CAMERA_DISTANCE = { 0.0f, 100.0f, 500.0f };
+	static constexpr VECTOR CAMERA_DISTANCE = { 100.0, 150.0f, -500.0f };
 
 	/// <summary>
 	/// インスタンス生成
@@ -75,7 +75,7 @@ public:
 	/// <para name="mode">カメラ状態</param>
 	/// <param name="pos">位置</param>
 	/// <param name="angleY">角度</param>
-	void Init(MODE mode, const VECTOR& pos = {}, float angleY = 0.0f);
+	void Init(MODE mode, const VECTOR& pos = {}, float angleY = 0.0f, Player* player = nullptr);
 
 	/// <summary>
 	/// 描画処理
@@ -164,6 +164,7 @@ private:
 	// カメラ状態
 	MODE mode_;
 
+	Player* follow_;
 
 	std::vector<VECTOR*> targetsPos_;
 	//std::shared_ptr<VECTOR> target_;
@@ -190,8 +191,15 @@ private:
 	};
 	Pos pos_;
 	
-	Quaternion rot_; // 回転度
-	Quaternion* playerRot_; // 回転度
+	struct Rotation
+	{
+		Quaternion camera; // 回転量
+
+		Quaternion target; // 注視点の回転度
+		Quaternion* player; // プレイヤーの回転度
+	};
+	Rotation rot_;
+
 
 	// 追尾しない時間
 	float freeTime_;
@@ -225,6 +233,8 @@ private:
 	void SetBeforeDraw_FixexPoint(void);
 
 	void SetBeforeDraw_Follow(void);
+	void BeforeDrawProc(void);
+	void _UpdateCameraRot(void);
 
 	void SetBeforeDraw_FollowZoom(void);
 };

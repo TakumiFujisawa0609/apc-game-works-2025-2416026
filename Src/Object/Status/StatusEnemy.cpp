@@ -12,6 +12,8 @@ StatusEnemy::StatusEnemy(void)
 
 	speed_ = 0.0f;
 
+	speedAcc_ = 0.0f;
+
 	atkInterval_ = 0.0f;
 
 	atkRange_ = 0.0f;

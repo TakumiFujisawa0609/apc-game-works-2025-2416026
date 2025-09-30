@@ -18,15 +18,21 @@ public:
 	Quaternion(const VECTOR& rad);
 	Quaternion(double w, double x, double y, double z);
 
-	~Quaternion(void);
+	~Quaternion(void) = default;
 
 	// オイラー角からクォータニオンへ変換
 	static Quaternion Euler(const VECTOR& rad);
+
+	// オイラー角からクォータニオンへ変換
 	static Quaternion Euler(double radX, double radY, double radZ);
+
 
 	// クォータニオンの合成
 	static Quaternion Mult(const Quaternion& q1, const Quaternion& q2);
+
+	// クォータニオンの合成
 	Quaternion Mult(const Quaternion& q) const;
+
 
 	// 指定軸を指定角分、回転させる
 	static Quaternion AngleAxis(double rad, VECTOR axis);
@@ -90,9 +96,20 @@ public:
 	static double Dot(const Quaternion& q1, const Quaternion& q2);
 	double Dot(const Quaternion& b) const;
 
-	// 正規化
+
+	/// <summary>
+	/// 対象を正規化して返す
+	/// </summary>
 	static Quaternion Normalize(const Quaternion& q);
+
+	/// <summary>
+	/// 自分自身を正規化して返す
+	/// </summary>
 	Quaternion Normalized(void) const;
+
+	/// <summary>
+	/// 自分自身を正規化
+	/// </summary>
 	void Normalize(void);
 
 	/// <summary>

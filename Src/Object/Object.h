@@ -110,6 +110,8 @@ protected:
 
 		float speed;  // 移動速度
 
+		float speedAcc;  // 移動時の加速度
+
 		float timeAct; // 攻撃時間
 
 		bool isGround; // 地面にいるか否か
@@ -165,10 +167,11 @@ protected:
 	/// <summary>
 	/// 移動処理
 	/// </summary>
-	/// <param name="acc">現在の加速させるベクトル</param>
-	/// <param name="movePow">加算量</param>
+	/// <param name="_curVelo">現在の加速させるベクトル</param>
+	/// <param name="_movePow">加算量</param>
+	/// <param name="_maxVelo">最大加算量限度</param>
 	/// <returns>加算後の値</returns>
-	float _Move(const float* acc, float movePow);
+	float _Move(const float* _curVelo, float _movePow, float _maxVelo);
 
 	/// <summary>
 	/// 回転処理

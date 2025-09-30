@@ -14,6 +14,8 @@ StatusPlayer::StatusPlayer(void)
 
 	speed_ = 0.0f;
 
+	speedAcc_ = 0.0f;
+
 	timeParry_ = 0.0f;
 
 	timeEvasion_ = 0.0f;

@@ -41,6 +41,7 @@ void Player::Load(void)
 void Player::Init(const VECTOR& pos, float angleY)
 {
 	/*　初期化処理　*/
+	inputPad_ = static_cast<int>(InputManager::JOYPAD_NO::PAD1);
 
 	SetParam();
 
@@ -84,7 +85,7 @@ void Player::SetParam(void)
 	paramChara_.quaRot = Quaternion::Identity();
 	paramChara_.quaRotLocal = Quaternion::Identity(); // ローカル回転初期化
 	paramChara_.quaRotLocal = Quaternion::Mult(paramChara_.quaRotLocal,
-											   Quaternion::AngleAxis(START_MODEL_ANGLE_Y, AsoUtility::AXIS_Y));
+											   Quaternion::AngleAxis(LOCAL_ANGLE_Y, AsoUtility::AXIS_Y));
 
 	VECTOR rotLocal = VAdd(AsoUtility::AXIS_X, AsoUtility::AXIS_Z);
 
@@ -99,12 +100,14 @@ void Player::SetParam(void)
 	paramChara_.hp    = status_.GetHp();
 	paramChara_.power = status_.GetPower();
 	paramChara_.speed = status_.GetSpeed();
+	paramChara_.speedAcc = status_.GetSpeedAcc();
 
 	paramPlayer_.weaponId = status_.GetWeaponId();
 	paramPlayer_.luck = status_.GetLuck();
 	paramChara_.handle = ResourceManager::GetInstance().LoadHandleId(ResourceManager::SRC::MODEL_PLAYER);
 	
 	SetAnim();
+	SetMatrixModel();
 }
 
 void Player::SetAnim(void)
@@ -151,10 +154,19 @@ void Player::Update(void)
 	paramChara_.prePos = paramChara_.pos;
 
 	float move = 1.0f;
-	if (input.KeyIsNew(KEY_INPUT_W)) { paramChara_.pos.z += move; }
-	if (input.KeyIsNew(KEY_INPUT_S)) { paramChara_.pos.z -= move; }
-	if (input.KeyIsNew(KEY_INPUT_A)) { paramChara_.pos.x -= move; }
-	if (input.KeyIsNew(KEY_INPUT_D)) { paramChara_.pos.x += move; }
+	int padNum = 0;
+	if (GetInputState() > 0)
+	{
+		paramChara_.pos.x += input.PadAlgKeyX(padNum, PAD_ALGKEY::LEFT) * move;
+		paramChara_.pos.z += input.PadAlgKeyY(padNum, PAD_ALGKEY::LEFT) * move;
+	}
+	else
+	{
+		if (input.KeyIsNew(KEY_INPUT_W)) { paramChara_.pos.z += move; }
+		if (input.KeyIsNew(KEY_INPUT_S)) { paramChara_.pos.z -= move; }
+		if (input.KeyIsNew(KEY_INPUT_A)) { paramChara_.pos.x -= move; }
+		if (input.KeyIsNew(KEY_INPUT_D)) { paramChara_.pos.x += move; }
+	}
 
 	switch (paramPlayer_.actionState)
 	{
@@ -228,9 +240,11 @@ void Player::DrawDebug(void)
 {
 #ifdef _DEBUG
 	
+	VECTOR pos = VAdd(paramChara_.pos, MODEL_OFFSET);
 	// パラメータ描画
-	DrawFormatString(0, 120, 0xFFFFFF,"player：p(%.1f, %.1f, %.1f), ac(%.1f°,%.1f°,%.1f°),ground(%d), type(%d)"
-					 ,paramChara_.pos.x, paramChara_.pos.y, paramChara_.pos.z
+	DrawFormatString(0, 120, 0xFFFFFF,"player：p(%.1f, %.1f, %.1f), rot(%.1f°, %.1f° ,%.1f°), ac(%.1f°,%.1f°,%.1f°),ground(%d), type(%d)"
+					 ,pos.x, pos.y, pos.z
+					 ,paramChara_.rot.x, paramChara_.rot.y, paramChara_.rot.z
 					 ,paramChara_.velocity.x, paramChara_.velocity.y, paramChara_.velocity.z
 					 ,paramChara_.isGround, paramPlayer_.actionState);
 
@@ -419,21 +433,18 @@ void Player::Move(void)
 	{
 		InputManager::JOYPAD_NO jno = static_cast<InputManager::JOYPAD_NO>(inputPad_);
 
-		// 左スティックの横軸取得
-		InputManager::JOYPAD_IN_STATE pad = input.GetPadInputState(jno);
-		int left = static_cast<int>(PAD_ALGKEY::LEFT);
 
-		if (pad.AlgKeyY[left] != 0 && IsActiveAction())
+		if (input.PadAlgKeyY(inputPad_, PAD_ALGKEY::LEFT) && IsActiveAction())
 		{
-			if (pad.AlgKeyY[left] < 0)
+			if (input.PadAlgKeyY(inputPad_, PAD_ALGKEY::LEFT) < 0)
 			{
 				// 奥移動処理
-				paramChara_.velocity.z += _Move(&paramChara_.velocity.z, paramChara_.speed);
+				paramChara_.velocity.z += _Move(&paramChara_.velocity.z, paramChara_.speedAcc, paramChara_.speed);
 			}
 			else
 			{
 				// 前移動処理
-				paramChara_.velocity.z += _Move(&paramChara_.velocity.z, -paramChara_.speed);
+				paramChara_.velocity.z += _Move(&paramChara_.velocity.z, -paramChara_.speedAcc , -paramChara_.speed);
 			}
 		}
 		else
@@ -442,17 +453,17 @@ void Player::Move(void)
 			paramChara_.velocity.z = DecVelocityXZ(&paramChara_.velocity.z);
 		}
 
-		if (pad.AlgKeyX[left] != 0 && IsActiveAction())
+		if (input.PadAlgKeyX(inputPad_, PAD_ALGKEY::LEFT) != 0 && IsActiveAction())
 		{
-			if (pad.AlgKeyX[left] > 0)
+			if (input.PadAlgKeyX(inputPad_, PAD_ALGKEY::LEFT) > 0)
 			{
 				// 右移動処理
-				paramChara_.velocity.x += _Move(&paramChara_.velocity.x, paramChara_.speed);
+				paramChara_.velocity.x += _Move(&paramChara_.velocity.x, paramChara_.speedAcc, paramChara_.speed);
 			}
 			else
 			{
 				// 左移動処理
-				paramChara_.velocity.x += _Move(&paramChara_.velocity.x, -paramChara_.speed);
+				paramChara_.velocity.x += _Move(&paramChara_.velocity.x, -paramChara_.speedAcc , -paramChara_.speed);
 			}
 		}
 		else
@@ -479,13 +490,13 @@ void Player::Move(void)
 			if (input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_BACK]))
 			{
 				// 奥移動処理
-				paramChara_.velocity.z += _Move(&paramChara_.velocity.z, paramChara_.speed);
+				paramChara_.velocity.z += _Move(&paramChara_.velocity.z, paramChara_.speedAcc, paramChara_.speed);
 			}
 
 			if (input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_FRONT]))
 			{
 				// 前移動処理
-				paramChara_.velocity.z += _Move(&paramChara_.velocity.z, -paramChara_.speed);
+				paramChara_.velocity.z += _Move(&paramChara_.velocity.z, -paramChara_.speedAcc, -paramChara_.speed);
 			}
 		}
 		else
@@ -498,13 +509,13 @@ void Player::Move(void)
 			if (input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_LEFT]))
 			{
 				// 左移動処理
-				paramChara_.velocity.x += _Move(&paramChara_.velocity.x, -paramChara_.speed);
+				paramChara_.velocity.x += _Move(&paramChara_.velocity.x, -paramChara_.speedAcc, -paramChara_.speed);
 			}
 
 			if (input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_RIGHT]))
 			{
 				// 右移動処理
-				paramChara_.velocity.x += _Move(&paramChara_.velocity.x, paramChara_.speed);
+				paramChara_.velocity.x += _Move(&paramChara_.velocity.x, paramChara_.speedAcc, paramChara_.speed);
 			}
 		}
 		else
@@ -518,24 +529,28 @@ void Player::Move(void)
 
 	if (paramChara_.velocity.x != 0.0f && paramChara_.velocity.z != 0.0f)
 	{
-		// 加速度の大きさを取得
-		float len = ((paramChara_.velocity.x * paramChara_.velocity.x) + (paramChara_.velocity.z * paramChara_.velocity.z));
+		float len = sqrtf((paramChara_.velocity.x * paramChara_.velocity.x) + (paramChara_.velocity.z * paramChara_.velocity.z));
 
+		// 移動ベクトルを正規化
 		float length = sqrtf(len);
 
-		// 移動速度を超えたらスカラー倍する
-		if (length > paramChara_.speed)
+		float speed = (paramChara_.speed + paramChara_.speedAcc);
+	
+		if (length > speed)
 		{
-			float scale = (paramChara_.speed / length);
+			// 長さが移動速度を超えた時、スカラー倍
 
+			float scale = (speed / length);
 
 			paramChara_.velocity.x *= scale;
 			paramChara_.velocity.z *= scale;
 		}
 	}
 
+	// 位置に反映する
 	// 移動処理
 	paramChara_.pos = VAdd(paramChara_.pos, paramChara_.velocity);
+
 }
 
 void Player::Jump(void)

@@ -47,8 +47,9 @@ public:
 		JUMP, // ジャンプ
 		PICK_UP, // 拾う
 		RECIEVE_HIT,
-		ROLL, // 回避
-		RUN, // 走る
+		ATTACK, // 攻撃
+		ROLL,   // 回避
+		RUN,    // 走る
 		RUN_CARRY,
 		SHOOT_ONEHANDED,
 		SHIT_DOWN,
@@ -103,7 +104,7 @@ public:
 	static constexpr float CATCH_OFFSET = 75.0f;
 
 
-	static constexpr float START_MODEL_ANGLE_Y = (180.0f * (DX_PI_F / 180.0f));
+	static constexpr float LOCAL_ANGLE_Y = (180.0f * (DX_PI_F / 180.0f));
 	// モデルの位置調整値
 	static constexpr VECTOR MODEL_OFFSET = { 0.0f, 0.0f, 0.0f };
 
@@ -259,7 +260,7 @@ protected:
 	std::map <INPUT_TYPE, unsigned int>inputKey_;
 
 	// 入力するゲームパッド識別番号
-	unsigned int inputPad_;
+	int inputPad_;
 
 	// ジャンプ力
 	float jumpPower_;

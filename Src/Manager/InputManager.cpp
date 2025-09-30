@@ -111,7 +111,6 @@ void InputManager::Update(void)
 	}
 
 	// ゲームパッド入力判定更新
-	SetPadInState(JOYPAD_NO::KEY_PAD1);
 	SetPadInState(JOYPAD_NO::PAD1);
 	SetPadInState(JOYPAD_NO::PAD2);
 	SetPadInState(JOYPAD_NO::PAD3);
@@ -438,7 +437,6 @@ InputManager::JOYPAD_TYPE InputManager::GetPadType(JOYPAD_NO padNo)
 	return static_cast<InputManager::JOYPAD_TYPE>(GetJoypadType(static_cast<int>(padNo)));
 }
 
-
 bool InputManager::PadIsBtnNew(int padNum, PAD_BTN button) const
 {
 	// パッドが未割当時、false
@@ -577,6 +575,38 @@ int InputManager::PadAlgKeyY(int padNum, int algKey)const
 	if (GetJoypadNum() < padNum) return false;
 
 	return padInfos_[padNum].AlgKeyY[algKey];
+}
+
+const VECTOR& InputManager::GetAlgKeyDirXZ(int padNum, JOYPAD_ALGKEY algKey) const
+{
+	VECTOR ret = {};
+
+	int algType = static_cast<int>(algKey);
+
+	// スティックの個々の入力値は、
+	// -1000.0f ～ 1000.0f の範囲で返ってくるが、
+	// X:1000.0f、Y:1000.0fになることは無い(1000と500くらいが最大)
+	// スティックの入力値を -1.0 ～ 1.0 に正規化
+	float dirX = (static_cast<float>(padInfos_[padNum].AlgKeyX[algType]) / ALGKEY_VAL_MAX);
+	float dirZ = (static_cast<float>(padInfos_[padNum].AlgKeyY[algType]) / ALGKEY_VAL_MAX);
+
+	// 平方根により、おおよその最大値が1.0となる
+	float len = sqrtf((dirX * dirX) + (dirZ * dirZ));
+	if (len < ALGKEY_THRESHOLD)
+	{
+		// 0でベクトルを返す
+		return ret;
+	}
+
+	// デッドゾーン境界から再スケーリング(可変デッドゾーン)
+	float scale = (len - ALGKEY_THRESHOLD) / (1.0f - ALGKEY_THRESHOLD);
+	dirX = (dirX / len) * scale;
+	dirZ = (dirZ / len) * scale;
+
+	// Zは前方向を正に反転
+	ret = VNorm({ dirX, 0.0f, -dirZ });
+
+	return ret;
 }
 
 #pragma endregion

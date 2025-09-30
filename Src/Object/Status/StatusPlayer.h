@@ -16,6 +16,7 @@ public:
 		POWER, // UŒ‚—Í
 		LUCK,  // K‰^
 		SPEED, // ˆÚ“®‘¬“x
+		SPEED_ACC, // ˆÚ“®‚Ì‰Á‘¬“x
 		WEAPON_NUM,      // •Ší”Ô†
 		TIME_INVINCIBLE, // –³“GŠÔ
 		TIME_PARRY,		 // ƒpƒŠƒBŠÔ
@@ -39,6 +40,7 @@ public:
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::POWER)], power_, 0);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::LUCK)], luck_, 0);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::SPEED)], speed_, 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::SPEED_ACC)], speedAcc_, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::WEAPON_NUM)], weaponId_, 0);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::TIME_INVINCIBLE)], timeInv_, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::TIME_PARRY)], timeParry_, 0.0f);
@@ -60,6 +62,8 @@ public:
 	int GetWeaponId(void) { return weaponId_; }
 
 	float GetSpeed(void) { return speed_; }
+
+	float GetSpeedAcc(void) { return speed_; }
 
 	/// <summary>
 	/// –³“GŠÔæ“¾
@@ -97,6 +101,8 @@ private:
 	int weaponId_;
 
 	float speed_;
+
+	float speedAcc_;
 
 	float timeParry_;
 

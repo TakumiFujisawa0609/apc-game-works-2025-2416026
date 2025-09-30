@@ -26,15 +26,10 @@ Quaternion::Quaternion(double ww, double wx, double wy, double wz)
     z = wz;
 }
 
-Quaternion::~Quaternion(void)
-{
-}
-
 Quaternion Quaternion::Euler(const VECTOR& rad)
 {
     return Euler(rad.x, rad.y, rad.z);
 }
-
 Quaternion Quaternion::Euler(double radX, double radY, double radZ)
 {
 
@@ -56,10 +51,10 @@ Quaternion Quaternion::Euler(double radX, double radY, double radZ)
     //ret.y = cosZ * sinX * cosY + sinZ * cosX * sinY;
     //ret.z = cosZ * cosX * sinY - sinZ * sinX * cosY;
 
-    ret.w = cosX * cosY * cosZ + sinX * sinY * sinZ;
-    ret.x = sinX * cosY * cosZ + cosX * sinY * sinZ;
-    ret.y = cosX * sinY * cosZ - sinX * cosY * sinZ;
-    ret.z = cosX * cosY * sinZ - sinX * sinY * cosZ;
+    ret.w = (cosX * cosY * cosZ) + (sinX * sinY * sinZ);
+    ret.x = (sinX * cosY * cosZ) + (cosX * sinY * sinZ);
+    ret.y = (cosX * sinY * cosZ) - (sinX * cosY * sinZ);
+    ret.z = (cosX * cosY * sinZ) - (sinX * sinY * cosZ);
 
     return ret;
 
@@ -110,7 +105,6 @@ Quaternion Quaternion::Mult(const Quaternion& q) const
 
 Quaternion Quaternion::AngleAxis(double rad, VECTOR axis)
 {
-
     Quaternion ret = Quaternion();
 
     double norm;
@@ -121,16 +115,18 @@ Quaternion Quaternion::AngleAxis(double rad, VECTOR axis)
     ret.w = 1.0;
     ret.x = ret.y = ret.z = 0.0;
 
-    norm = (double)axis.x * (double)axis.x + (double)axis.y * (double)axis.y + (double)axis.z * (double)axis.z;
-    if (norm <= 0.0f)
-    {
-        return ret;
-    }
+    norm = (static_cast<double>(axis.x) * static_cast<double>(axis.x) + 
+            static_cast<double>(axis.y) * static_cast<double>(axis.y) + 
+            static_cast<double>(axis.z) * static_cast<double>(axis.z));
+
+    // É[ÉçäÑÇËñhé~
+    if (norm <= 0.0f) { return ret; }
+
 
     norm = 1.0 / sqrt(norm);
-    axis.x = (float)(axis.x * norm);
-    axis.y = (float)(axis.y * norm);
-    axis.z = (float)(axis.z * norm);
+    axis.x = static_cast<float>(axis.x * norm);
+    axis.y = static_cast<float>(axis.y * norm);
+    axis.z = static_cast<float>(axis.z * norm);
 
     c = cos(0.5f * rad);
     s = sin(0.5f * rad);
@@ -152,7 +148,7 @@ VECTOR Quaternion::PosAxis(const Quaternion& q, VECTOR pos)
     tmp = tmp.Mult(q);
     tmp = tmp.Mult(Quaternion(0.0f, pos.x, pos.y, pos.z));
     tmp = tmp.Mult(q.Inverse());
-    return { (float)tmp.x, (float)tmp.y, (float)tmp.z };
+    return { static_cast<float>(tmp.x), static_cast<float>(tmp.y), static_cast<float>(tmp.z) };
 }
 
 VECTOR Quaternion::PosAxis(VECTOR pos) const
@@ -479,32 +475,31 @@ double Quaternion::Dot(const Quaternion& q) const
     return (w * q.w + x * q.x + y * q.y + z * q.z);
 }
 
+
 Quaternion Quaternion::Normalize(const Quaternion& q)
 {
-    float scale = 1.0f / static_cast<float>(q.Length());
+    /* ëŒè€Çê≥ãKâªÇµÇƒï‘Ç∑ */
+    float scale = (1.0f / static_cast<float>(q.Length()));
     VECTOR v = VScale(q.xyz(), scale);
     Quaternion ret = Quaternion(q.w * scale, v.x, v.y, v.z);
     return ret;
 }
-
 Quaternion Quaternion::Normalized(void) const
 {
+    /* é©ï™é©êgÇê≥ãKâªÇµÇƒï‘Ç∑ */
+    double mag = sqrt((w * w) + (x * x) + (y * y) + (z * z));
 
-    double mag = sqrt(w * w + x * x + y * y + z * z);
     return Quaternion(w / mag, x / mag, y / mag, z / mag);
-
 }
-
 void Quaternion::Normalize(void)
 {
-
-    double mag = sqrt(w * w + x * x + y * y + z * z);
+    /* é©ï™é©êgÇê≥ãKâª */
+    double mag = sqrt((w * w) + (x * x) + (y * y) + (z * z));
 
     w /= mag;
     x /= mag;
     y /= mag;
     z /= mag;
-
 }
 
 Quaternion Quaternion::Inverse(void) const

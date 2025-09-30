@@ -24,6 +24,7 @@ public:
 		HP,              // HP
 		POWER,           // çUåÇóÕ
 		SPEED,			 // à⁄ìÆë¨ìx
+		SPEED_ACC,       // à⁄ìÆéûÇÃâ¡ë¨ìx
 		ATTACK_INTERVAL, // çUåÇä‘äu
 		ATTACK_RANEGE,   // çUåÇîÕàÕ
 		SEARCH_RANGE,    // çıìGîÕàÕ
@@ -42,17 +43,18 @@ public:
 
 	void LoadParam(const std::array<std::string, static_cast<int>(PARAM::MAX)>& _loadString)
 	{
-		name_ = _loadString[0];
-		handlePath_ = _loadString[1];
+		name_ = _loadString[static_cast<int>(PARAM::NAME)];
+		handlePath_ = _loadString[static_cast<int>(PARAM::HANDLE_PATH)];
 
-		UtilityCommon::ChangeString(_loadString[2], hp_, 1);
-		UtilityCommon::ChangeString(_loadString[3], power_, 0);
-		UtilityCommon::ChangeString(_loadString[4], speed_, 0.0f);
-		UtilityCommon::ChangeString(_loadString[5], atkInterval_, 0.0f);
-		UtilityCommon::ChangeString(_loadString[6], atkRange_, 0.0f);
-		UtilityCommon::ChangeString(_loadString[7], searchRange_, 0.0f);
-		UtilityCommon::ChangeString(_loadString[8], animSpeedIdle_, 0.0f);
-		UtilityCommon::ChangeString(_loadString[9], animSpeedAtk_, 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::HP)], hp_, 1);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::POWER)], power_, 0);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::SPEED)], speed_, 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::SPEED_ACC)], speedAcc_, 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ATTACK_INTERVAL)], atkInterval_, 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ATTACK_RANEGE)], atkRange_, 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::SEARCH_RANGE)], searchRange_, 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_IDLE)], animSpeedIdle_, 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_ATTACK)], animSpeedAtk_, 0.0f);
 	}
 
 
@@ -65,6 +67,8 @@ public:
 	int GetPower(void) { return power_; }
 
 	float GetSpeed(void) { return speed_; }
+
+	float GetSpeedAcc(void) { return speedAcc_; }
 
 	float GetAtkInterval(void) { return atkInterval_; }
 
@@ -88,6 +92,8 @@ private:
 	int power_;
 
 	float speed_;
+
+	float speedAcc_;
 
 	float atkInterval_;
 

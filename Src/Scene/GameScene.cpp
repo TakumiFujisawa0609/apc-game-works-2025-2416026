@@ -66,7 +66,7 @@ void GameScene::ReInit(void)
 
 	// カメラ移動領域割り当て
 	Camera& camera = Camera::GetInstance();
-	camera.Init(Camera::MODE::FLLOW, player_->GetPos(), player_->GetRotationLocal().y);
+	camera.Init(Camera::MODE::FLLOW, player_->GetPos(), player_->GetRotationLocal().y, player_);
 
 	// カメラ追従対象初期化
 	camera.SetTrackingTarget(&player_->GetPos());
@@ -116,6 +116,9 @@ void GameScene::Draw(void)
 	Vector2 midPos = { (Application::SCREEN_SIZE_X / 2), (Application::SCREEN_SIZE_Y / 2) };
 	int x;
 
+	// グリッド線描画
+	SceneManager::GetInstance().DrawGrid();
+
 	// Effekseerにより再生中のエフェクトを更新する
 	UpdateEffekseer3D();
 
@@ -136,6 +139,8 @@ void GameScene::Draw(void)
 	//colManager_->DrawDebug();
 
 	player_->DrawDebug();
+
+	Camera::GetInstance().DrawDebug();
 #endif
 }
 

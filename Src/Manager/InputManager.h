@@ -7,13 +7,16 @@ class InputManager
 {
 public:
 
+	// アナログキーの入力受付しきい値(0.0～1.0)
+	static constexpr float ALGKEY_THRESHOLD = 0.5f;
+
+
 	/// <summary>
 	/// コントローラー認識番号
 	/// </summary>
 	enum class JOYPAD_NO
 	{
-		KEY_PAD1 = 0,	  // キー入力とパッド１
-		PAD1,			  // パッド１入力
+		PAD1 = 1,		  // パッド１入力
 		PAD2,			  // パッド２入力
 		PAD3,			  // パッド３入力
 		PAD4 = 4,		  // パッド４入力
@@ -66,47 +69,6 @@ public:
 		D_PAD,    // 十字キー
 
 		MAX
-	};
-
-
-	/// <summary>
-	/// ゲームコントローラー入力情報
-	/// </summary>
-	struct JOYPAD_IN_STATE
-	{
-		// ボタンの前フレーム入力判定
-		unsigned char ButtonOld[static_cast<int>(PAD_BTN::MAX)];
-
-		// ボタンの現在フレーム入力判定
-		unsigned char ButtonNew[static_cast<int>(PAD_BTN::MAX)];
-
-		bool IsOld[static_cast<int>(PAD_BTN::MAX)];
-		bool IsNew[static_cast<int>(PAD_BTN::MAX)];
-
-		// 入力時の判定
-		bool IsTrgDown[static_cast<int>(PAD_BTN::MAX)];
-
-		// 離した時の判定
-		bool IsTrgUp[static_cast<int>(PAD_BTN::MAX)];
-
-
-		// スティックの横入力の傾き具合
-		int AlgKeyX[static_cast<int>(JOYPAD_ALGKEY::MAX)];
-
-		// スティックの縦入力の傾き具合
-		int AlgKeyY[static_cast<int>(JOYPAD_ALGKEY::MAX)];
-
-		// スティックの前フレームの入力判定
-		bool IsOldAlgKey[static_cast<int>(JOYPAD_ALGKEY::MAX)];
-
-		// スティックの現在フレーム入力判定
-		bool IsNewAlgKey[static_cast<int>(JOYPAD_ALGKEY::MAX)];
-
-		// スティックの入力時の判定
-		bool IsTrgDownAlgKey[static_cast<int>(JOYPAD_ALGKEY::MAX)];
-
-		// スティックを離した時の判定
-		bool IsTrgUpAlgKey[static_cast<int>(JOYPAD_ALGKEY::MAX)];
 	};
 
 
@@ -221,11 +183,6 @@ public:
 #pragma endregion
 
 #pragma region コントローラー入力
-	/// <summary>
-	/// コントローラの入力情報
-	/// </summary>
-	/// <param name="padNum">コントローラの対象</param>
-	JOYPAD_IN_STATE& GetPadInputState(JOYPAD_NO padNum);
 
 	/// <summary>
 	/// コントローラの入力判定
@@ -332,6 +289,13 @@ public:
 	int PadAlgKeyY(int padNum, int algKey)const;
 
 	/// <summary>
+	/// コントローラのスティックの傾き方向を取得(XZ平面)
+	/// </summary>
+	/// <param name="padNum">コントローラの対象</param>
+	/// <param name="algKey">スティック番号</param>
+	const VECTOR& GetAlgKeyDirXZ(int padNum, JOYPAD_ALGKEY algKey)const;
+
+	/// <summary>
 	/// いずれかのコントローラの入力判定
 	/// </summary>
 	/// <param name=""></param>
@@ -345,6 +309,10 @@ private:
 
 	// シングルトンインスタンス
 	static InputManager* instance_;
+
+	// アナログキーの最大値
+	static constexpr float ALGKEY_VAL_MAX = 1000.0f;
+
 
 	// キー情報
 	struct Key
@@ -365,6 +333,47 @@ private:
 		bool trgDown;  // 現フレームで入力されたか否か
 		bool trgUp;	   // 現フレームで入力が終了したか否か
 	};
+
+	/// <summary>
+	/// ゲームコントローラー入力情報
+	/// </summary>
+	struct JOYPAD_IN_STATE
+	{
+		// ボタンの前フレーム入力判定
+		unsigned char ButtonOld[static_cast<int>(PAD_BTN::MAX)];
+
+		// ボタンの現在フレーム入力判定
+		unsigned char ButtonNew[static_cast<int>(PAD_BTN::MAX)];
+
+		bool IsOld[static_cast<int>(PAD_BTN::MAX)];
+		bool IsNew[static_cast<int>(PAD_BTN::MAX)];
+
+		// 入力時の判定
+		bool IsTrgDown[static_cast<int>(PAD_BTN::MAX)];
+
+		// 離した時の判定
+		bool IsTrgUp[static_cast<int>(PAD_BTN::MAX)];
+
+
+		// スティックの横入力の傾き具合
+		int AlgKeyX[static_cast<int>(JOYPAD_ALGKEY::MAX)];
+
+		// スティックの縦入力の傾き具合
+		int AlgKeyY[static_cast<int>(JOYPAD_ALGKEY::MAX)];
+
+		// スティックの前フレームの入力判定
+		bool IsOldAlgKey[static_cast<int>(JOYPAD_ALGKEY::MAX)];
+
+		// スティックの現在フレーム入力判定
+		bool IsNewAlgKey[static_cast<int>(JOYPAD_ALGKEY::MAX)];
+
+		// スティックの入力時の判定
+		bool IsTrgDownAlgKey[static_cast<int>(JOYPAD_ALGKEY::MAX)];
+
+		// スティックを離した時の判定
+		bool IsTrgUpAlgKey[static_cast<int>(JOYPAD_ALGKEY::MAX)];
+	};
+
 
 #pragma region キーボードのメンバ変数
 	// キー情報配列
@@ -444,6 +453,13 @@ private:
 #pragma endregion
 
 #pragma region コントローラ識別
+
+	/// <summary>
+	/// コントローラの入力情報
+	/// </summary>
+	/// <param name="padNum">コントローラの対象</param>
+	JOYPAD_IN_STATE& GetPadInputState(JOYPAD_NO padNum);
+
 	/// <summary>
 	/// 接続されたコントローラを識別して取得
 	/// </summary>
