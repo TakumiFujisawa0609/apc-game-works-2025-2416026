@@ -55,6 +55,8 @@ public:
 		START,     // START
 		L_TRIGGER, // LT
 		R_TRIGGER, // RT
+		L_STICK, // Lスティック
+		R_STICK, // Rスティック
 
 		MAX	// 要素数
 	};

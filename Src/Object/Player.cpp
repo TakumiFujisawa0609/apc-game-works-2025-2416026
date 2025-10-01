@@ -31,6 +31,8 @@ Player::Player(void):
 	inputPad_ = -1;
 	inputType_ = INPUT_TYPE::NONE;
 
+	paramPlayer_.isRun = false;
+
 }
 
 void Player::Load(void)
@@ -42,6 +44,13 @@ void Player::Init(const VECTOR& pos, float angleY)
 {
 	/*　初期化処理　*/
 	inputPad_ = static_cast<int>(InputManager::JOYPAD_NO::PAD1);
+	inputKey_.emplace(INPUT_TYPE::MOVE_BACK, KEY_INPUT_W);
+	inputKey_.emplace(INPUT_TYPE::MOVE_FRONT, KEY_INPUT_S);
+	inputKey_.emplace(INPUT_TYPE::MOVE_LEFT, KEY_INPUT_A);
+	inputKey_.emplace(INPUT_TYPE::MOVE_RIGHT, KEY_INPUT_D);
+	inputKey_.emplace(INPUT_TYPE::RUN, KEY_INPUT_LSHIFT);
+	//inputKey_.emplace(INPUT_TYPE::ATTACK_JUB, MOUSE_INPUT_1);
+	//inputKey_.emplace(INPUT_TYPE::ATTACK_STRONG, MOUSE_INPUT_2);
 
 	SetParam();
 
@@ -105,6 +114,11 @@ void Player::SetParam(void)
 	paramPlayer_.weaponId = status_.GetWeaponId();
 	paramPlayer_.luck = status_.GetLuck();
 	paramChara_.handle = ResourceManager::GetInstance().LoadHandleId(ResourceManager::SRC::MODEL_PLAYER);
+
+	paramPlayer_.animSpeed.clear();
+	paramPlayer_.animSpeed.emplace(ANIM_STATE::IDLE, status_.GetAnimSpeedIdle());
+	paramPlayer_.animSpeed.emplace(ANIM_STATE::WALK, status_.GetAnimSpeedWalk());
+	paramPlayer_.animSpeed.emplace(ANIM_STATE::RUN, status_.GetAnimSpeedRun());
 	
 	SetAnim();
 	SetMatrixModel();
@@ -112,6 +126,7 @@ void Player::SetParam(void)
 
 void Player::SetAnim(void)
 {
+	ANIM_STATE type;
 	int max = static_cast<int>(ANIM_STATE::MAX);
 	float speed = 0.0f;
 
@@ -119,21 +134,14 @@ void Player::SetAnim(void)
 	anim_ = new AnimationController(paramChara_.handle);
 
 
-	for (int i = 0; i < max; i++)
+	for (auto& anim : paramPlayer_.animSpeed)
 	{
-		speed = ANIM_SPEED;
+		type = anim.first;
 
-		if (i == static_cast<int>(ANIM_STATE::JUMP))
-		{
-			speed = ANIM_SPEED_JUMP_ACTIVE;
-		}
-		else if (i == static_cast<int>(ANIM_STATE::WALK))
-		{
-			speed = ANIM_SPEED_MOVE;
-		}
+		speed = paramPlayer_.animSpeed[type];
 
 		// アニメーション割り当て
-		anim_->AddInFbx(i, speed, i);
+		anim_->AddInFbx(static_cast<int>(type), speed, static_cast<int>(type));
 	}
 
 	// 待機アニメーション再生
@@ -145,28 +153,12 @@ void Player::SetAnim(void)
 void Player::Update(void)
 {
 	/*　更新処理　*/
-	InputManager& input = InputManager::GetInstance();
 
 	// 反転回転フラグ
 	bool isRevert = false;
 
 	// 現在位置割り当て
 	paramChara_.prePos = paramChara_.pos;
-
-	float move = 1.0f;
-	int padNum = 0;
-	if (GetInputState() > 0)
-	{
-		paramChara_.pos.x += input.PadAlgKeyX(padNum, PAD_ALGKEY::LEFT) * move;
-		paramChara_.pos.z += input.PadAlgKeyY(padNum, PAD_ALGKEY::LEFT) * move;
-	}
-	else
-	{
-		if (input.KeyIsNew(KEY_INPUT_W)) { paramChara_.pos.z += move; }
-		if (input.KeyIsNew(KEY_INPUT_S)) { paramChara_.pos.z -= move; }
-		if (input.KeyIsNew(KEY_INPUT_A)) { paramChara_.pos.x -= move; }
-		if (input.KeyIsNew(KEY_INPUT_D)) { paramChara_.pos.x += move; }
-	}
 
 	switch (paramPlayer_.actionState)
 	{
@@ -257,6 +249,8 @@ void Player::Release(void)
 {
 	/*　解放処理　*/
 
+	paramPlayer_.animSpeed.clear();
+
 	// アニメーション解放
 	anim_->Release();
 	delete anim_;
@@ -277,7 +271,7 @@ void Player::Update_Idle(void)
 	ANIM_STATE anim = static_cast<ANIM_STATE>(anim_->GetPlayType());
 
 	// 攻撃入力・攻撃アニメーションではないとき、攻撃有効化
-	if (IsInputAttack() && anim != ANIM_STATE::SWORD_SLASH)
+	if (IsInputAtkStrong() && anim != ANIM_STATE::SWORD_SLASH)
 	{
 		SetActionState(ACTION_STATE::ATTACK_WAIT);
 
@@ -317,7 +311,7 @@ bool Player::IsInputMove(void)
 	bool ret = false;
 
 	// コントローラ入力時
-	if (inputPad_ != -1)
+	if (GetJoypadNum() > 0)
 	{
 		InputManager::JOYPAD_NO jno = static_cast<InputManager::JOYPAD_NO>(inputPad_);
 
@@ -341,7 +335,7 @@ bool Player::IsInputMove(void)
 	return ret;
 }
 
-bool Player::IsInputAttack(void)
+bool Player::IsInputAtkStrong(void)
 {
 	InputManager& input = InputManager::GetInstance();
 
@@ -350,8 +344,32 @@ bool Player::IsInputAttack(void)
 	// コントローラ入力時
 	if (inputPad_ != -1)
 	{
-		if (input.PadIsBtnTrgDown(inputPad_, PAD_BTN::R_TRIGGER) ||
-			input.PadIsBtnTrgDown(inputPad_, PAD_BTN::L_TRIGGER))
+		if (input.PadIsBtnTrgDown(inputPad_, PAD_BTN::UP))
+		{
+			ret = true;
+		}
+	}
+
+	// キーボード入力時
+	else if (input.KeyIsTrgDown(inputKey_[INPUT_TYPE::ATTACK_STRONG]))
+	{
+		// 移動入力時、true
+		ret = true;
+	}
+
+	return ret;
+}
+
+bool Player::IsInputAtkJub(void)
+{
+	InputManager& input = InputManager::GetInstance();
+
+	bool ret = false;
+
+	// コントローラ入力時
+	if (GetJoypadNum() > 0)
+	{
+		if (input.PadIsBtnTrgDown(inputPad_, PAD_BTN::LEFT))
 		{
 			ret = true;
 		}
@@ -367,31 +385,41 @@ bool Player::IsInputAttack(void)
 	return ret;
 }
 
-bool Player::IsInputJump(void)
+bool Player::IsInputRun(void)
 {
 	InputManager& input = InputManager::GetInstance();
 
-	bool ret = false;
-
 	// コントローラ入力時
-	if (inputPad_ != -1)
+	if (GetJoypadNum() > 0)
 	{
-		if (input.PadIsBtnTrgDown(inputPad_, PAD_BTN::UP) ||
-			input.PadIsBtnTrgDown(inputPad_, PAD_BTN::LEFT))
+		if (input.PadIsBtnTrgDown(inputPad_, PAD_BTN::L_STICK))
 		{
-			ret = true;
+			paramPlayer_.isRun = true;
+		}
+		else if (input.PadIsBtnTrgUp(inputPad_, PAD_BTN::L_STICK))
+		{
+			paramPlayer_.isRun = false;
 		}
 	}
 
 	// キーボード入力時
-	else if (input.KeyIsTrgDown(inputKey_[INPUT_TYPE::JUMP]))
+	else
 	{
-		// 移動入力時、true
-		ret = true;
+		if (input.KeyIsTrgDown(inputKey_[INPUT_TYPE::RUN]))
+		{
+			// ダッシュ移動入力時、true
+			paramPlayer_.isRun = true;
+		}
+		else if (input.KeyIsTrgUp(inputKey_[INPUT_TYPE::RUN]))
+		{
+			// ダッシュ移動入力時、true
+			paramPlayer_.isRun = false;
+		}
 	}
 
-	return ret;
+	return paramPlayer_.isRun;
 }
+
 
 void Player::SetIsAttack(bool flag)
 {
@@ -429,7 +457,7 @@ void Player::Move(void)
 
 	InputManager& input = InputManager::GetInstance();
 
-	if (inputPad_ != -1)
+	if (GetJoypadNum() > 0)
 	{
 		InputManager::JOYPAD_NO jno = static_cast<InputManager::JOYPAD_NO>(inputPad_);
 
@@ -553,25 +581,6 @@ void Player::Move(void)
 
 }
 
-void Player::Jump(void)
-{
-	/*　ジャンプ処理　*/
-	auto& input = InputManager::GetInstance();
-
-	// ジャンプ処理
-	if (IsInputJump() && paramChara_.isGround)
-	{
-		// 地面から離れる
-		paramChara_.isGround = false;
-
-		// Y軸加算
-		paramChara_.velocity.y = START_JUMP_POWER;
-	}
-	Gravity(); // 重力加算
-
-	// 移動量増加
-	paramChara_.pos.y += paramChara_.velocity.y;
-}
 
 void Player::Update_Animation(void)
 {
@@ -598,20 +607,16 @@ void Player::AnimationState(void)
 	// 待機アニメーション状態
 	if (state == ANIM_STATE::IDLE)
 	{
-		if (IsInputJump())
-		{
-			// ジャンプアニメーション有効化
-			anim_->Play(static_cast<int>(ANIM_STATE::JUMP), false);
-		}
+		// ダッシュ
+		if (IsInputRun() && IsInputMove()) { anim_->Play(static_cast<int>(ANIM_STATE::RUN)); }
 
-		if (IsInputMove())
+		// 歩行
+		else if (IsInputMove()) { anim_->Play(static_cast<int>(ANIM_STATE::WALK)); }
+
+		// 攻撃
+		if (IsInputAtkStrong())
 		{
-			// 移動アニメーション有効化
-			anim_->Play(static_cast<int>(ANIM_STATE::WALK));
-		}
-		if (IsInputAttack())
-		{
-			// 攻撃アニメーション有効化
+			paramPlayer_.isRun = false;
 			anim_->Play(static_cast<int>(ANIM_STATE::SWORD_SLASH), false);
 		}
 	}
@@ -624,82 +629,43 @@ void Player::AnimationState(void)
 			paramPlayer_.actionState != ACTION_STATE::ATTACK &&
 			paramChara_.timeAct <= 0.0f)
 		{
-			if (!paramChara_.isGround)
-			{
-				anim_->Play(static_cast<int>(ANIM_STATE::JUMP));
-			}
-			else
-			{
-				if (IsInputMove())
-				{
-					anim_->Play(static_cast<int>(ANIM_STATE::WALK));
-				}
-				else
-				{
-					anim_->Play(static_cast<int>(ANIM_STATE::IDLE));
-				}
-			}
+			if (IsInputRun() && IsInputMove()) { anim_->Play(static_cast<int>(ANIM_STATE::RUN)); }
+
+			// 歩行
+			else if (IsInputMove()) { anim_->Play(static_cast<int>(ANIM_STATE::WALK)); }
+
+			// 待機
+			else { anim_->Play(static_cast<int>(ANIM_STATE::IDLE)); }
 		}
 	}
 
 	else if (state == ANIM_STATE::WALK)
 	{
-		if (!IsInputMove())
-		{
-			anim_->Play(static_cast<int>(ANIM_STATE::IDLE));
-		}
+		// ダッシュ
+		if (IsInputRun() && IsInputMove()) { anim_->Play(static_cast<int>(ANIM_STATE::RUN)); }
 
-		if (IsInputJump())
-		{
-			anim_->Play(static_cast<int>(ANIM_STATE::JUMP), false);
-		}
+		// 待機
+		else if (!IsInputMove()) { anim_->Play(static_cast<int>(ANIM_STATE::IDLE)); }
 
-		if (IsInputAttack())
+		// 攻撃
+		if (IsInputAtkStrong())
 		{
+			paramPlayer_.isRun = false;
 			anim_->Play(static_cast<int>(ANIM_STATE::SWORD_SLASH), false);
 		}
 	}
-
-	else if (state == ANIM_STATE::JUMP)
+	else if (state == ANIM_STATE::RUN)
 	{
-		if (anim_->IsEnd())
-		{
-			anim_->Play(static_cast<int>(ANIM_STATE::JUMP));
-		}
-		if (paramChara_.isGround)
-		{
-			if (IsInputMove())
-			{
-				anim_->Play(static_cast<int>(ANIM_STATE::WALK));
-			}
-			else
-			{
-				anim_->Play(static_cast<int>(ANIM_STATE::IDLE));
-			}
-		}
+		// 歩行
+		if (IsInputMove() && !IsInputRun()) { anim_->Play(static_cast<int>(ANIM_STATE::WALK)); }
 
-		if (IsInputAttack())
-		{
-			anim_->Play(static_cast<int>(ANIM_STATE::SWORD_SLASH), false);
-		}
-	}
+		// 待機
+		else if (!IsInputMove()){ anim_->Play(static_cast<int>(ANIM_STATE::IDLE)); }
 
-	else if (state == ANIM_STATE::JUMP)
-	{
-		if (paramChara_.isGround)
+		// 攻撃
+		if (IsInputAtkStrong())
 		{
-			if (IsInputMove())
-			{
-				anim_->Play(static_cast<int>(ANIM_STATE::WALK));
-			}
-			else
-			{
-				anim_->Play(static_cast<int>(ANIM_STATE::IDLE));
-			}
-		}
-
-		if (IsInputAttack())
-		{
+			paramPlayer_.isRun = false;
 			anim_->Play(static_cast<int>(ANIM_STATE::SWORD_SLASH), false);
 		}
 	}

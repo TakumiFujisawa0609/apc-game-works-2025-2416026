@@ -21,4 +21,13 @@ StatusPlayer::StatusPlayer(void)
 	timeEvasion_ = 0.0f;
 
 	timeInv_ = 0.0f;
+
+	comboMag_ = 0.0f;
+
+
+	animSpeedIdle_ = 0.0f;
+
+	animSpeedWalk_ = 0.0f;
+
+	animSpeedRun_ = 0.0f;
 }

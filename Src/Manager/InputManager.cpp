@@ -309,6 +309,11 @@ InputManager::JOYPAD_IN_STATE& InputManager::GetPadInputState(JOYPAD_NO padNum)
 		index = static_cast<int>(PAD_BTN::START);
 		ret.ButtonNew[index] = d.Buttons[7];
 
+		index = static_cast<int>(PAD_BTN::L_STICK);
+		ret.ButtonNew[index] = d.Buttons[8];
+
+		index = static_cast<int>(PAD_BTN::R_STICK);
+		ret.ButtonNew[index] = d.Buttons[9];
 
 		// RTrigger
 		index = static_cast<int>(PAD_BTN::L_TRIGGER);

@@ -174,8 +174,6 @@ void SceneManager::ChangeScene(SceneManager::SCENE_ID nextScene)
 
 void SceneManager::DrawGrid(void)
 {
-#ifdef _DEBUG
-
 	// XZ基本軸(グリッド)
 	float num;
 	VECTOR sPos;
@@ -204,7 +202,7 @@ void SceneManager::DrawGrid(void)
 	ePos = { 0.0f,  GRID_HLEN, 0.0f };
 	DrawLine3D(sPos, ePos, 0x00ff00);
 	DrawSphere3D(ePos, 20.0f, 10, 0x00ff00, 0x00ff00, true);
-#endif
+
 }
 
 void SceneManager::DoChangeState(SCENE_ID nextScene)

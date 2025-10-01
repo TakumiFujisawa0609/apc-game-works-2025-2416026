@@ -82,8 +82,7 @@ public:
 		ATTACK_JUB,    // 弱攻撃
 		ATTACK_STRONG, // 強攻撃
 
-		DASH,		  // ダッシュ
-		JUMP,		  // ジャンプ
+		RUN,		  // ダッシュ
 
 		MAX,
 	};
@@ -230,7 +229,7 @@ public:
 
 protected:
 
-	struct PLAYER_PARAM
+	struct PlayerParam
 	{
 		ACTION_STATE actionState; // 行動状態
 
@@ -245,8 +244,12 @@ protected:
 		int combo; // コンボ数
 
 		int weaponId; // 武器ID
+
+		bool isRun; // ダッシュフラグ
+
+		std::map<ANIM_STATE, float> animSpeed;
 	};
-	PLAYER_PARAM paramPlayer_;
+	PlayerParam paramPlayer_;
 
 	StatusPlayer& status_;
 
@@ -257,7 +260,7 @@ protected:
 	INPUT_TYPE inputType_;
 
 	// 入力するキーの種類
-	std::map <INPUT_TYPE, unsigned int>inputKey_;
+	std::map<INPUT_TYPE, unsigned int> inputKey_;
 
 	// 入力するゲームパッド識別番号
 	int inputPad_;
@@ -288,11 +291,6 @@ protected:
 	void Move(void);
 
 	/// <summary>
-	/// ジャンプ処理
-	/// </summary>
-	void Jump(void);
-
-	/// <summary>
 	/// アニメーション割り当て
 	/// </summary>
 	void SetAnim(void)override;
@@ -310,12 +308,17 @@ protected:
 	/// <summary>
 	/// 攻撃入力をしているか否か
 	/// </summary>
-	bool IsInputAttack(void);
+	bool IsInputAtkStrong(void);
 
 	/// <summary>
-	/// ジャンプ入力をしているか否か
+	/// 弱攻撃入力をしているか否か
 	/// </summary>
-	bool IsInputJump(void);
+	bool IsInputAtkJub(void);
+
+	/// <summary>
+	/// ダッシュ入力をしているか否か
+	/// </summary>
+	bool IsInputRun(void);
 
 
 	/// <summary>

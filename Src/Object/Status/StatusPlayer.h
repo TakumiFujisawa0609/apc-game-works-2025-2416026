@@ -23,6 +23,10 @@ public:
 		TIME_EVASION,    // 回避時間
 		COMBO_MAG, 	     // コンボ倍率
 
+		ANIM_SPEED_IDLE, // 待機アニメーション速度
+		ANIM_SPEED_WALK, // 移動アニメーション速度
+		ANIM_SPEED_RUN, // ダッシュアニメーション速度
+
 		MAX,
 	};
 
@@ -46,6 +50,10 @@ public:
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::TIME_PARRY)], timeParry_, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::TIME_EVASION)], timeEvasion_, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::COMBO_MAG)], comboMag_, 0.0f);
+
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_IDLE)], animSpeedIdle_, 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_WALK)], animSpeedWalk_, 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_RUN)], animSpeedRun_, 0.0f);
 	}
 
 
@@ -84,6 +92,13 @@ public:
 	/// コンボ倍率
 	/// </summary>
 	float GetComboMag(void) { return comboMag_; }
+
+	// アニメーション速度
+	float& GetAnimSpeedIdle(void) { return animSpeedIdle_; };
+
+	float& GetAnimSpeedWalk(void) { return animSpeedWalk_; };
+
+	float& GetAnimSpeedRun(void) { return animSpeedRun_; };
 	
 
 private:
@@ -113,4 +128,11 @@ private:
 
 	// コンボ倍率
 	float comboMag_;
+
+
+	float animSpeedIdle_;
+
+	float animSpeedWalk_;
+
+	float animSpeedRun_;
 };
