@@ -1,5 +1,6 @@
 #pragma once
 #include "../Object.h"
+#include "../Status/StatusEnemy.h"
 #include <string>
 class StatusEnemy;
 
@@ -7,55 +8,72 @@ class Enemy : public Object
 {
 public:
 
-	enum class TYPE
+	enum class ACTION_STATE
 	{
-		NONE,
-		WARRIOR,
+		NONE = -1,
+		INACTIVE, // 非表示状態
+		SPAWN, 
+		IDLE,
+		ATTACK_START,
+		ATTACK_ACTIVE,
+		ATTACK_END,
+		MAX,
 	};
 
-	Enemy(TYPE type);
+	static constexpr float LOCAL_ANGLE_Y = (180.0f * (DX_PI_F / 180.0f));
 
-	~Enemy(void) = default;
+	// モデルの位置調整値
+	static constexpr VECTOR MODEL_OFFSET = { 0.0f, 0.0f, 0.0f };
+
+	
+	Enemy(StatusEnemy::TYPE type);
+
+	virtual ~Enemy(void) = default;
 
 	void Load(void)override;
 
-	void Init(const VECTOR& pos, float angleY = 0.0f)override;
+	void Init(const VECTOR& pos, float angleY = 0.0f, ACTION_STATE state = ACTION_STATE::IDLE);
 
 	void Update(void)override;
 
-	void Draw(void)override;
+	void Release(void)override;
+
 
 	void SetParam(void) override;
 
+	/// <summary>
+	/// 行動状態取得
+	/// </summary>
+	ACTION_STATE GetActionState(void)const { return actionState_; };
 
-private:
+	bool GetIsActive(void)const { return (actionState_ != ACTION_STATE::INACTIVE);  };
+
+
+protected:
 
 	struct ENEMY_PARAM
 	{
 		std::string name;
 
-		int handle;
+		StatusEnemy::TYPE type;
 
 		float curAtkInterval;
 
 		float atkRange;
 
 		float searchRange;
-
-
-		float animSpeedIdle;
-
-		float curAnimSpeedIdle;
-
-		float animSpeedAtk;
-
-		float curAnimSpeedAtk;
 	};
+
 	ENEMY_PARAM paramEnemy_;
+
+	ACTION_STATE actionState_;
 
 	StatusEnemy& status_;
 
-	void LoadStatus(void);
+
+	void LoadResource(void);
+
+	virtual void InitAnim(void) = 0;
 
 	//StatusEnemy& data_;
 

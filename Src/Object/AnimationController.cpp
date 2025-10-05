@@ -133,22 +133,8 @@ void AnimationController::Release(void)
 		}
 	}
 
-#pragma region beta
-	/*
-	// ロードしたアニメーションを解放
-	for (const std::pair<int, Animation>& pair : animations_)
-	{
-		if (pair.second.model != -1)
-		{
-			MV1DeleteModel(pair.second.model);
-		}
-	}*/
-#pragma endregion
-
 	// リスト解放
 	animations_.clear();
-
-	MV1DeleteModel(modelId_);
 }
 
 bool AnimationController::IsEnd(void) const

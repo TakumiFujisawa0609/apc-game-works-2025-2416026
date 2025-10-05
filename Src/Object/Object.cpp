@@ -18,7 +18,7 @@ Object::Object(void)
 	paramChara_.velocity = {};
 
 	paramChara_.pos = paramChara_.prePos = {};
-	paramChara_.modelOffset;
+	paramChara_.localPos;
 
 	paramChara_.quaRot = Quaternion::Identity();
 	paramChara_.quaRotLocal = Quaternion::Identity();
@@ -38,8 +38,23 @@ Object::Object(void)
 
 	anim_ = nullptr;
 	//collision_ = nullptr;
+
+	Load();
 }
 
+void Object::Init(void)
+{
+	paramChara_.velocity = AsoUtility::VECTOR_ZERO;
+	paramChara_.dir = {};
+
+	SetParam();
+
+	// アニメーション初期化処理
+	InitAnim();
+
+	// モデル位置割り当て処理
+	SetMatrixModel();
+}
 
 void Object::Draw(void)
 {
@@ -59,27 +74,11 @@ void Object::Draw(void)
 
 	MV1SetDifColorScale(paramChara_.handle, color);
 
+//#ifdef _DEBUG
+	DrawSphere3D(paramChara_.pos, paramChara_.scale.y, 8, 0xaaaaaa, 0xaaaaaa, false);
+//#endif
 	// モデル描画処理
 	MV1DrawModel(paramChara_.handle);
-}
-
-void Object::Update_Idle(void)
-{
-}
-
-void Object::Update_Attack(void)
-{
-}
-
-
-void Object::Update_GameOver(void)
-{
-	float delta = SceneManager::GetInstance().GetDeltaTime();
-
-	if (paramChara_.timeInv > 0.0f)
-	{
-		paramChara_.timeInv -= delta;
-	}
 }
 
 
@@ -95,7 +94,7 @@ void Object::SetMatrixModel(void)
 	mixRot = Quaternion::Mult(paramChara_.quaRot, paramChara_.quaRotLocal);
 
 	// 位置
-	MATRIX matPos = MGetTranslate(VAdd(paramChara_.pos, paramChara_.modelOffset));
+	MATRIX matPos = MGetTranslate(VAdd(paramChara_.pos, paramChara_.localPos));
 
 
 	/* 行列の合成 */
@@ -368,16 +367,4 @@ const VECTOR& Object::GetPosDelta(void) const
 {
 	/* 移動量を取得 */
 	return VSub(paramChara_.pos, paramChara_.prePos);
-}
-
-const VECTOR& Object::GetScale(void) const
-{
-	/* キャラクターのスケールを取得 */
-	return paramChara_.scale;
-}
-
-const VECTOR& Object::GetModelOffset(void) const
-{
-	/* キャラクターモデルの位置調整値を取得 */
-	return paramChara_.modelOffset;
 }

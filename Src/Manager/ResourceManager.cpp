@@ -61,7 +61,7 @@ void ResourceManager::SetResource(void)
 	src++;
 
 	// “G
-	max = static_cast<int>(StatusEnemy::TYPE::MAX);
+	max = static_cast<int>(StatusEnemy::TYPE::MAX) - 1;
 	for (int i = 0; i < max; i++)
 	{
 		res = Resource(Resource::LOAD_TYPE::MODEL, PATH_MODEL + data.GetHandlePathEnemy(i));
@@ -70,7 +70,7 @@ void ResourceManager::SetResource(void)
 	}
 
 	// •Ší
-	max = static_cast<int>(StatusWeapon::TYPE::MAX);
+	max = static_cast<int>(StatusWeapon::TYPE::MAX) - 1;
 	for (int i = 0; i < max; i++)
 	{
 		res = Resource(Resource::LOAD_TYPE::MODEL, PATH_MODEL + data.GetHandlePathWeapon(i));

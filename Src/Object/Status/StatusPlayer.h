@@ -12,6 +12,7 @@ public:
 	{
 		START_NAME,  // 初期の名前
 		HANDLE_PATH, // モデルのハンドルパス
+		SCALE, // モデルのスケール
 		HP,    // HP
 		POWER, // 攻撃力
 		LUCK,  // 幸運
@@ -40,6 +41,7 @@ public:
 		startName_  = _loadString[static_cast<int>(PARAM::START_NAME)];
 		handlePath_ = _loadString[static_cast<int>(PARAM::HANDLE_PATH)];
 
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::SCALE)], scale_, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::HP)], hp_, 0);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::POWER)], power_, 0);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::LUCK)], luck_, 0);
@@ -60,6 +62,8 @@ public:
 	std::string& GetStartName(void) { return startName_; }
 
 	std::string& GetHandlePath(void) { return handlePath_; }
+
+	float GetScale(void) { return scale_; }
 
 	int GetHp(void) { return hp_; }
 
@@ -106,6 +110,8 @@ private:
 	std::string startName_;
 
 	std::string handlePath_;
+
+	float scale_;
 
 	int hp_;
 

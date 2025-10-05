@@ -98,7 +98,7 @@ protected:
 		Quaternion quaRotLocal; // ローカル回転(クォータニオン)
 
 		VECTOR scale;		// スケール
-		VECTOR modelOffset; // モデル位置調整値
+		VECTOR localPos; // モデル位置調整値
 
 		int handle;   // ハンドルID
 		int frameMax; // メッシュ数
@@ -163,7 +163,6 @@ protected:
 	// ダメージ色有効間隔
 	static constexpr int COLOR_TEAM = 2;
 
-
 	/// <summary>
 	/// 移動処理
 	/// </summary>
@@ -193,7 +192,7 @@ protected:
 	/// <summary>
 	/// アニメーション割り当て処理
 	/// </summary>
-	virtual void SetAnim(void) = 0;
+	virtual void InitAnim(void) = 0;
 
 
 public:
@@ -209,13 +208,9 @@ public:
 	/// </summary>
 	virtual ~Object(void) = default; // defaultさん やっておしまいなさい
 
-	virtual void Load(void) = 0;
+	virtual void Load(void) {};
 
-	/// <summary>
-	/// 初期化処理
-	/// </summary>
-	/// <param name="pos">位置</param>
-	virtual void Init(const VECTOR& pos,float angleY = 0.0f) = 0;
+	void Init(void);
 
 	/// <summary>
 	/// 更新処理
@@ -225,29 +220,12 @@ public:
 	/// <summary>
 	/// 描画処理
 	/// </summary>
-	virtual void Draw(void);
+	void Draw(void);
 
 	/// <summary>
 	/// 解放処理
 	/// </summary>
 	virtual void Release(void) {};
-
-
-	/// <summary>
-	/// 待機更新処理
-	/// </summary>
-	virtual void Update_Idle(void);
-
-	/// <summary>
-	/// 攻撃更新処理
-	/// </summary>
-	virtual void Update_Attack(void);
-
-	/// <summary>
-	/// ゲームオーバー状態の更新処理
-	/// </summary>
-	virtual void Update_GameOver(void);
-
 
 	/// <summary>
 	/// パラメータ割り当て
@@ -317,7 +295,7 @@ public:
 	/// 加速度を割り当て
 	/// </summary>
 	/// <param name="velo">加速度</param>
-	void SetVelocity(const VECTOR& velo) { paramChara_.velocity = velo;  };
+	void SetVelocity(const VECTOR& velo) { paramChara_.velocity = velo; };
 
 	/// <summary>
 	/// 地面判定を割り当て
@@ -334,6 +312,11 @@ public:
 	/// 前フレーム位置取得
 	/// </summary>
 	VECTOR& GetPrePos(void) { return paramChara_.prePos; };
+
+	/// <summary>
+	/// ローカル座標取得
+	/// </summary>
+	const VECTOR& GetPosLocal(void) const { return paramChara_.localPos; };
 
 	/// <summary>
 	/// 持ちあげ位置取得
@@ -376,12 +359,8 @@ public:
 	/// <summary>
 	/// スケール取得
 	/// </summary>
-	const VECTOR& GetScale(void) const;
+	const VECTOR& GetScale(void) const { return paramChara_.scale; };
 
-	/// <summary>
-	/// モデル調整値取得
-	/// </summary>
-	const VECTOR& GetModelOffset(void) const;
 
 	/// <summary>
 	/// キャラモデルハンドル取得

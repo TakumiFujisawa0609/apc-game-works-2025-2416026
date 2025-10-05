@@ -40,7 +40,7 @@ public:
 	static constexpr VECTOR ZOOM_IN_MAX = { 0.0f, 100.0f, 650.0f };
 
 	// 最大ズームアウトローカル座標
-	static constexpr VECTOR ZOOM_OUT_MAX = { 0.0f, 500.0f, 1000.0f };
+	static constexpr VECTOR ZOOM_OUT_MAX = { 0.0f, 2000.0f, 2500.0f };
 
 	// ズーム速度
 	static constexpr float ZOOM_SPEED = 2.0f;
@@ -51,7 +51,7 @@ public:
 	// 注視点への視点移動速度(0～1.0)
 	static constexpr float CAMERA_LOOK_SPEED = 0.0f;
 
-	static constexpr VECTOR CAMERA_DISTANCE = { 100.0, 150.0f, -500.0f };
+	static constexpr VECTOR CAMERA_DISTANCE = { 0.0, 150.0f, -400.0f };
 
 	/// <summary>
 	/// インスタンス生成

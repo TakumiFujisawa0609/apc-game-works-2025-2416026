@@ -304,6 +304,8 @@ public:
 	/// <returns></returns>
 	bool PadAnyInput(void)const;
 
+	
+
 #pragma endregion
 
 
@@ -342,38 +344,47 @@ private:
 	struct JOYPAD_IN_STATE
 	{
 		// ボタンの前フレーム入力判定
-		unsigned char ButtonOld[static_cast<int>(PAD_BTN::MAX)];
+		unsigned char buttonOld[static_cast<int>(PAD_BTN::MAX)];
 
 		// ボタンの現在フレーム入力判定
-		unsigned char ButtonNew[static_cast<int>(PAD_BTN::MAX)];
+		unsigned char buttonNew[static_cast<int>(PAD_BTN::MAX)];
 
-		bool IsOld[static_cast<int>(PAD_BTN::MAX)];
-		bool IsNew[static_cast<int>(PAD_BTN::MAX)];
+		bool isOld[static_cast<int>(PAD_BTN::MAX)];
+		bool isNew[static_cast<int>(PAD_BTN::MAX)];
 
 		// 入力時の判定
-		bool IsTrgDown[static_cast<int>(PAD_BTN::MAX)];
+		bool isTrgDown[static_cast<int>(PAD_BTN::MAX)];
 
 		// 離した時の判定
-		bool IsTrgUp[static_cast<int>(PAD_BTN::MAX)];
+		bool isTrgUp[static_cast<int>(PAD_BTN::MAX)];
 
 
 		// スティックの横入力の傾き具合
-		int AlgKeyX[static_cast<int>(JOYPAD_ALGKEY::MAX)];
+		int algKeyX[static_cast<int>(JOYPAD_ALGKEY::MAX)];
 
 		// スティックの縦入力の傾き具合
-		int AlgKeyY[static_cast<int>(JOYPAD_ALGKEY::MAX)];
+		int algKeyY[static_cast<int>(JOYPAD_ALGKEY::MAX)];
 
 		// スティックの前フレームの入力判定
-		bool IsOldAlgKey[static_cast<int>(JOYPAD_ALGKEY::MAX)];
+		bool isOldAlgKey[static_cast<int>(JOYPAD_ALGKEY::MAX)];
 
 		// スティックの現在フレーム入力判定
-		bool IsNewAlgKey[static_cast<int>(JOYPAD_ALGKEY::MAX)];
+		bool isNewAlgKey[static_cast<int>(JOYPAD_ALGKEY::MAX)];
 
 		// スティックの入力時の判定
-		bool IsTrgDownAlgKey[static_cast<int>(JOYPAD_ALGKEY::MAX)];
+		bool isTrgDownAlgKey[static_cast<int>(JOYPAD_ALGKEY::MAX)];
 
 		// スティックを離した時の判定
-		bool IsTrgUpAlgKey[static_cast<int>(JOYPAD_ALGKEY::MAX)];
+		bool isTrgUpAlgKey[static_cast<int>(JOYPAD_ALGKEY::MAX)];
+
+		// 振動判定
+		bool isVibration;
+
+		// 振動の強さ(0～100)
+		unsigned int vibrationPow;
+
+		// 振動の時間
+		float vibrationTime;
 	};
 
 

@@ -6,6 +6,8 @@ StatusPlayer::StatusPlayer(void)
 
 	handlePath_ = "";
 
+	scale_ = 0.0f;
+
 	power_ = 0;
 
 	luck_ = 0;

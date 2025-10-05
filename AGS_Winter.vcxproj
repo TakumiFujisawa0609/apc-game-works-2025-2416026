@@ -149,6 +149,8 @@
     <ClInclude Include="Src\Manager\EffectManager.h" />
     <ClInclude Include="Src\Object\AnimationController.h" />
     <ClInclude Include="Src\Object\Enemy\Enemy.h" />
+    <ClInclude Include="Src\Object\Enemy\EnemyController.h" />
+    <ClInclude Include="Src\Object\Enemy\EnemyWarrior.h" />
     <ClInclude Include="Src\Object\Object.h" />
     <ClInclude Include="Src\Object\Player.h" />
     <ClInclude Include="Src\Object\Status\StatusData.h" />
@@ -182,6 +184,8 @@
     <ClCompile Include="Src\Manager\EffectManager.cpp" />
     <ClCompile Include="Src\Object\AnimationController.cpp" />
     <ClCompile Include="Src\Object\Enemy\Enemy.cpp" />
+    <ClCompile Include="Src\Object\Enemy\EnemyController.cpp" />
+    <ClCompile Include="Src\Object\Enemy\EnemyWarrior.cpp" />
     <ClCompile Include="Src\Object\Object.cpp" />
     <ClCompile Include="Src\Object\Player.cpp" />
     <ClCompile Include="Src\Object\Status\StatusData.cpp" />

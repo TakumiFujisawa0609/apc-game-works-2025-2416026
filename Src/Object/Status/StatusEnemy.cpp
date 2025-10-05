@@ -6,6 +6,10 @@ StatusEnemy::StatusEnemy(void)
 
 	handlePath_ = "";
 
+	type_ = TYPE::NONE;
+
+	scale_ = 0.0f;
+
 	hp_ = 0;
 
 	power_ = 0;
@@ -20,7 +24,23 @@ StatusEnemy::StatusEnemy(void)
 
 	searchRange_ = 0.0f;
 
-	animSpeedIdle_ = 0.0f;
+	animSpeed_.idle = 0.0f;
 
-	animSpeedAtk_ = 0.0f;
+	animSpeed_.attack = 0.0f;
+
+	animSpeed_.walk = 0.0f;
+
+	animSpeed_.spawn = 0.0f;
+}
+
+void StatusEnemy::SetType(const std::string& text)
+{
+	for (auto& type : TYPE_STRING)
+	{
+		if (type.second == text)
+		{
+			// テキストと状態が一致時に割り当て
+			type_ = type.first;
+		}
+	}
 }

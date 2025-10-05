@@ -138,17 +138,12 @@ public:
 	/// <summary>
 	/// 初期化処理
 	/// </summary>
-	void Init(const VECTOR& pos, float angleY = 0.0f) override;
+	void Init(const VECTOR& pos, float angleY = 0.0f);
 
 	/// <summary>
 	/// 更新処理
 	/// </summary>
 	void Update(void) override;
-
-	/// <summary描画処理>
-	/// 
-	/// </summary>
-	void Draw(void)override;
 
 	/// <summary>
 	/// デバッグ表示
@@ -272,17 +267,17 @@ protected:
 	/// <summary>
 	/// 待機更新処理
 	/// </summary>
-	void Update_Idle(void) override;
+	void Update_Idle(void);
 
 	/// <summary>
 	/// 攻撃更新処理
 	/// </summary>
-	void Update_Attack(void)override;
+	void Update_Attack(void);
 
 	/// <summary>
 	/// ゲームオーバー状態の更新処理
 	/// </summary>
-	void Update_GameOver(void)override;
+	void Update_GameOver(void);
 
 
 	/// <summary>
@@ -293,7 +288,7 @@ protected:
 	/// <summary>
 	/// アニメーション割り当て
 	/// </summary>
-	void SetAnim(void)override;
+	void InitAnim(void)override;
 
 	/// <summary>
 	/// アニメーション処理

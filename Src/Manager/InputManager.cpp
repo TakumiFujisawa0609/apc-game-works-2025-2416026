@@ -231,27 +231,27 @@ void InputManager::SetPadInState(JOYPAD_NO jPadNum)
 	int max = static_cast<int>(PAD_BTN::MAX);
 	for (int i = 0; i < max; i++)
 	{
-		stateNow.ButtonOld[i] = stateNow.ButtonNew[i];
-		stateNow.ButtonNew[i] = stateNew.ButtonNew[i];
+		stateNow.buttonOld[i] = stateNow.buttonNew[i];
+		stateNow.buttonNew[i] = stateNew.buttonNew[i];
 
-		stateNow.IsOld[i] = stateNow.IsNew[i];
-		stateNow.IsNew[i] = (stateNow.ButtonNew[i] > 0);
+		stateNow.isOld[i] = stateNow.isNew[i];
+		stateNow.isNew[i] = (stateNow.buttonNew[i] > 0);
 
-		stateNow.IsTrgDown[i] = (stateNow.IsNew[i] && !stateNow.IsOld[i]);
-		stateNow.IsTrgUp[i] = (!stateNow.IsNew[i] && stateNow.IsOld[i]);
+		stateNow.isTrgDown[i] = (stateNow.isNew[i] && !stateNow.isOld[i]);
+		stateNow.isTrgUp[i] = (!stateNow.isNew[i] && stateNow.isOld[i]);
 	}
 
 	max = static_cast<int>(JOYPAD_ALGKEY::MAX);
 	for (int i = 0; i < max; i++)
 	{
-		stateNow.AlgKeyX[i] = stateNew.AlgKeyX[i];
-		stateNow.AlgKeyY[i] = stateNew.AlgKeyY[i];
+		stateNow.algKeyX[i] = stateNew.algKeyX[i];
+		stateNow.algKeyY[i] = stateNew.algKeyY[i];
 
-		stateNow.IsOldAlgKey[i] = stateNow.IsNewAlgKey[i];
-		stateNow.IsNewAlgKey[i] = (stateNow.AlgKeyX[i] != 0 || stateNow.AlgKeyY[i] != 0);
+		stateNow.isOldAlgKey[i] = stateNow.isNewAlgKey[i];
+		stateNow.isNewAlgKey[i] = (stateNow.algKeyX[i] != 0 || stateNow.algKeyY[i] != 0);
 
-		stateNow.IsTrgDownAlgKey[i] = (stateNow.IsNewAlgKey[i] && !stateNow.IsOldAlgKey[i]);
-		stateNow.IsTrgUpAlgKey[i] = (!stateNow.IsNewAlgKey[i] && stateNow.IsOldAlgKey[i]);
+		stateNow.isTrgDownAlgKey[i] = (stateNow.isNewAlgKey[i] && !stateNow.isOldAlgKey[i]);
+		stateNow.isTrgUpAlgKey[i] = (!stateNow.isNewAlgKey[i] && stateNow.isOldAlgKey[i]);
 	}
 }
 
@@ -279,61 +279,61 @@ InputManager::JOYPAD_IN_STATE& InputManager::GetPadInputState(JOYPAD_NO padNum)
 
 		// A
 		index = static_cast<int>(PAD_BTN::DOWN);
-		ret.ButtonNew[index] = d.Buttons[0];
+		ret.buttonNew[index] = d.Buttons[0];
 
 		// B
 		index = static_cast<int>(PAD_BTN::RIGHT);
-		ret.ButtonNew[index] = d.Buttons[1];
+		ret.buttonNew[index] = d.Buttons[1];
 
 		// X
 		index = static_cast<int>(PAD_BTN::LEFT);
-		ret.ButtonNew[index] = d.Buttons[2];
+		ret.buttonNew[index] = d.Buttons[2];
 
 		// Y
 		index = static_cast<int>(PAD_BTN::UP);
-		ret.ButtonNew[index] = d.Buttons[3];
+		ret.buttonNew[index] = d.Buttons[3];
 
 		// L
 		index = static_cast<int>(PAD_BTN::L_BUTTON);
-		ret.ButtonNew[index] = d.Buttons[4];
+		ret.buttonNew[index] = d.Buttons[4];
 
 		// R
 		index = static_cast<int>(PAD_BTN::R_BUTTON);
-		ret.ButtonNew[index] = d.Buttons[5];
+		ret.buttonNew[index] = d.Buttons[5];
 
 		// BACK
 		index = static_cast<int>(PAD_BTN::BACK);
-		ret.ButtonNew[index] = d.Buttons[6];
+		ret.buttonNew[index] = d.Buttons[6];
 
 		// START
 		index = static_cast<int>(PAD_BTN::START);
-		ret.ButtonNew[index] = d.Buttons[7];
+		ret.buttonNew[index] = d.Buttons[7];
 
 		index = static_cast<int>(PAD_BTN::L_STICK);
-		ret.ButtonNew[index] = d.Buttons[8];
+		ret.buttonNew[index] = d.Buttons[8];
 
 		index = static_cast<int>(PAD_BTN::R_STICK);
-		ret.ButtonNew[index] = d.Buttons[9];
+		ret.buttonNew[index] = d.Buttons[9];
 
 		// RTrigger
 		index = static_cast<int>(PAD_BTN::L_TRIGGER);
-		ret.ButtonNew[index] = x.LeftTrigger;
+		ret.buttonNew[index] = x.LeftTrigger;
 
 		// RTrigger
 		index = static_cast<int>(PAD_BTN::R_TRIGGER);
-		ret.ButtonNew[index] = x.RightTrigger;
+		ret.buttonNew[index] = x.RightTrigger;
 
 
 
 		// 左スティック
 		index = static_cast<int>(JOYPAD_ALGKEY::LEFT);
-		ret.AlgKeyX[index] = d.X;
-		ret.AlgKeyY[index] = d.Y;
+		ret.algKeyX[index] = d.X;
+		ret.algKeyY[index] = d.Y;
 
 		// 右スティック
 		index = static_cast<int>(JOYPAD_ALGKEY::RIGHT);
-		ret.AlgKeyX[index] = d.Rx;
-		ret.AlgKeyY[index] = d.Ry;
+		ret.algKeyX[index] = d.Rx;
+		ret.algKeyY[index] = d.Ry;
 
 		// Dパッド(十字スティック)
 		index = static_cast<int>(JOYPAD_ALGKEY::D_PAD);
@@ -349,8 +349,8 @@ InputManager::JOYPAD_IN_STATE& InputManager::GetPadInputState(JOYPAD_NO padNum)
 		if (d.POV == &up)    inputY = -1;
 		if (d.POV == &down)  inputY = 1;
 
-		ret.AlgKeyX[index] = inputX;
-		ret.AlgKeyY[index] = inputY;
+		ret.algKeyX[index] = inputX;
+		ret.algKeyY[index] = inputY;
 	}
 	break;
 
@@ -448,7 +448,7 @@ bool InputManager::PadIsBtnNew(int padNum, PAD_BTN button) const
 	if (GetJoypadNum() < padNum) return false;
 
 	int btnType = static_cast<int>(button);
-	bool ret = (padInfos_[padNum].IsNew[btnType]);
+	bool ret = (padInfos_[padNum].isNew[btnType]);
 	return ret;
 }
 bool InputManager::PadIsBtnNew(int padNum, int button) const
@@ -456,7 +456,7 @@ bool InputManager::PadIsBtnNew(int padNum, int button) const
 	// パッドが未割当時、false
 	if (GetJoypadNum() < padNum) return false;
 
-	bool ret = (padInfos_[padNum].IsNew[button]);
+	bool ret = (padInfos_[padNum].isNew[button]);
 	return ret;
 }
 
@@ -466,7 +466,7 @@ bool InputManager::PadIsBtnTrgDown(int padNum, PAD_BTN button) const
 	if (GetJoypadNum() < padNum) return false;
 
 	int btnType = static_cast<int>(button);
-	bool ret = (padInfos_[padNum].IsTrgDown[btnType]);
+	bool ret = (padInfos_[padNum].isTrgDown[btnType]);
 	return ret;
 }
 bool InputManager::PadIsBtnTrgDown(int padNum, int button) const
@@ -474,7 +474,7 @@ bool InputManager::PadIsBtnTrgDown(int padNum, int button) const
 	// パッドが未割当時、false
 	if (GetJoypadNum() < padNum) return false;
 
-	bool ret = (padInfos_[padNum].IsTrgDown[button]);
+	bool ret = (padInfos_[padNum].isTrgDown[button]);
 	return ret;
 }
 
@@ -484,7 +484,7 @@ bool InputManager::PadIsBtnTrgUp(int padNum, PAD_BTN button) const
 	if (GetJoypadNum() < padNum) return false;
 
 	int btnType = static_cast<int>(button);
-	bool ret = (padInfos_[padNum].IsTrgUp[btnType]);
+	bool ret = (padInfos_[padNum].isTrgUp[btnType]);
 	return ret;
 }
 bool InputManager::PadIsBtnTrgUp(int padNum, int button) const
@@ -492,7 +492,7 @@ bool InputManager::PadIsBtnTrgUp(int padNum, int button) const
 	// パッドが未割当時、false
 	if (GetJoypadNum() < padNum) return false;
 
-	bool ret = (padInfos_[padNum].IsTrgUp[button]);
+	bool ret = (padInfos_[padNum].isTrgUp[button]);
 	return ret;
 }
 
@@ -502,7 +502,7 @@ bool InputManager::PadIsAlgKeyNew(int padNum, JOYPAD_ALGKEY algKey)const
 	if (GetJoypadNum() < padNum) return false;
 
 	int keyType = static_cast<int>(algKey);
-	bool ret = (padInfos_[padNum].IsNewAlgKey[keyType]);
+	bool ret = (padInfos_[padNum].isNewAlgKey[keyType]);
 	return ret;
 }
 bool InputManager::PadIsAlgKeyNew(int padNum, int algKey)const
@@ -510,7 +510,7 @@ bool InputManager::PadIsAlgKeyNew(int padNum, int algKey)const
 	// パッドが未割当時、false
 	if (GetJoypadNum() < padNum) return false;
 
-	bool ret = (padInfos_[padNum].IsNewAlgKey[algKey]);
+	bool ret = (padInfos_[padNum].isNewAlgKey[algKey]);
 	return ret;
 }
 
@@ -520,7 +520,7 @@ bool InputManager::PadIsAlgKeyTrgDown(int padNum, JOYPAD_ALGKEY algKey)const
 	if (GetJoypadNum() < padNum) return false;
 
 	int keyType = static_cast<int>(algKey);
-	bool ret = (padInfos_[padNum].IsTrgDownAlgKey[keyType]);
+	bool ret = (padInfos_[padNum].isTrgDownAlgKey[keyType]);
 	return ret;
 }
 bool InputManager::PadIsAlgKeyTrgDown(int padNum, int algKey)const
@@ -528,7 +528,7 @@ bool InputManager::PadIsAlgKeyTrgDown(int padNum, int algKey)const
 	// パッドが未割当時、false
 	if (GetJoypadNum() < padNum) return false;
 
-	bool ret = (padInfos_[padNum].IsTrgDownAlgKey[algKey]);
+	bool ret = (padInfos_[padNum].isTrgDownAlgKey[algKey]);
 	return ret;
 }
 
@@ -538,7 +538,7 @@ bool InputManager::PadIsAlgKeyTrgUp(int padNum, JOYPAD_ALGKEY algKey)const
 	if (GetJoypadNum() < padNum) return false;
 
 	int keyType = static_cast<int>(algKey);
-	bool ret = (padInfos_[padNum].IsTrgUpAlgKey[keyType]);
+	bool ret = (padInfos_[padNum].isTrgUpAlgKey[keyType]);
 	return ret;
 }
 bool InputManager::PadIsAlgKeyTrgUp(int padNum, int algKey)const
@@ -546,7 +546,7 @@ bool InputManager::PadIsAlgKeyTrgUp(int padNum, int algKey)const
 	// パッドが未割当時、false
 	if (GetJoypadNum() < padNum) return false;
 
-	bool ret = (padInfos_[padNum].IsTrgUpAlgKey[algKey]);
+	bool ret = (padInfos_[padNum].isTrgUpAlgKey[algKey]);
 	return ret;
 }
 
@@ -556,14 +556,14 @@ int InputManager::PadAlgKeyX(int padNum, JOYPAD_ALGKEY algKey)const
 	if (GetJoypadNum() < padNum) return false;
 
 	int key = static_cast<int>(algKey);
-	return padInfos_[padNum].AlgKeyX[key];
+	return padInfos_[padNum].algKeyX[key];
 }
 int InputManager::PadAlgKeyX(int padNum, int algKey)const
 {
 	// パッドが未割当時、false
 	if (GetJoypadNum() < padNum) return false;
 
-	return padInfos_[padNum].AlgKeyX[algKey];
+	return padInfos_[padNum].algKeyX[algKey];
 }
 
 int InputManager::PadAlgKeyY(int padNum, JOYPAD_ALGKEY algKey)const
@@ -572,14 +572,14 @@ int InputManager::PadAlgKeyY(int padNum, JOYPAD_ALGKEY algKey)const
 	if (GetJoypadNum() < padNum) return false;
 
 	int key = static_cast<int>(algKey);
-	return padInfos_[padNum].AlgKeyY[key];
+	return padInfos_[padNum].algKeyY[key];
 }
 int InputManager::PadAlgKeyY(int padNum, int algKey)const
 {
 	// パッドが未割当時、false
 	if (GetJoypadNum() < padNum) return false;
 
-	return padInfos_[padNum].AlgKeyY[algKey];
+	return padInfos_[padNum].algKeyY[algKey];
 }
 
 const VECTOR& InputManager::GetAlgKeyDirXZ(int padNum, JOYPAD_ALGKEY algKey) const
@@ -592,8 +592,8 @@ const VECTOR& InputManager::GetAlgKeyDirXZ(int padNum, JOYPAD_ALGKEY algKey) con
 	// -1000.0f ～ 1000.0f の範囲で返ってくるが、
 	// X:1000.0f、Y:1000.0fになることは無い(1000と500くらいが最大)
 	// スティックの入力値を -1.0 ～ 1.0 に正規化
-	float dirX = (static_cast<float>(padInfos_[padNum].AlgKeyX[algType]) / ALGKEY_VAL_MAX);
-	float dirZ = (static_cast<float>(padInfos_[padNum].AlgKeyY[algType]) / ALGKEY_VAL_MAX);
+	float dirX = (static_cast<float>(padInfos_[padNum].algKeyX[algType]) / ALGKEY_VAL_MAX);
+	float dirZ = (static_cast<float>(padInfos_[padNum].algKeyY[algType]) / ALGKEY_VAL_MAX);
 
 	// 平方根により、おおよその最大値が1.0となる
 	float len = sqrtf((dirX * dirX) + (dirZ * dirZ));

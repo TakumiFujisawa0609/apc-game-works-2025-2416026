@@ -78,7 +78,7 @@ public:
 	/// <summary>
 	/// 敵ステータス参照
 	/// </summary>
-	StatusEnemy& GetEnemyStatus(int target)const { return *enemy_.at(target).get(); };
+	StatusEnemy& GetEnemyStatus(int target)const { return *enemy_.at(target - 1).get(); };
 
 	/// <summary>
 	/// 敵ステータスマップ参照

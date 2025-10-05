@@ -7,6 +7,7 @@
 #include "../Utility/AsoUtility.h"
 #include "../Utility/Vector2.h"
 #include "../Object/Player.h"
+#include "../Object/Enemy/EnemyController.h"
 #include "../Manager/EffectManager.h"
 #include "../Manager/SceneManager.h"
 #include "../Manager/CollisionManager.h"
@@ -25,22 +26,26 @@ GameScene::GameScene(void)
 {
 	/*　デフォルトコンストラクタ　*/
 	gameState_ = GAME_STATE::NONE;
+
+	Load();
 }
 
 void GameScene::Load(void)
 {
+	// プレイヤー処理
+	player_ = new Player();
+	player_->Load();
 
+	// 敵マネージャー
+	enemys_ = new EnemyController();
+
+	// 当たり判定マネージャ
+	colManager_ = new CollisionManager();
 }
 
 void GameScene::Init(void)
 {
 	/*　初期化処理　*/
-
-	// プレイヤー処理
-	player_ = new Player();
-
-	// 当たり判定マネージャ
-	colManager_ = new CollisionManager();
 
 
 	// 初期化処理
@@ -55,6 +60,9 @@ void GameScene::ReInit(void)
 	// ゲーム有効化
 	gameState_ = GAME_STATE::IDLE;
 
+	// 敵初期化処理
+	enemys_->Release();
+	enemys_->Init();
 
 	// プレイヤー処理
 	player_->Init(POS_START_PLAYER, 90.0f);
@@ -122,6 +130,9 @@ void GameScene::Draw(void)
 	// Effekseerにより再生中のエフェクトを更新する
 	UpdateEffekseer3D();
 
+	// 敵描画
+	enemys_->Draw();
+
 	// プレイヤー描画
 	player_->Draw();
 
@@ -150,6 +161,10 @@ void GameScene::Release(void)
 
 	// 当たり判定マネージャ解放
 	delete colManager_;
+
+	// 敵マネージャ解放
+	enemys_->Release();
+	delete enemys_;
 
 	// プレイヤー解放・削除
 	player_->Release();
@@ -192,8 +207,11 @@ void GameScene::DrawUI(void)
 
 void GameScene::GameIdleProc(void)
 {
-	// プレイヤー更新処理
+	// プレイヤー更新
 	player_->Update();
+
+	// 敵マネージャ更新
+	enemys_->Update();
 }
 
 void GameScene::GameOverProc(void)

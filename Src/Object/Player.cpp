@@ -6,11 +6,13 @@
 #include "./Object.h"
 #include "../Application.h"
 #include "../Manager/ResourceManager.h"
+#include "../Manager/Resource.h"
 #include "../Manager/InputManager.h"
 #include "../Manager/SceneManager.h"
 #include "./Status/StatusData.h"
 #include "./Status/StatusPlayer.h"
 #include "../Utility/AsoUtility.h"
+#include "../Utility/Quaternion.h"
 #include "./AnimationController.h"
 
 using PAD_BTN = InputManager::PAD_BTN;
@@ -32,16 +34,23 @@ Player::Player(void):
 	inputType_ = INPUT_TYPE::NONE;
 
 	paramPlayer_.isRun = false;
-
 }
 
 void Player::Load(void)
 {
-
+	paramChara_.handle = ResourceManager::GetInstance().LoadHandleId(ResourceManager::SRC::MODEL_PLAYER);
 }
 
 void Player::Init(const VECTOR& pos, float angleY)
 {
+	// 位置割り当て
+	paramChara_.pos = paramChara_.prePos = pos;
+	float rotY = AsoUtility::Deg2Rad(angleY);
+	paramChara_.quaRot = Quaternion::Euler({ 0.0f, rotY, 0.0f });
+
+	// 初期化処理
+	Object::Init();
+
 	/*　初期化処理　*/
 	inputPad_ = static_cast<int>(InputManager::JOYPAD_NO::PAD1);
 	inputKey_.emplace(INPUT_TYPE::MOVE_BACK, KEY_INPUT_W);
@@ -52,26 +61,10 @@ void Player::Init(const VECTOR& pos, float angleY)
 	//inputKey_.emplace(INPUT_TYPE::ATTACK_JUB, MOUSE_INPUT_1);
 	//inputKey_.emplace(INPUT_TYPE::ATTACK_STRONG, MOUSE_INPUT_2);
 
-	SetParam();
+	//paramChara_.posChatch = AsoUtility::VECTOR_ZERO;
+	//paramChara_.posChatch.y += CATCH_OFFSET;
 
-	float rotY = AsoUtility::Deg2Rad(angleY);
-	paramChara_.quaRot = Quaternion::Euler({ 0.0f, angleY, 0.0f });
-
-	paramChara_.pos = paramChara_.prePos = pos;
-
-	paramChara_.posChatch = AsoUtility::VECTOR_ZERO;
-	paramChara_.posChatch.y += CATCH_OFFSET;
-
-
-	// モデルスケール調整
-	VECTOR size = { MODEL_SIZE, MODEL_SIZE, MODEL_SIZE };
-	MV1SetScale(paramChara_.handle, size);
-
-	// モデル位置調整
-	VECTOR modelPos = VAdd(paramChara_.pos, MODEL_OFFSET);
-	MV1SetPosition(paramChara_.handle, modelPos);
-
-	jumpPower_ = START_JUMP_POWER;
+	//jumpPower_ = START_JUMP_POWER;
 
 	// 当たり判定割り当て
 	//collision_ = new PlayerCollision;
@@ -85,10 +78,7 @@ void Player::SetParam(void)
 	// 行動状態
 	paramPlayer_.actionState = ACTION_STATE::IDLE;
 
-	paramChara_.velocity = AsoUtility::VECTOR_ZERO;
-	paramChara_.dir = {};
-
-	paramChara_.modelOffset = MODEL_OFFSET;
+	paramChara_.localPos = MODEL_OFFSET;
 
 	// 角度初期化
 	paramChara_.quaRot = Quaternion::Identity();
@@ -104,7 +94,8 @@ void Player::SetParam(void)
 	// 着地判定
 	paramChara_.isGround = false;
 
-	paramChara_.scale = { MODEL_SIZE, MODEL_SIZE, MODEL_SIZE };
+	float scale = status_.GetScale();
+	paramChara_.scale = { scale ,scale, scale };
 
 	paramChara_.hp    = status_.GetHp();
 	paramChara_.power = status_.GetPower();
@@ -113,35 +104,29 @@ void Player::SetParam(void)
 
 	paramPlayer_.weaponId = status_.GetWeaponId();
 	paramPlayer_.luck = status_.GetLuck();
-	paramChara_.handle = ResourceManager::GetInstance().LoadHandleId(ResourceManager::SRC::MODEL_PLAYER);
-
-	paramPlayer_.animSpeed.clear();
-	paramPlayer_.animSpeed.emplace(ANIM_STATE::IDLE, status_.GetAnimSpeedIdle());
-	paramPlayer_.animSpeed.emplace(ANIM_STATE::WALK, status_.GetAnimSpeedWalk());
-	paramPlayer_.animSpeed.emplace(ANIM_STATE::RUN, status_.GetAnimSpeedRun());
-	
-	SetAnim();
-	SetMatrixModel();
 }
 
-void Player::SetAnim(void)
+void Player::InitAnim(void)
 {
-	ANIM_STATE type;
+	int type;
 	int max = static_cast<int>(ANIM_STATE::MAX);
 	float speed = 0.0f;
 
 	// アニメーション初期化
 	anim_ = new AnimationController(paramChara_.handle);
 
+	paramPlayer_.animSpeed.emplace(ANIM_STATE::IDLE, status_.GetAnimSpeedIdle());
+	paramPlayer_.animSpeed.emplace(ANIM_STATE::WALK, status_.GetAnimSpeedWalk());
+	paramPlayer_.animSpeed.emplace(ANIM_STATE::RUN, status_.GetAnimSpeedRun());
 
 	for (auto& anim : paramPlayer_.animSpeed)
 	{
-		type = anim.first;
+		type = static_cast<int>(anim.first);
 
-		speed = paramPlayer_.animSpeed[type];
+		speed = paramPlayer_.animSpeed[anim.first];
 
 		// アニメーション割り当て
-		anim_->AddInFbx(static_cast<int>(type), speed, static_cast<int>(type));
+		anim_->AddInFbx(type, speed, type);
 	}
 
 	// 待機アニメーション再生
@@ -185,32 +170,11 @@ void Player::Update(void)
 	break;
 	}
 
-
-#ifdef _DEBUG
-	/*　重量変化　*/
-	/*
-	if (input.KeyIsTrgDown(KEY_INPUT_UP))
-	{
-		paramChara_.weight += 0.1f;
-		if (paramChara_.weight > 1.0f) paramChara_.weight = 1.0f;
-	}
-	if (input.KeyIsTrgDown(KEY_INPUT_DOWN))
-	{
-		paramChara_.weight -= 0.1f;
-		if (paramChara_.weight < 0.0f) paramChara_.weight = 0.0f;
-	}*/
-#endif
-
 	// 移動処理
 	Move();
 
 	// 回転処理
 	Rotation(isRevert);
-
-	// モデル位置調整
-	VECTOR pos = VAdd(paramChara_.pos, MODEL_OFFSET);
-	VECTOR size = { MODEL_SIZE, MODEL_SIZE, MODEL_SIZE };
-	MV1SetScale(paramChara_.handle, size);
 
 	// アニメーション更新
 	Update_Animation();
@@ -221,11 +185,6 @@ void Player::Update(void)
 
 	// 当たり判定更新
 	//collision_->Update();
-}
-
-void Player::Draw(void)
-{
-	MV1DrawModel(paramChara_.handle);
 }
 
 void Player::DrawDebug(void)
