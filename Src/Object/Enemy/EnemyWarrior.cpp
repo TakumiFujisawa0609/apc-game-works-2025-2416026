@@ -5,11 +5,18 @@
 #include "../Status/StatusData.h"
 #include "../Status/StatusEnemy.h"
 #include "../AnimationController.h"
+#include "../Player.h"
 
-EnemyWarrior::EnemyWarrior(void)
-		:Enemy(StatusEnemy::TYPE::SKELETON_WARRIOR)
+EnemyWarrior::EnemyWarrior(Player& player)
+		:Enemy(StatusEnemy::TYPE::SKELETON_WARRIOR, player)
 {
 	animSpeed_.clear();
+}
+
+void EnemyWarrior::SetParam(void)
+{
+	paramChara_.bodyFrameName = "Skeleton_Warrior_Eyes";
+	Enemy::SetParam();
 }
 
 void EnemyWarrior::InitAnim(void)

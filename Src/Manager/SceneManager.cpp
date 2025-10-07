@@ -8,7 +8,6 @@
 #include "../Scene/GameScene.h"
 #include "./InputManager.h"
 #include "./ResourceManager.h"
-//#include "../Common/Fader.h"
 #pragma endregion
 
 
@@ -32,6 +31,8 @@ SceneManager::SceneManager(void)
 	waitSceneId_ = SCENE_ID::NONE;
 
 	isChangeScene_ = false; // 遷移フラグ
+
+	isDebugMode_ = false;
 
 	Load(); // 初期化処理
 }
@@ -99,6 +100,8 @@ void SceneManager::Update(void)
 {
 	/*　更新処理　*/
 
+	InputManager& input = InputManager::GetInstance();
+
 	// シーン無効時は処理終了
 	if (curScene_ == nullptr) return;
 
@@ -113,6 +116,12 @@ void SceneManager::Update(void)
 	//if (isChangeScene_) Fade(); // フェード処理
 
 	curScene_->Update(); // 現在のシーン更新処理
+
+	// デバッグモード有効化処理
+	if (input.KeyIsTrgDown(KEY_INPUT_TAB))
+	{
+		isDebugMode_ = ((!isDebugMode_) ? true : false);
+	}
 }
 
 void SceneManager::Draw(void)
@@ -123,24 +132,34 @@ void SceneManager::Draw(void)
 	curScene_->Draw();
 
 	//fader_->Draw(); // フェーダ描画
+//#ifdef _DEBUG
+	if (isDebugMode_)
+	{
+		Vector2 midPos = { Application::SCREEN_HALF_X, Application::SCREEN_HALF_Y };
 
-#ifdef _DEBUG
+		// 三分割法グリッド線
+		Vector2 lineGlid = { (Application::SCREEN_SIZE_X / 3), (Application::SCREEN_SIZE_Y / 3) };
 
-	Vector2 midPos = { (Application::SCREEN_SIZE_X / 2), (Application::SCREEN_SIZE_Y / 2) };
-
-	// 三分割法グリッド線
-	Vector2 lineGlid = { (Application::SCREEN_SIZE_X / 3), (Application::SCREEN_SIZE_Y / 3) };
-
-	DrawBox(0, (lineGlid.y - 1), (midPos.x * 2), (lineGlid.y + 1),
+		DrawBox(0, (lineGlid.y - 1), (midPos.x * 2), (lineGlid.y + 1),
 			0x0, true);
-	DrawBox(0, ((lineGlid.y * 2) - 1), (midPos.x * 2), ((lineGlid.y * 2) + 1),
+		DrawBox(0, ((lineGlid.y * 2) - 1), (midPos.x * 2), ((lineGlid.y * 2) + 1),
 			0x0, true);
 
-	DrawBox((lineGlid.x - 1), 0, (lineGlid.x + 1), (midPos.y * 2),
+		DrawBox((lineGlid.x - 1), 0, (lineGlid.x + 1), (midPos.y * 2),
 			0x0, true);
-	DrawBox(((lineGlid.x * 2) - 1), 0, ((lineGlid.x * 2) + 1), (midPos.y * 2),
+		DrawBox(((lineGlid.x * 2) - 1), 0, ((lineGlid.x * 2) + 1), (midPos.y * 2),
 			0x0, true);
-#endif
+	}
+//#endif
+}
+
+void SceneManager::DrawDebug(void)
+{
+	if (isDebugMode_)
+	{
+		int x = Application::SCREEN_SIZE_X - 500;
+		DrawString(x, 0, "デバッグモード有効中", 0xff0000);
+	}
 }
 
 void SceneManager::Destroy(void)
@@ -203,6 +222,11 @@ void SceneManager::DrawGrid(void)
 	DrawLine3D(sPos, ePos, 0x00ff00);
 	DrawSphere3D(ePos, 20.0f, 10, 0x00ff00, 0x00ff00, true);
 
+}
+
+bool SceneManager::GetIsDebugMode(void)
+{
+	return isDebugMode_;
 }
 
 void SceneManager::DoChangeState(SCENE_ID nextScene)

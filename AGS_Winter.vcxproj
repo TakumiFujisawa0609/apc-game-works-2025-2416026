@@ -140,12 +140,14 @@
   <ItemGroup>
     <ClInclude Include="Src\Application.h" />
     <ClInclude Include="Src\Common\Camera.h" />
-    <ClInclude Include="Src\Common\ConfigController.h" />
     <ClInclude Include="Src\Common\Fader.h" />
     <ClInclude Include="Src\Common\Font.h" />
     <ClInclude Include="Src\Common\FrameRate.h" />
     <ClInclude Include="Src\Common\GameExit.h" />
+    <ClInclude Include="Src\Common\Quaternion.h" />
+    <ClInclude Include="Src\Common\Vector2.h" />
     <ClInclude Include="Src\Manager\CollisionManager.h" />
+    <ClInclude Include="Src\Manager\ConfigManager.h" />
     <ClInclude Include="Src\Manager\EffectManager.h" />
     <ClInclude Include="Src\Object\AnimationController.h" />
     <ClInclude Include="Src\Object\Enemy\Enemy.h" />
@@ -168,19 +170,20 @@
     <ClInclude Include="Src\Scene\SceneBase.h" />
     <ClInclude Include="Src\Scene\TitleScene.h" />
     <ClInclude Include="Src\Utility\AsoUtility.h" />
-    <ClInclude Include="Src\Utility\Quaternion.h" />
+    <ClInclude Include="Src\Utility\UtilityCollision.h" />
     <ClInclude Include="Src\Utility\UtilityCommon.h" />
-    <ClInclude Include="Src\Utility\Vector2.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Application.cpp" />
     <ClCompile Include="Src\Common\Camera.cpp" />
-    <ClCompile Include="Src\Common\ConfigController.cpp" />
     <ClCompile Include="Src\Common\Fader.cpp" />
     <ClCompile Include="Src\Common\Font.cpp" />
     <ClCompile Include="Src\Common\FrameRate.cpp" />
     <ClCompile Include="Src\Common\GameExit.cpp" />
+    <ClCompile Include="Src\Common\Quaternion.cpp" />
+    <ClCompile Include="Src\Common\Vector2.cpp" />
     <ClCompile Include="Src\Manager\CollisionManager.cpp" />
+    <ClCompile Include="Src\Manager\ConfigManager.cpp" />
     <ClCompile Include="Src\Manager\EffectManager.cpp" />
     <ClCompile Include="Src\Object\AnimationController.cpp" />
     <ClCompile Include="Src\Object\Enemy\Enemy.cpp" />
@@ -203,9 +206,8 @@
     <ClCompile Include="Src\Scene\SceneBase.cpp" />
     <ClCompile Include="Src\Scene\TitleScene.cpp" />
     <ClCompile Include="Src\Utility\AsoUtility.cpp" />
-    <ClCompile Include="Src\Utility\Quaternion.cpp" />
+    <ClCompile Include="Src\Utility\UtilityCollision.cpp" />
     <ClCompile Include="Src\Utility\UtilityCommon.cpp" />
-    <ClCompile Include="Src\Utility\Vector2.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

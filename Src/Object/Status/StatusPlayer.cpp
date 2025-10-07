@@ -32,4 +32,19 @@ StatusPlayer::StatusPlayer(void)
 	animSpeedWalk_ = 0.0f;
 
 	animSpeedRun_ = 0.0f;
+
+	mortionTimes_.clear();
+}
+
+StatusPlayer::Mortion::Mortion(void)
+{
+	name = "";
+
+	start = 0.0f;
+
+	active = 0.0f;
+
+	end = 0.0f;
+
+	animSpeed = 0.0f;
 }

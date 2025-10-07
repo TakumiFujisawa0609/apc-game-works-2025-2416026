@@ -1,6 +1,6 @@
 #pragma once
 #include "../Scene/SceneBase.h"
-#include "../Utility/Vector2.h"
+#include "../Common/Vector2.h"
 #include <DxLib.h>
 
 /// <summary>

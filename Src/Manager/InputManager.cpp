@@ -34,6 +34,9 @@ InputManager::InputManager(void)
 
 void InputManager::Init(void)
 {
+	// キーボード割り当て時、コントローラ操作化
+	inputType_ = ((GetJoypadNum() > 0) ? INPUT_TYPE::CONTROLLER : INPUT_TYPE::KEYBOARD_MOUSE);
+	
 	SetInputKey(); // 入力キー登録
 
 	SetInputMouse(); // マウス入力登録
@@ -50,9 +53,6 @@ void InputManager::SetInputKey(void)
 	AddKey(KEY_INPUT_A);
 	AddKey(KEY_INPUT_S);
 	AddKey(KEY_INPUT_D);
-	AddKey(KEY_INPUT_C);
-	AddKey(KEY_INPUT_V);
-	AddKey(KEY_INPUT_Z);
 
 	// 
 	AddKey(KEY_INPUT_UP);
@@ -63,6 +63,10 @@ void InputManager::SetInputKey(void)
 	AddKey(KEY_INPUT_ESCAPE);
 	AddKey(KEY_INPUT_LSHIFT);
 	AddKey(KEY_INPUT_RSHIFT);
+	AddKey(KEY_INPUT_LCONTROL);
+	AddKey(KEY_INPUT_RCONTROL);
+	AddKey(KEY_INPUT_TAB);
+	AddKey(KEY_INPUT_DELETE);
 }
 
 void InputManager::SetInputMouse(void)
@@ -255,21 +259,21 @@ void InputManager::SetPadInState(JOYPAD_NO jPadNum)
 	}
 }
 
-InputManager::JOYPAD_IN_STATE& InputManager::GetPadInputState(JOYPAD_NO padNum)
+InputManager::JOYPAD_IN_STATE& InputManager::GetPadInputState(JOYPAD_NO _padNum)
 {
 	/* コントローラ入力取得処理 */
 
 	JOYPAD_IN_STATE ret = InputManager::JOYPAD_IN_STATE();
 
-	auto type = GetPadType(padNum);
+	auto type = GetPadType(_padNum);
 
 	switch (type)
 	{
 		/* XBOX入力 */
 	case InputManager::JOYPAD_TYPE::XBOX_ONE:
 	{
-		auto d = GetPadDInputState(padNum);
-		auto x = GetPadXInputState(padNum);
+		auto d = GetPadDInputState(_padNum);
+		auto x = GetPadXInputState(_padNum);
 
 		int index;
 
@@ -358,7 +362,7 @@ InputManager::JOYPAD_IN_STATE& InputManager::GetPadInputState(JOYPAD_NO padNum)
 	case InputManager::JOYPAD_TYPE::DUAL_SENSE:
 	{
 		/*
-		auto d = GetPadDInputState(padNum);
+		auto d = GetPadDInputState(_padNum);
 
 		int index;
 
@@ -422,17 +426,17 @@ InputManager::JOYPAD_TYPE InputManager::GetJPadType(JOYPAD_NO jPadNo)
 }
 
 
-DINPUT_JOYSTATE InputManager::GetPadDInputState(InputManager::JOYPAD_NO padNum)
+DINPUT_JOYSTATE InputManager::GetPadDInputState(InputManager::JOYPAD_NO _padNum)
 {
 	// DirectInput情報取得
-	GetJoypadDirectInputState(static_cast<int>(padNum), &joyDInState_);
+	GetJoypadDirectInputState(static_cast<int>(_padNum), &joyDInState_);
 	return joyDInState_;
 }
 
-XINPUT_STATE InputManager::GetPadXInputState(InputManager::JOYPAD_NO padNum)
+XINPUT_STATE InputManager::GetPadXInputState(InputManager::JOYPAD_NO _padNum)
 {
 	// ボタン入力情報取得
-	GetJoypadXInputState(static_cast<int>(padNum), &joyXInState_);
+	GetJoypadXInputState(static_cast<int>(_padNum), &joyXInState_);
 	return joyXInState_;
 }
 
@@ -442,158 +446,173 @@ InputManager::JOYPAD_TYPE InputManager::GetPadType(JOYPAD_NO padNo)
 	return static_cast<InputManager::JOYPAD_TYPE>(GetJoypadType(static_cast<int>(padNo)));
 }
 
-bool InputManager::PadIsBtnNew(int padNum, PAD_BTN button) const
+bool InputManager::PadIsBtnNew(JOYPAD_NO _padNum, PAD_BTN button) const
 {
+	int num = static_cast<int>(_padNum);
+
 	// パッドが未割当時、false
-	if (GetJoypadNum() < padNum) return false;
+	if (GetJoypadNum() < num) return false;
 
 	int btnType = static_cast<int>(button);
-	bool ret = (padInfos_[padNum].isNew[btnType]);
+	bool ret = (padInfos_[num].isNew[btnType]);
 	return ret;
 }
-bool InputManager::PadIsBtnNew(int padNum, int button) const
+bool InputManager::PadIsBtnNew(int _padNum, int button) const
 {
 	// パッドが未割当時、false
-	if (GetJoypadNum() < padNum) return false;
+	if (GetJoypadNum() < _padNum) return false;
 
-	bool ret = (padInfos_[padNum].isNew[button]);
+	bool ret = (padInfos_[_padNum].isNew[button]);
 	return ret;
 }
 
-bool InputManager::PadIsBtnTrgDown(int padNum, PAD_BTN button) const
+bool InputManager::PadIsBtnTrgDown(JOYPAD_NO _padNum, PAD_BTN button) const
 {
+	int num = static_cast<int>(_padNum);
+
 	// パッドが未割当時、false
-	if (GetJoypadNum() < padNum) return false;
+	if (GetJoypadNum() < num) return false;
 
 	int btnType = static_cast<int>(button);
-	bool ret = (padInfos_[padNum].isTrgDown[btnType]);
+	bool ret = (padInfos_[num].isTrgDown[btnType]);
 	return ret;
 }
-bool InputManager::PadIsBtnTrgDown(int padNum, int button) const
+bool InputManager::PadIsBtnTrgDown(int _padNum, int button) const
 {
 	// パッドが未割当時、false
-	if (GetJoypadNum() < padNum) return false;
+	if (GetJoypadNum() < _padNum) return false;
 
-	bool ret = (padInfos_[padNum].isTrgDown[button]);
+	bool ret = (padInfos_[_padNum].isTrgDown[button]);
 	return ret;
 }
 
-bool InputManager::PadIsBtnTrgUp(int padNum, PAD_BTN button) const
+bool InputManager::PadIsBtnTrgUp(JOYPAD_NO _padNum, PAD_BTN button) const
 {
+	int num = static_cast<int>(_padNum);
+
 	// パッドが未割当時、false
-	if (GetJoypadNum() < padNum) return false;
+	if (GetJoypadNum() < num) return false;
 
 	int btnType = static_cast<int>(button);
-	bool ret = (padInfos_[padNum].isTrgUp[btnType]);
+	bool ret = (padInfos_[num].isTrgUp[btnType]);
 	return ret;
 }
-bool InputManager::PadIsBtnTrgUp(int padNum, int button) const
+bool InputManager::PadIsBtnTrgUp(int _padNum, int button) const
 {
 	// パッドが未割当時、false
-	if (GetJoypadNum() < padNum) return false;
+	if (GetJoypadNum() < _padNum) return false;
 
-	bool ret = (padInfos_[padNum].isTrgUp[button]);
-	return ret;
-}
-
-bool InputManager::PadIsAlgKeyNew(int padNum, JOYPAD_ALGKEY algKey)const
-{
-	// パッドが未割当時、false
-	if (GetJoypadNum() < padNum) return false;
-
-	int keyType = static_cast<int>(algKey);
-	bool ret = (padInfos_[padNum].isNewAlgKey[keyType]);
-	return ret;
-}
-bool InputManager::PadIsAlgKeyNew(int padNum, int algKey)const
-{
-	// パッドが未割当時、false
-	if (GetJoypadNum() < padNum) return false;
-
-	bool ret = (padInfos_[padNum].isNewAlgKey[algKey]);
+	bool ret = (padInfos_[_padNum].isTrgUp[button]);
 	return ret;
 }
 
-bool InputManager::PadIsAlgKeyTrgDown(int padNum, JOYPAD_ALGKEY algKey)const
+bool InputManager::PadIsAlgKeyNew(JOYPAD_NO _padNum, JOYPAD_ALGKEY _algKey)const
 {
-	// パッドが未割当時、false
-	if (GetJoypadNum() < padNum) return false;
+	int num = static_cast<int>(_padNum);
 
-	int keyType = static_cast<int>(algKey);
-	bool ret = (padInfos_[padNum].isTrgDownAlgKey[keyType]);
+	// パッドが未割当時、false
+	if (GetJoypadNum() < static_cast<int>(num)) return false;
+
+	int keyType = static_cast<int>(_algKey);
+	bool ret = (padInfos_[num].isNewAlgKey[keyType]);
 	return ret;
 }
-bool InputManager::PadIsAlgKeyTrgDown(int padNum, int algKey)const
+bool InputManager::PadIsAlgKeyNew(int _padNum, int _algKey)const
 {
 	// パッドが未割当時、false
-	if (GetJoypadNum() < padNum) return false;
+	if (GetJoypadNum() < _padNum) return false;
 
-	bool ret = (padInfos_[padNum].isTrgDownAlgKey[algKey]);
-	return ret;
-}
-
-bool InputManager::PadIsAlgKeyTrgUp(int padNum, JOYPAD_ALGKEY algKey)const
-{
-	// パッドが未割当時、false
-	if (GetJoypadNum() < padNum) return false;
-
-	int keyType = static_cast<int>(algKey);
-	bool ret = (padInfos_[padNum].isTrgUpAlgKey[keyType]);
-	return ret;
-}
-bool InputManager::PadIsAlgKeyTrgUp(int padNum, int algKey)const
-{
-	// パッドが未割当時、false
-	if (GetJoypadNum() < padNum) return false;
-
-	bool ret = (padInfos_[padNum].isTrgUpAlgKey[algKey]);
+	bool ret = (padInfos_[_padNum].isNewAlgKey[_algKey]);
 	return ret;
 }
 
-int InputManager::PadAlgKeyX(int padNum, JOYPAD_ALGKEY algKey)const
+bool InputManager::PadIsAlgKeyTrgDown(JOYPAD_NO _padNum, JOYPAD_ALGKEY _algKey)const
+{
+	int num = static_cast<int>(_padNum);
+	// パッドが未割当時、false
+	if (GetJoypadNum() < num) return false;
+
+	int keyType = static_cast<int>(_algKey);
+	bool ret = (padInfos_[num].isTrgDownAlgKey[keyType]);
+	return ret;
+}
+bool InputManager::PadIsAlgKeyTrgDown(int _padNum, int _algKey)const
 {
 	// パッドが未割当時、false
-	if (GetJoypadNum() < padNum) return false;
+	if (GetJoypadNum() < _padNum) return false;
 
-	int key = static_cast<int>(algKey);
-	return padInfos_[padNum].algKeyX[key];
+	bool ret = (padInfos_[_padNum].isTrgDownAlgKey[_algKey]);
+	return ret;
 }
-int InputManager::PadAlgKeyX(int padNum, int algKey)const
+
+bool InputManager::PadIsAlgKeyTrgUp(JOYPAD_NO _padNum, JOYPAD_ALGKEY _algKey)const
+{
+	int num = static_cast<int>(_padNum);
+	// パッドが未割当時、false
+	if (GetJoypadNum() < num) return false;
+
+	int keyType = static_cast<int>(_algKey);
+	bool ret = (padInfos_[num].isTrgUpAlgKey[keyType]);
+	return ret;
+}
+bool InputManager::PadIsAlgKeyTrgUp(int _padNum, int _algKey)const
 {
 	// パッドが未割当時、false
-	if (GetJoypadNum() < padNum) return false;
+	if (GetJoypadNum() < _padNum) return false;
 
-	return padInfos_[padNum].algKeyX[algKey];
+	bool ret = (padInfos_[_padNum].isTrgUpAlgKey[_algKey]);
+	return ret;
 }
 
-int InputManager::PadAlgKeyY(int padNum, JOYPAD_ALGKEY algKey)const
+int InputManager::PadAlgKeyX(JOYPAD_NO _padNum, JOYPAD_ALGKEY _algKey)const
+{
+	int num = static_cast<int>(_padNum);
+
+	// パッドが未割当時、false
+	if (GetJoypadNum() < num) return false;
+
+	int key = static_cast<int>(_algKey);
+	return padInfos_[num].algKeyX[key];
+}
+int InputManager::PadAlgKeyX(int _padNum, int _algKey)const
 {
 	// パッドが未割当時、false
-	if (GetJoypadNum() < padNum) return false;
+	if (GetJoypadNum() < _padNum) return false;
 
-	int key = static_cast<int>(algKey);
-	return padInfos_[padNum].algKeyY[key];
+	return padInfos_[_padNum].algKeyX[_algKey];
 }
-int InputManager::PadAlgKeyY(int padNum, int algKey)const
+
+int InputManager::PadAlgKeyY(JOYPAD_NO _padNum, JOYPAD_ALGKEY _algKey)const
+{
+	int num = static_cast<int>(_padNum);
+
+	// パッドが未割当時、false
+	if (GetJoypadNum() < num) return false;
+
+	int key = static_cast<int>(_algKey);
+	return padInfos_[num].algKeyY[key];
+}
+int InputManager::PadAlgKeyY(int _padNum, int _algKey)const
 {
 	// パッドが未割当時、false
-	if (GetJoypadNum() < padNum) return false;
+	if (GetJoypadNum() < _padNum) return false;
 
-	return padInfos_[padNum].algKeyY[algKey];
+	return padInfos_[_padNum].algKeyY[_algKey];
 }
 
-const VECTOR& InputManager::GetAlgKeyDirXZ(int padNum, JOYPAD_ALGKEY algKey) const
+const VECTOR& InputManager::GetAlgKeyDirXZ(JOYPAD_NO _padNum, JOYPAD_ALGKEY _algKey) const
 {
 	VECTOR ret = {};
 
-	int algType = static_cast<int>(algKey);
+	int num = static_cast<int>(_padNum);
+	int algType = static_cast<int>(_algKey);
 
 	// スティックの個々の入力値は、
 	// -1000.0f ～ 1000.0f の範囲で返ってくるが、
 	// X:1000.0f、Y:1000.0fになることは無い(1000と500くらいが最大)
 	// スティックの入力値を -1.0 ～ 1.0 に正規化
-	float dirX = (static_cast<float>(padInfos_[padNum].algKeyX[algType]) / ALGKEY_VAL_MAX);
-	float dirZ = (static_cast<float>(padInfos_[padNum].algKeyY[algType]) / ALGKEY_VAL_MAX);
+	float dirX = (static_cast<float>(padInfos_[num].algKeyX[algType]) / ALGKEY_VAL_MAX);
+	float dirZ = (static_cast<float>(padInfos_[num].algKeyY[algType]) / ALGKEY_VAL_MAX);
 
 	// 平方根により、おおよその最大値が1.0となる
 	float len = sqrtf((dirX * dirX) + (dirZ * dirZ));

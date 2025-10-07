@@ -1,7 +1,7 @@
 #pragma once
 #include <DxLib.h>
 #include <string>
-#include "../Utility/Vector2.h"
+#include "../Common/Vector2.h"
 
 class GameExit
 {

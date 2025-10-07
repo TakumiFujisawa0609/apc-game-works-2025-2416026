@@ -3,6 +3,7 @@
 #include <vector>
 #include <DxLib.h>
 class Enemy;
+class Player;
 
 using ENEMY_TYPE = StatusEnemy::TYPE;
 
@@ -10,7 +11,7 @@ class EnemyController
 {
 public:
 
-	EnemyController(void);
+	EnemyController(Player& player);
 
 	~EnemyController(void) = default;
 
@@ -20,10 +21,18 @@ public:
 
 	void Draw(void);
 
+	void DrawDebug(void);
+
 	void Release(void);
 
+	/// <summary>
+	/// “GƒŠƒXƒgŽæ“¾
+	/// </summary>
+	const std::vector<Enemy*>& GetEnemys(void) { return enemys_; };
 
 private:
+
+	Player& player_;
 
 	std::vector<Enemy*> enemys_;
 

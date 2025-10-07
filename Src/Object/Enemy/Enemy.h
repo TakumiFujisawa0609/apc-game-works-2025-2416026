@@ -3,6 +3,7 @@
 #include "../Status/StatusEnemy.h"
 #include <string>
 class StatusEnemy;
+class Player;
 
 class Enemy : public Object
 {
@@ -12,27 +13,28 @@ public:
 	{
 		NONE = -1,
 		INACTIVE, // 非表示状態
-		SPAWN, 
-		IDLE,
-		ATTACK_START,
+		SPAWN,    // 生成状態
+		IDLE,	  // 待機状態
+		SEARCH,   // プレイヤー追従
+		MOVE,     // 移動状態
+		ATTACK_START, 
 		ATTACK_ACTIVE,
 		ATTACK_END,
 		MAX,
 	};
 
 	static constexpr float LOCAL_ANGLE_Y = (180.0f * (DX_PI_F / 180.0f));
-
-	// モデルの位置調整値
-	static constexpr VECTOR MODEL_OFFSET = { 0.0f, 0.0f, 0.0f };
-
 	
-	Enemy(StatusEnemy::TYPE type);
+	
+	Enemy(StatusEnemy::TYPE type, Player& players);
 
 	virtual ~Enemy(void) = default;
 
 	void Load(void)override;
 
 	void Init(const VECTOR& pos, float angleY = 0.0f, ACTION_STATE state = ACTION_STATE::IDLE);
+
+	void Draw(void)override;
 
 	void Update(void)override;
 
@@ -44,16 +46,23 @@ public:
 	/// <summary>
 	/// 行動状態取得
 	/// </summary>
-	ACTION_STATE GetActionState(void)const { return actionState_; };
+	ACTION_STATE GetActionState(void)const { return paramEnemy_.actionState; };
 
-	bool GetIsActive(void)const { return (actionState_ != ACTION_STATE::INACTIVE);  };
+	bool GetIsActive(void)const { return (paramEnemy_.actionState != ACTION_STATE::INACTIVE);  };
 
+	/// <summary>
+	/// 敵表示処理
+	/// </summary>
+	/// <param name="_isView">表示するか否か</param>
+	void SetIsView(bool _isView);
 
 protected:
 
 	struct ENEMY_PARAM
 	{
 		std::string name;
+
+		ACTION_STATE actionState;
 
 		StatusEnemy::TYPE type;
 
@@ -62,19 +71,40 @@ protected:
 		float atkRange;
 
 		float searchRange;
+
+		// 索敵有効フラグ
+		bool isHearing;
 	};
 
 	ENEMY_PARAM paramEnemy_;
 
-	ACTION_STATE actionState_;
+	
 
 	StatusEnemy& status_;
+
+	Player& player_;
 
 
 	void LoadResource(void);
 
+	/// <summary>
+	/// プレイヤーの方向を追尾
+	/// </summary>
+	void LookPlayerPos(void);
+
 	virtual void InitAnim(void) = 0;
 
-	//StatusEnemy& data_;
+	void UpdateAnim(void)override;
 
+	void SearchField(void);
+	void DrawSearchRange(void);
+
+	void UpdateState(void);
+	virtual void UpdateStateIdle(void);
+	virtual void UpdateStateSpawn(void);
+	virtual void UpdateStateSearch(void);
+	virtual void UpdateStateMove(void);
+	virtual void UpdateStateAtk(void);
+
+	void ChangeActionState(ACTION_STATE state);
 };

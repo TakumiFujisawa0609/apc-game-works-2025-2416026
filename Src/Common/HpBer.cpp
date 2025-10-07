@@ -1,21 +1,14 @@
-/* ----------
-　HPバー処理
- ------------- */
-
 #include "HpBer.h"
 #include <string>
 #include <DxLib.h>
 
-/*　デフォルトコンストラクタ　*/
 HPBer::HPBer(void)
 {
-	/*　HP初期化　*/
-	sizeX_ = 0;
-	sizeY_ = 0;
-	color_ = -1;
-	backColor_ = -1;
-	maxHP_ = -1;
-	curHP_ = -1;
+	ber_.pos = {};
+	ber_.size = {};
+	ber_.color = 0x0;
+	ber_.maxHp = -1;
+	ber_.curHp = -1;
 
 	/*　HPバー初期化　*/
 	berPosX_  = 0;

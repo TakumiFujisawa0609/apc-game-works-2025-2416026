@@ -1,11 +1,12 @@
 #include "Object.h"
 #include <DxLib.h>
 #include <string>
+#include <cassert>
 #include "./Status/StatusData.h"
 #include "./AnimationController.h"
 #include "../Application.h"
-#include "../Utility/Quaternion.h"
-#include "../Utility/Vector2.h"
+#include "../Common/Quaternion.h"
+#include "../Common/Vector2.h"
 #include "../Utility/AsoUtility.h"
 #include "../Manager/SceneManager.h"
 #include "../Manager/SoundManager.h"
@@ -18,7 +19,7 @@ Object::Object(void)
 	paramChara_.velocity = {};
 
 	paramChara_.pos = paramChara_.prePos = {};
-	paramChara_.localPos;
+	paramChara_.posLocal = {};
 
 	paramChara_.quaRot = Quaternion::Identity();
 	paramChara_.quaRotLocal = Quaternion::Identity();
@@ -47,6 +48,9 @@ void Object::Init(void)
 	paramChara_.velocity = AsoUtility::VECTOR_ZERO;
 	paramChara_.dir = {};
 
+	// フレーム初期化処理
+	InitModelFrame();
+
 	SetParam();
 
 	// アニメーション初期化処理
@@ -54,6 +58,26 @@ void Object::Init(void)
 
 	// モデル位置割り当て処理
 	SetMatrixModel();
+}
+void Object::InitModelFrame(void)
+{
+	int max = MV1GetFrameNum(paramChara_.handle);
+
+	for (int i = 0; i < max; i++)
+	{
+		Frame frame;
+		frame.name = MV1GetFrameName(paramChara_.handle, i);
+		frame.num = i;
+		frame.pos = MV1GetFramePosition(paramChara_.handle, i);
+		frame.localMat = MV1GetFrameLocalMatrix(paramChara_.handle, i);
+
+		// フレーム全表示
+		frame.isVisible = true;
+		MV1SetFrameVisible(paramChara_.handle, i, frame.isVisible);
+
+		// フレーム格納
+		paramChara_.frames.push_back(frame);
+	}
 }
 
 void Object::Draw(void)
@@ -74,11 +98,23 @@ void Object::Draw(void)
 
 	MV1SetDifColorScale(paramChara_.handle, color);
 
-//#ifdef _DEBUG
-	DrawSphere3D(paramChara_.pos, paramChara_.scale.y, 8, 0xaaaaaa, 0xaaaaaa, false);
-//#endif
 	// モデル描画処理
 	MV1DrawModel(paramChara_.handle);
+
+	VECTOR pos = VAdd(paramChara_.pos, paramChara_.posLocal);
+	DrawSphere3D(pos, paramChara_.scale.y, 8, 0xaaaaaa, 0xaaaaaa, false);
+}
+
+void Object::DrawDebug(void)
+{
+	//#ifdef _DEBUG
+	if (SceneManager::GetInstance().GetIsDebugMode())
+	{
+		// 向き描画
+		VECTOR pos = VAdd(paramChara_.pos, paramChara_.posLocal);
+		AsoUtility::DrawLineXYZ(pos, paramChara_.quaRot);
+	}
+	//#endif
 }
 
 
@@ -94,7 +130,8 @@ void Object::SetMatrixModel(void)
 	mixRot = Quaternion::Mult(paramChara_.quaRot, paramChara_.quaRotLocal);
 
 	// 位置
-	MATRIX matPos = MGetTranslate(VAdd(paramChara_.pos, paramChara_.localPos));
+	VECTOR pos = VAdd(paramChara_.pos, paramChara_.posLocal);
+	MATRIX matPos = MGetTranslate(pos);
 
 
 	/* 行列の合成 */
@@ -119,6 +156,34 @@ void Object::SetMatrixModel(void)
 	paramChara_.rot = paramChara_.quaRot.ToEuler();
 }
 
+void Object::UpdateModelFrame(void)
+{
+	int handle = paramChara_.handle;
+
+	for (auto& frame : paramChara_.frames)
+	{
+		// ワールド座標割り当て
+		frame.pos = MV1GetFramePosition(handle, frame.num);
+
+		// ローカル行列割り当て
+		frame.localMat = MV1GetFrameLocalMatrix(handle, frame.num);
+
+		// フレームを表示
+		MV1SetFrameVisible(handle, frame.num, frame.isVisible);
+	}
+}
+int Object::FindFrameNum(const std::string& name)
+{
+	for (auto& frame : paramChara_.frames)
+	{
+		// 名前と一致時フレーム番号を返す
+		if (frame.name == name)
+		{
+			return frame.num;
+		}
+	}
+	assert("\nフレーム名が一致しませんでした。\n");
+}
 
 
 void Object::RevertPosXZ(const VECTOR& revertVec, float power)
@@ -268,6 +333,22 @@ void Object::KnockBack(const VECTOR& targetPos, float invTime,
 	paramChara_.velocity = VAdd(paramChara_.velocity, knockVelo);
 }
 
+bool Object::CheckActiveAttack(void) const
+{
+	bool ret = false;
+
+	// 攻撃判定が有効中か否か
+	if (paramChara_.attackState == ATTACK_STATE::ACTIVE &&
+		paramChara_.timeAct > 0.0f)
+	{
+		// 攻撃有効時、true
+		ret = true;
+	}
+
+	return ret;
+
+}
+
 float Object::_Move(const float* _curVelo, float _movePow, float _maxVelo)
 {
 	// 現在移動量
@@ -356,6 +437,34 @@ float Object::DecVelocityXZ(const float* acc)
 	return vel;
 }
 
+
+
+
+void Object::ChangeAttackState(ATTACK_STATE state, float _activeTime)
+{
+	// 状態割り当て
+	paramChara_.attackState = state;
+
+	// 行動時間割り当て
+	paramChara_.timeAct = _activeTime;
+}
+
+void Object::ChangeAttackStateNext(float _activeTime)
+{
+	// 次の行動状態に遷移
+	ATTACK_STATE state = paramChara_.attackState;
+	int next = (static_cast<int>(state) + 1);
+	state = static_cast<ATTACK_STATE>(next);
+
+	// 攻撃が終了時、無効状態に戻す
+	if (state == ATTACK_STATE::MAX) { state = ATTACK_STATE::NONE; }
+
+	// 状態割り当て
+	paramChara_.attackState = state;
+
+	// 行動時間割り当て
+	paramChara_.timeAct = _activeTime;
+}
 
 VECTOR& Object::GetPosChatch(void)
 {

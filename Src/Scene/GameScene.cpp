@@ -5,7 +5,7 @@
 #include <string>
 #include "../Application.h"
 #include "../Utility/AsoUtility.h"
-#include "../Utility/Vector2.h"
+#include "../Common/Vector2.h"
 #include "../Object/Player.h"
 #include "../Object/Enemy/EnemyController.h"
 #include "../Manager/EffectManager.h"
@@ -37,7 +37,7 @@ void GameScene::Load(void)
 	player_->Load();
 
 	// 敵マネージャー
-	enemys_ = new EnemyController();
+	enemys_ = new EnemyController(*player_);
 
 	// 当たり判定マネージャ
 	colManager_ = new CollisionManager();
@@ -121,7 +121,7 @@ void GameScene::Draw(void)
 	/*　描画処理　*/
 	Font& font = Font::GetInstance();
 	Vector2 textPos = {};
-	Vector2 midPos = { (Application::SCREEN_SIZE_X / 2), (Application::SCREEN_SIZE_Y / 2) };
+	Vector2 midPos = { Application::SCREEN_HALF_X, Application::SCREEN_HALF_Y };
 	int x;
 
 	// グリッド線描画
@@ -148,6 +148,8 @@ void GameScene::Draw(void)
 #ifdef _DEBUG
 
 	//colManager_->DrawDebug();
+
+	enemys_->DrawDebug();
 
 	player_->DrawDebug();
 
@@ -183,11 +185,10 @@ bool GameScene::IsCheck(void)
 {
 	bool ret = false;
 	InputManager& input = InputManager::GetInstance();
-	int pad1 = static_cast<int>(InputManager::JOYPAD_NO::PAD1);
 
-	if (input.PadIsBtnTrgDown(pad1, PAD_BTN::START) ||
-		input.PadIsBtnTrgDown(pad1, PAD_BTN::RIGHT) ||
-		input.PadIsBtnTrgDown(pad1, PAD_BTN::DOWN) ||
+	if (input.PadIsBtnTrgDown(InputManager::JOYPAD_NO::PAD1, PAD_BTN::START) ||
+		input.PadIsBtnTrgDown(InputManager::JOYPAD_NO::PAD1, PAD_BTN::RIGHT) ||
+		input.PadIsBtnTrgDown(InputManager::JOYPAD_NO::PAD1, PAD_BTN::DOWN) ||
 
 		input.KeyIsTrgDown(KEY_INPUT_SPACE) ||
 		input.KeyIsTrgDown(KEY_INPUT_RETURN))

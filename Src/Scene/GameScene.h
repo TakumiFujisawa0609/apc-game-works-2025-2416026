@@ -1,6 +1,5 @@
 #pragma once
 #include "SceneBase.h"
-#include "../Utility/Vector2.h"
 #include <DxLib.h>
 
 class Player;

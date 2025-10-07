@@ -1,5 +1,5 @@
 #pragma once
-#include "../Utility/Vector2.h"
+#include "../Common/Vector2.h"
 #include <DxLib.h>
 #include <map>
 #include "../Object/Object.h"
@@ -115,57 +115,7 @@ public:
 
 
 
-	/// <summary>
-	/// 3D矩形当たり判定
-	/// </summary>
-	/// <param name="pos1">対象１の2点座標</param>
-	/// <param name="pos2">対象２の2点座標</param>
-	/// <param name="size1">対象１のスケール</param>
-	/// <param name="size2">対象２のスケール</param>
-	static bool IsHitBoxToBox2D(const Vector2& pos1, const Vector2& pos2, const Vector2& size1, const Vector2& size2);
-
-
-	/// <summary>
-	/// 2D円形当たり判定
-	/// </summary>
-	/// <param name="pos1">対象１の座標</param>
-	/// <param name="pos2">対象２の座標</param>
-	/// <param name="radius1">対象１の半径</param>
-	/// <param name="radius2">対象２の半径</param>
-	static bool IsHitSphareCollision2D(const Vector2& pos1, const Vector2& pos2, float radius1, float radius2);
-
-	/// <summary>
-	/// 球形同士の当たり判定
-	/// </summary>
-	/// <param name="pos1">対象１の座標</param>
-	/// <param name="pos2">対象２の座標</param>
-	/// <param name="radius1">対象１の半径</param>
-	/// <param name="radius2">対象２の半径</param>
-	static bool IsHitSphareToSphere(const VECTOR& pos1, const VECTOR& pos2, float radius1, float radius2);
 	
-	/// <summary>
-	/// ボックス同士の当たり判定
-	/// </summary>
-	/// <param name="pos1">対象１の中央座標</param>
-	/// <param name="pos2">対象２の中央座標</param>
-	/// <param name="size1">対象１のスケール</param>
-	/// <param name="size2">対象２のスケール</param>
-	bool IsHitBoxToBox(const VECTOR& pos1, const VECTOR& pos2, const VECTOR& size1, const VECTOR& size2);
-
-	/// <summary>
-	/// 球体とカプセルの衝突判定
-	/// </summary>
-	/// <param name="sphPos">球体の位置</param>
-	/// <param name="sphRadius">球体の半径</param>
-	/// <param name="capPos1">カプセルの位置１</param>
-	/// <param name="capPos2">カプセルの位置２</param>
-	/// <param name="capRadius">カプセルの半径</param>
-	static bool IsHitSphereToCapsule(const VECTOR& sphPos, float sphRadius,
-									 const VECTOR& capPos1, const VECTOR& capPos2, float capRadius);
-
-	
-	static bool IsHitCapsuleToCapsule(const VECTOR& capTop1, const VECTOR& capBottom1, float radius1,
-									  const VECTOR& capTop2, const VECTOR& capBottom2, float radius2);
 	/// <summary>
 	/// 球形同士の当たり判定
 	/// </summary>
@@ -262,18 +212,5 @@ private:
 	/// <param name="offset">当たり判定のオフセット</param>
 	//bool CheckStageDamageCollision(CharaBase* chara, const VECTOR& topPos, const VECTOR& bottomPos,
 	//							   MV1_COLL_RESULT_POLY_DIM* result, float offset);
-
-
-	/// <summary>
-	/// カプセル同士の当たり判定
-	/// </summary>
-	/// <param name="capPosTop1">カプセル１の上位置</param>
-	/// <param name="capPosBot1">カプセル１の下位置</param>
-	/// <param name="capCtc1">カプセル１の接点</param>
-	/// <param name="capPosTop2">カプセル２の上位置</param>
-	/// <param name="capPosBot2">カプセル２下位置</param>
-	/// <param name="capCtc2">カプセル２の接点</param>
-	static float _CapPointBitween(const VECTOR& capTop1, const VECTOR& capBottom1, VECTOR& capCtc1,
-								  const VECTOR& capTop2, const VECTOR& capBottom2, VECTOR& capCtc2);
 
 };

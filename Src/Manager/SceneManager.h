@@ -4,7 +4,7 @@ class SceneBase;
 
 #include <chrono> // 時間
 #include <DxLib.h>
-#include "../Utility/Vector2.h"
+#include "../Common/Vector2.h"
 
 /// <summary>
 /// シーン管理マネージャ
@@ -74,6 +74,11 @@ public:
 	void Draw(void);
 
 	/// <summary>
+	/// デバッグ描画処理
+	/// </summary>
+	void DrawDebug(void);
+
+	/// <summary>
 	/// 解放処理
 	/// </summary>
 	void Destroy(void);
@@ -110,8 +115,12 @@ public:
 	/// <summary>
 	/// グリッド線描画
 	/// </summary>
-	/// <param name=""></param>
 	void DrawGrid(void);
+
+	/// <summary>
+	/// デバッグモード有効判定
+	/// </summary>
+	bool GetIsDebugMode(void);
 
 
 private:
@@ -153,6 +162,9 @@ private:
 
 		int tempScreen_;
 	};
+	// 演出
+	Perform perform_;
+
 
 	// 静的インスタンス
 	static SceneManager* instance_;
@@ -178,8 +190,7 @@ private:
 	// シーン遷移するか否か
 	bool isChangeScene_;
 
-	// 演出
-	Perform perform_;
+	bool isDebugMode_;
 
 
 	/// <summary>

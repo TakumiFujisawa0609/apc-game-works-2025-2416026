@@ -2,7 +2,7 @@
 #include "../Status/StatusEnemy.h"
 #include "./Enemy.h"
 #include <map>
-
+class Player;
 
 class EnemyWarrior : public Enemy
 {
@@ -18,12 +18,14 @@ public:
 		MAX,
 	};
 
-	EnemyWarrior(void);
+	EnemyWarrior(Player& player);
 
 	~EnemyWarrior(void) = default;
 
 
 protected:
+
+	void SetParam(void)override;
 
 	void InitAnim(void)override;
 

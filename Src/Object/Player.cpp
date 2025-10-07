@@ -12,12 +12,9 @@
 #include "./Status/StatusData.h"
 #include "./Status/StatusPlayer.h"
 #include "../Utility/AsoUtility.h"
-#include "../Utility/Quaternion.h"
+#include "../Common/Quaternion.h"
 #include "./AnimationController.h"
 
-using PAD_BTN = InputManager::PAD_BTN;
-using PAD_ALGKEY = InputManager::JOYPAD_ALGKEY;
-using ANIM_STATE = Player::ANIM_STATE;
 
 Player::Player(void):
 	status_(StatusData::GetInstance().GetPlayerStatus())
@@ -58,8 +55,11 @@ void Player::Init(const VECTOR& pos, float angleY)
 	inputKey_.emplace(INPUT_TYPE::MOVE_LEFT, KEY_INPUT_A);
 	inputKey_.emplace(INPUT_TYPE::MOVE_RIGHT, KEY_INPUT_D);
 	inputKey_.emplace(INPUT_TYPE::RUN, KEY_INPUT_LSHIFT);
-	//inputKey_.emplace(INPUT_TYPE::ATTACK_JUB, MOUSE_INPUT_1);
-	//inputKey_.emplace(INPUT_TYPE::ATTACK_STRONG, MOUSE_INPUT_2);
+	inputKey_.emplace(INPUT_TYPE::ATTACK_JUB, MOUSE_INPUT_LEFT);
+	inputKey_.emplace(INPUT_TYPE::ATTACK_STRONG, MOUSE_INPUT_RIGHT);
+
+	// 攻撃状態初期化
+	paramChara_.attackState = ATTACK_STATE::NONE;
 
 	//paramChara_.posChatch = AsoUtility::VECTOR_ZERO;
 	//paramChara_.posChatch.y += CATCH_OFFSET;
@@ -78,7 +78,10 @@ void Player::SetParam(void)
 	// 行動状態
 	paramPlayer_.actionState = ACTION_STATE::IDLE;
 
-	paramChara_.localPos = MODEL_OFFSET;
+	// フレーム番号
+	paramChara_.bodyFrameName = "Body";
+	int frameNum = FindFrameNum(paramChara_.bodyFrameName);
+	paramChara_.posLocal = {};
 
 	// 角度初期化
 	paramChara_.quaRot = Quaternion::Identity();
@@ -118,6 +121,7 @@ void Player::InitAnim(void)
 	paramPlayer_.animSpeed.emplace(ANIM_STATE::IDLE, status_.GetAnimSpeedIdle());
 	paramPlayer_.animSpeed.emplace(ANIM_STATE::WALK, status_.GetAnimSpeedWalk());
 	paramPlayer_.animSpeed.emplace(ANIM_STATE::RUN, status_.GetAnimSpeedRun());
+	paramPlayer_.animSpeed.emplace(ANIM_STATE::SWORD_SLASH, status_.GetMortionSpeed(MORTION_TYPE::JUB_1));
 
 	for (auto& anim : paramPlayer_.animSpeed)
 	{
@@ -145,40 +149,17 @@ void Player::Update(void)
 	// 現在位置割り当て
 	paramChara_.prePos = paramChara_.pos;
 
-	switch (paramPlayer_.actionState)
-	{
-	case ACTION_STATE::IDLE:
-	{
-		Update_Idle();
-	}
-	break;
-
-	case ACTION_STATE::ATTACK_WAIT:
-	case ACTION_STATE::ATTACK:
-	case ACTION_STATE::ATTACK_END:
-	{
-		// 攻撃処理
-		Update_Attack();
-	}
-	break;
-
-	case ACTION_STATE::GAME_OVER:
-	{
-		// ゲームオーバー処理
-		Update_GameOver();
-	}
-	break;
-	}
-
-	// 移動処理
-	Move();
+	// 状態更新処理
+	UpdateActionState();
 
 	// 回転処理
 	Rotation(isRevert);
 
 	// アニメーション更新
-	Update_Animation();
+	UpdateAnim();
 
+	// フレーム更新
+	UpdateModelFrame();
 
 	// 行列更新
 	SetMatrixModel();
@@ -191,16 +172,16 @@ void Player::DrawDebug(void)
 {
 #ifdef _DEBUG
 	
-	VECTOR pos = VAdd(paramChara_.pos, MODEL_OFFSET);
+	Object::DrawDebug();
+
+	VECTOR pos = VAdd(paramChara_.pos, paramChara_.posLocal);
 	// パラメータ描画
-	DrawFormatString(0, 120, 0xFFFFFF,"player：p(%.1f, %.1f, %.1f), rot(%.1f°, %.1f° ,%.1f°), ac(%.1f°,%.1f°,%.1f°),ground(%d), type(%d)"
+	DrawFormatString(0, 120, 0xFFFFFF,"player：p(%.1f, %.1f, %.1f), rot(%.1f°, %.1f° ,%.1f°), ac(%.1f°,%.1f°,%.1f°),ground(%d), type(%d), anim(%d)"
 					 ,pos.x, pos.y, pos.z
 					 ,paramChara_.rot.x, paramChara_.rot.y, paramChara_.rot.z
 					 ,paramChara_.velocity.x, paramChara_.velocity.y, paramChara_.velocity.z
-					 ,paramChara_.isGround, paramPlayer_.actionState);
-
-	// 向き描画
-	AsoUtility::DrawLineXYZ(paramChara_.pos, paramChara_.quaRot);
+					 ,paramChara_.isGround, paramPlayer_.actionState
+					 ,anim_->GetPlayType());
 #endif
 }
 
@@ -219,37 +200,70 @@ void Player::Release(void)
 	//delete collision_;
 }
 
-void Player::Update_Idle(void)
+void Player::UpdateActionState(void)
+{
+	switch (paramPlayer_.actionState)
+	{
+		case ACTION_STATE::IDLE:
+		{
+			UpdateStateIdle();
+		}
+		break;
+
+		case ACTION_STATE::ATTACK_JUB_1:
+		{
+			// 攻撃処理
+			UpdateStateAtk();
+		}
+		break;
+
+		case ACTION_STATE::GAME_OVER:
+		{
+			// ゲームオーバー処理
+			UpdateStateOver();
+		}
+		break;
+	}
+}
+
+void Player::UpdateStateIdle(void)
 {
 	auto& input = InputManager::GetInstance();
 
 	// ジャンプ
 	//Jump();
 
+	// 移動処理
+	Move();
+
 	// 攻撃処理起動
 	ANIM_STATE anim = static_cast<ANIM_STATE>(anim_->GetPlayType());
 
 	// 攻撃入力・攻撃アニメーションではないとき、攻撃有効化
-	if (IsInputAtkStrong() && anim != ANIM_STATE::SWORD_SLASH)
+	if (IsInputAtkStrong())
 	{
-		SetActionState(ACTION_STATE::ATTACK_WAIT);
+		ChangeActionState(ACTION_STATE::ATTACK_JUB_1);
 
-		paramChara_.timeAct = ATTACK_TIME_WAIT;
+		//paramChara_.timeAct = status_.GetMortionStart(MORTION_TYPE::JUB_1);
 	}
 }
 
 
-void Player::Update_Attack(void)
+void Player::UpdateStateAtk(void)
 {
-	Action(ACTION_STATE::ATTACK_WAIT, ACTION_STATE::ATTACK, ATTACK_TIME,
-		ACTION_STATE::ATTACK_END, ATTACK_TIME_END);
+	MORTION_TYPE type = MORTION_TYPE::NONE;
 
-	// 重力
-	//Gravity();
+	if (paramPlayer_.actionState == ACTION_STATE::ATTACK_JUB_1)
+	{
+		type = MORTION_TYPE::JUB_1;
+		anim_->Play(static_cast<int>(ANIM_STATE::SWORD_SLASH),false);
+	}
+
+	UpdateMortion(type);
 }
 
 
-void Player::Update_GameOver(void)
+void Player::UpdateStateOver(void)
 {
 	float delta = SceneManager::GetInstance().GetDeltaTime();
 
@@ -272,10 +286,8 @@ bool Player::IsInputMove(void)
 	// コントローラ入力時
 	if (GetJoypadNum() > 0)
 	{
-		InputManager::JOYPAD_NO jno = static_cast<InputManager::JOYPAD_NO>(inputPad_);
-
 		// 左スティックが入力されている時
-		if (input.PadIsAlgKeyNew(inputPad_, PAD_ALGKEY::LEFT))
+		if (input.PadIsAlgKeyNew(PAD_NO::PAD1, PAD_ALGKEY::LEFT))
 		{
 			ret = true;
 		}
@@ -303,7 +315,7 @@ bool Player::IsInputAtkStrong(void)
 	// コントローラ入力時
 	if (inputPad_ != -1)
 	{
-		if (input.PadIsBtnTrgDown(inputPad_, PAD_BTN::UP))
+		if (input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::UP))
 		{
 			ret = true;
 		}
@@ -328,14 +340,14 @@ bool Player::IsInputAtkJub(void)
 	// コントローラ入力時
 	if (GetJoypadNum() > 0)
 	{
-		if (input.PadIsBtnTrgDown(inputPad_, PAD_BTN::LEFT))
+		if (input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::LEFT))
 		{
 			ret = true;
 		}
 	}
 
 	// キーボード入力時
-	else if (input.KeyIsTrgDown(inputKey_[INPUT_TYPE::ATTACK_JUB]))
+	else if (input.MouseIsTrgDown(inputKey_[INPUT_TYPE::ATTACK_JUB]))
 	{
 		// 移動入力時、true
 		ret = true;
@@ -351,11 +363,11 @@ bool Player::IsInputRun(void)
 	// コントローラ入力時
 	if (GetJoypadNum() > 0)
 	{
-		if (input.PadIsBtnTrgDown(inputPad_, PAD_BTN::L_STICK))
+		if (input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::L_STICK))
 		{
 			paramPlayer_.isRun = true;
 		}
-		else if (input.PadIsBtnTrgUp(inputPad_, PAD_BTN::L_STICK))
+		else if (input.PadIsBtnTrgUp(PAD_NO::PAD1, PAD_BTN::L_STICK))
 		{
 			paramPlayer_.isRun = false;
 		}
@@ -390,23 +402,20 @@ void Player::SetIsAttack(bool flag)
 }
 
 
-bool Player::CheckActiveAttack(void) const
-{
-	bool ret = false;
 
-	// 攻撃判定が有効中か否か
-	if (paramPlayer_.actionState == ACTION_STATE::ATTACK &&
-		paramChara_.timeAct > 0.0f)
+
+void Player::ChangeActionState(ACTION_STATE state)
+{
+	paramPlayer_.actionState = state;
+	if (state == ACTION_STATE::IDLE)
 	{
-		// 攻撃有効時、true
-		ret = true;
+		anim_->Play(static_cast<int>(ANIM_STATE::IDLE));
+	}
+	else if (state == ACTION_STATE::ATTACK_JUB_1)
+	{
+		paramChara_.attackState = ATTACK_STATE::START;
 	}
 
-	return ret;
-}
-
-void Player::SetActionState(ACTION_STATE state)
-{
 }
 
 
@@ -418,12 +427,9 @@ void Player::Move(void)
 
 	if (GetJoypadNum() > 0)
 	{
-		InputManager::JOYPAD_NO jno = static_cast<InputManager::JOYPAD_NO>(inputPad_);
-
-
-		if (input.PadAlgKeyY(inputPad_, PAD_ALGKEY::LEFT) && IsActiveAction())
+		if (input.PadAlgKeyY(PAD_NO::PAD1, PAD_ALGKEY::LEFT) && IsActiveAction())
 		{
-			if (input.PadAlgKeyY(inputPad_, PAD_ALGKEY::LEFT) < 0)
+			if (input.PadAlgKeyY(PAD_NO::PAD1, PAD_ALGKEY::LEFT) < 0)
 			{
 				// 奥移動処理
 				paramChara_.velocity.z += _Move(&paramChara_.velocity.z, paramChara_.speedAcc, paramChara_.speed);
@@ -440,9 +446,9 @@ void Player::Move(void)
 			paramChara_.velocity.z = DecVelocityXZ(&paramChara_.velocity.z);
 		}
 
-		if (input.PadAlgKeyX(inputPad_, PAD_ALGKEY::LEFT) != 0 && IsActiveAction())
+		if (input.PadAlgKeyX(PAD_NO::PAD1, PAD_ALGKEY::LEFT) != 0 && IsActiveAction())
 		{
-			if (input.PadAlgKeyX(inputPad_, PAD_ALGKEY::LEFT) > 0)
+			if (input.PadAlgKeyX(PAD_NO::PAD1, PAD_ALGKEY::LEFT) > 0)
 			{
 				// 右移動処理
 				paramChara_.velocity.x += _Move(&paramChara_.velocity.x, paramChara_.speedAcc, paramChara_.speed);
@@ -541,18 +547,10 @@ void Player::Move(void)
 }
 
 
-void Player::Update_Animation(void)
+void Player::UpdateAnim(void)
 {
 	// アニメーション遷移処理
 	AnimationState();
-
-
-	if (paramChara_.timeInv > 0.0f)
-	{
-		anim_->Play(static_cast<int>(ANIM_STATE::JUMP), false);
-		anim_->SetAnimStep(anim_->GetPlayTimeTotal());
-		anim_->Stop();
-	}
 
 	// アニメーション更新
 	anim_->Update();
@@ -580,24 +578,6 @@ void Player::AnimationState(void)
 		}
 	}
 
-	else if (state == ANIM_STATE::SWORD_SLASH)
-	{
-		// 攻撃終了時、アニメーション終了している時
-		if (anim_->IsEnd() &&
-			paramPlayer_.actionState != ACTION_STATE::ATTACK_END &&
-			paramPlayer_.actionState != ACTION_STATE::ATTACK &&
-			paramChara_.timeAct <= 0.0f)
-		{
-			if (IsInputRun() && IsInputMove()) { anim_->Play(static_cast<int>(ANIM_STATE::RUN)); }
-
-			// 歩行
-			else if (IsInputMove()) { anim_->Play(static_cast<int>(ANIM_STATE::WALK)); }
-
-			// 待機
-			else { anim_->Play(static_cast<int>(ANIM_STATE::IDLE)); }
-		}
-	}
-
 	else if (state == ANIM_STATE::WALK)
 	{
 		// ダッシュ
@@ -607,7 +587,7 @@ void Player::AnimationState(void)
 		else if (!IsInputMove()) { anim_->Play(static_cast<int>(ANIM_STATE::IDLE)); }
 
 		// 攻撃
-		if (IsInputAtkStrong())
+		if (IsInputAtkJub())
 		{
 			paramPlayer_.isRun = false;
 			anim_->Play(static_cast<int>(ANIM_STATE::SWORD_SLASH), false);
@@ -622,70 +602,86 @@ void Player::AnimationState(void)
 		else if (!IsInputMove()){ anim_->Play(static_cast<int>(ANIM_STATE::IDLE)); }
 
 		// 攻撃
-		if (IsInputAtkStrong())
+		if (IsInputAtkJub())
 		{
 			paramPlayer_.isRun = false;
 			anim_->Play(static_cast<int>(ANIM_STATE::SWORD_SLASH), false);
 		}
 	}
+
+	else if (state == ANIM_STATE::SWORD_SLASH)
+	{
+		// 攻撃終了時、アニメーション終了している時
+		if (anim_->IsEnd() && paramChara_.timeAct <= 0.0f &&
+			paramChara_.attackState == ATTACK_STATE::END)
+		{
+			if (IsInputRun() && IsInputMove()) { anim_->Play(static_cast<int>(ANIM_STATE::RUN)); }
+
+			// 歩行
+			else if (IsInputMove()) { anim_->Play(static_cast<int>(ANIM_STATE::WALK)); }
+
+			// 待機
+			else { anim_->Play(static_cast<int>(ANIM_STATE::IDLE)); }
+		}
+	}
 }
 
 
-void Player::Action(ACTION_STATE waitState, ACTION_STATE activeState, float activeTime,
-	ACTION_STATE endState, float endTime)
+void Player::UpdateMortion(MORTION_TYPE _type)
 {
-	auto& input = InputManager::GetInstance();
 	float delta = SceneManager::GetInstance().GetDeltaTime();
-
+	
+	float time[static_cast<int>(ATTACK_STATE::MAX)];
+	time[static_cast<int>(ATTACK_STATE::START)] = status_.GetMortionStart(_type);
+	time[static_cast<int>(ATTACK_STATE::ACTIVE)] = status_.GetMortionActive(_type);
+	time[static_cast<int>(ATTACK_STATE::END)] = status_.GetMortionEnd(_type);
 
 	// 攻撃しているときに攻撃時間減少
 	paramChara_.timeAct -= delta;
 
-	if (paramPlayer_.actionState == waitState)
+	if (paramChara_.timeAct < 0.0f)
 	{
-		if (paramChara_.timeAct <= 0.0f)
+		// 行動の有効な時間割り当て
+		int state = static_cast<int>(paramChara_.attackState);
+
+		if (paramChara_.attackState == ATTACK_STATE::MAX)
 		{
-			// 行動の有効な時間割り当て
-			paramChara_.timeAct = activeTime;
-
-			// 有効化
-			SetActionState(activeState);
-		}
-	}
-
-	// 行動時の処理
-	if (paramPlayer_.actionState == activeState)
-	{
-		if (paramChara_.timeAct <= 0.0f)
-		{
-			// 行動が失敗した時の処理
-			paramChara_.timeAct = endTime;
-
-			// 行動終了処理
-			SetActionState(endState);
-		}
-	}
-
-	// 終了時の処理
-	if (paramPlayer_.actionState == endState)
-	{
-		int temp = 0;
-		if (paramChara_.timeAct <= 0.0f)
-		{
-			paramChara_.timeAct = 0.0f;
-
 			// 待機状態に戻す
-			SetActionState(ACTION_STATE::IDLE);
+			ChangeActionState(ACTION_STATE::IDLE);
+		}
+		else
+		{
+			// 次の攻撃状態に遷移
+			ChangeAttackStateNext(time[state]);
 		}
 	}
+
+	if (paramChara_.attackState == ATTACK_STATE::END &&
+		anim_->IsEnd())
+	{
+		if (IsInputAtkJub())
+		{
+			ChangeActionState(ACTION_STATE::ATTACK_JUB_1);
+		}
+		else if (IsInputAtkStrong())
+		{
+			ChangeActionState(ACTION_STATE::ATTACK_SPECIAL);
+		}
+		else
+		{
+			ChangeActionState(ACTION_STATE::IDLE);
+		}
+	}
+	int temp = 0;
 }
 
 bool Player::IsActiveAction(void)const
 {
 	bool ret = true;
 
-	if (paramPlayer_.actionState == ACTION_STATE::ATTACK ||
-		paramPlayer_.actionState == ACTION_STATE::ATTACK_END ||
+	// 攻撃中・ゲームオーバー時はfalse
+	if (paramChara_.attackState == ATTACK_STATE::START ||
+		paramChara_.attackState == ATTACK_STATE::ACTIVE ||
 		paramPlayer_.actionState == ACTION_STATE::GAME_OVER)
 	{
 		return false;

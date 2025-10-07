@@ -88,7 +88,9 @@ void AnimationController::Update(void)
 	// 経過時間の取得
 	float deltaTime = SceneManager::GetInstance().GetDeltaTime();
 
-	if (playAnim_.attachNo == -1) return;
+	// アニメーション未割当時
+	if (playAnim_.attachNo == -1 &&
+		!IsFindAnimation(playAnim_.attachNo)) return;
 
 
 	// 再生
@@ -153,16 +155,6 @@ bool AnimationController::IsEnd(void) const
 	}
 
 	return false;
-}
-
-int AnimationController::GetPlayType(void)
-{
-	return playType_;
-}
-
-void AnimationController::Stop(bool isStop)
-{
-	isStop_ = isStop;
 }
 
 void AnimationController::SetAnimStep(float step)
@@ -236,4 +228,21 @@ void AnimationController::Add(int type, float speed, Animation& animation)
 		// 動的配列に追加
 		animations_.emplace(type, animation);
 	}
+}
+
+bool AnimationController::IsFindAnimation(int type)
+{
+	bool isFind = false;
+
+	auto it = animations_.find(type);
+	if (it != animations_.end())
+	{
+		// 発見
+		isFind = true;
+	}
+
+#ifdef _DEBUG
+	OutputDebugString("\nアニメーションの情報がありません。\n");
+#endif
+	return isFind;
 }

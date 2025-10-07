@@ -1,8 +1,9 @@
 #pragma once
 #include "./Object.h"
-#include "../Utility/Vector2.h"
 #include <DxLib.h>
-#include <map>
+#include <unordered_map>
+#include "../Manager/InputManager.h"
+#include "./Status/StatusPlayer.h"
 
 class PlayerCollision;
 class CollisionBase;
@@ -11,6 +12,12 @@ class StatusPlayer;
 
 class Player : public Object
 {
+	using PAD_BTN = InputManager::PAD_BTN;
+	using PAD_ALGKEY = InputManager::JOYPAD_ALGKEY;
+	using PAD_NO = InputManager::JOYPAD_NO;
+
+	using MORTION_TYPE = StatusPlayer::MORTION_TYPE;
+
 public:
 
 	/// <summary>
@@ -25,13 +32,16 @@ public:
 	enum class ACTION_STATE
 	{
 		NONE = -1,
-		IDLE,		 // 待機
+		IDLE, // 待機
 
-		ATTACK_WAIT, // 攻撃準備
-		ATTACK,		 // 攻撃
-		ATTACK_END,  // 攻撃終了
+		ATTACK_JUB_1, // 弱攻撃１回目(初回)
+		ATTACK_JUB_2, // 弱攻撃２回目
+		ATTACK_JUB_3, // 弱攻撃３回目
 
-		ATTACK_SPECIAL,
+		ATTACK_SPECIAL, // 強攻撃単体(必殺技)
+		ATTACK_STRONG_1, // 弱１回 強攻撃
+		ATTACK_STRONG_2, // 弱２回 強攻撃
+		ATTACK_STRONG_3, // 弱３回 強攻撃
 
 		GAME_OVER, // ゲームオーバー状態
 
@@ -173,16 +183,11 @@ public:
 	/// <param name="flag"></param>
 	void SetIsAttack(bool flag);
 
-	/// <summary>
-	/// 攻撃をできるかどうかの判定
-	/// </summary>
-	bool CheckActiveAttack(void) const;
-
 
 	/// <summary>
 	/// 行動状態
 	/// </summary>
-	void SetActionState(ACTION_STATE state);
+	void ChangeActionState(ACTION_STATE state);
 
 	/// <summary>
 	/// パリィ増加倍率割り当て
@@ -242,7 +247,7 @@ protected:
 
 		bool isRun; // ダッシュフラグ
 
-		std::map<ANIM_STATE, float> animSpeed;
+		std::unordered_map<ANIM_STATE, float> animSpeed;
 	};
 	PlayerParam paramPlayer_;
 
@@ -255,7 +260,7 @@ protected:
 	INPUT_TYPE inputType_;
 
 	// 入力するキーの種類
-	std::map<INPUT_TYPE, unsigned int> inputKey_;
+	std::unordered_map<INPUT_TYPE, unsigned int> inputKey_;
 
 	// 入力するゲームパッド識別番号
 	int inputPad_;
@@ -263,21 +268,25 @@ protected:
 	// ジャンプ力
 	float jumpPower_;
 
+	/// <summary>
+	/// 状態更新処理
+	/// </summary>
+	void UpdateActionState(void);
 
 	/// <summary>
 	/// 待機更新処理
 	/// </summary>
-	void Update_Idle(void);
+	void UpdateStateIdle(void);
 
 	/// <summary>
 	/// 攻撃更新処理
 	/// </summary>
-	void Update_Attack(void);
+	void UpdateStateAtk(void);
 
 	/// <summary>
 	/// ゲームオーバー状態の更新処理
 	/// </summary>
-	void Update_GameOver(void);
+	void UpdateStateOver(void);
 
 
 	/// <summary>
@@ -293,7 +302,7 @@ protected:
 	/// <summary>
 	/// アニメーション処理
 	/// </summary>
-	void Update_Animation(void);
+	void UpdateAnim(void)override;
 
 	/// <summary>
 	/// 各アニメーション遷移処理
@@ -317,22 +326,10 @@ protected:
 
 
 	/// <summary>
-	/// 行動処理
+	/// モーション処理
 	/// </summary>
-	/// <param name="waitState">行動の待機状態</param>
-	/// <param name="activeState">行動の有効状態</param>
-	/// <param name="activeTime">有効時間</param>
-	/// <param name="endState">行動の終了状態</param>
-	/// <param name="endTime">終了時間</param>
-	void Action(ACTION_STATE waitState, ACTION_STATE activeState, float activeTime,
-		ACTION_STATE endState, float endTime);
-
-	/// <summary>
-	/// キャラモデル割り当て処理
-	/// </summary>
-	/// <param name="type"></param>
-	/// <returns></returns>
-	int SetCharaModel(const PLAYER_TYPE& type);
+	/// <param name="_type">モーションの種類</param>
+	void UpdateMortion(MORTION_TYPE _type);
 
 	/// <summary>
 	/// 行動可能か否か判定

@@ -1,5 +1,5 @@
 #pragma once
-#include <map>
+#include <unordered_map>
 #include <string>
 
 class AnimationController
@@ -82,13 +82,13 @@ public:
 	/// <summary>
 	/// 再生中のアニメーション番号取得
 	/// </summary>
-	int GetPlayType(void);
+	int GetPlayType(void) { return playType_; };
 
 	/// <summary>
 	/// アニメーション停止処理
 	/// </summary>
 	/// <param name="isStop"></param>
-	void Stop(bool isStop = true);
+	void Stop(bool isStop = true) { isStop_ = isStop; };
 
 	/// <summary>
 	/// 再生位置変更処理
@@ -113,7 +113,7 @@ private:
 	int modelId_;
 
 	// 種類別のアニメーションデータ
-	std::map<int, Animation> animations_;
+	std::unordered_map<int, Animation> animations_;
 
 	// 再生中のアニメーション
 	int playType_;
@@ -135,4 +135,10 @@ private:
 	/// <param name="speed">再生速度</param>
 	/// <param name="animIndex"></param>
 	void Add(int type, float speed, Animation& animIndex);
+
+	/// <summary>
+	/// アニメーションが格納されているか判定
+	/// </summary>
+	/// <param name="type">アニメーションの種類</param>
+	bool IsFindAnimation(int type);
 };

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../Utility/Quaternion.h"
+#include "../Common/Quaternion.h"
 #include <DxLib.h>
 #include <memory>
-#include <map>
+#include <vector>
 #include <string>
 
 class StatusData;
@@ -14,6 +14,14 @@ class Object
 public:
 
 	// 行動状態
+	enum class ATTACK_STATE
+	{
+		NONE = -1, // 攻撃していない
+		START,     // 開始モーション
+		ACTIVE,    // 有効中
+		END,       // 終了
+		MAX
+	};
 
 	// 殴る最低限の横吹っ飛ばし量
 	static constexpr float KNOCK_PUNCH_XZ_MIN = 5.0f;
@@ -79,46 +87,97 @@ public:
 
 protected:
 
+	struct Frame
+	{
+		// フレーム名
+		std::string name;
+
+		// フレーム番号
+		int num;
+
+		// ワールド座標
+		VECTOR pos;
+
+		MATRIX localMat;
+
+		// 表示フラグ
+		bool isVisible;
+	};
+
 	/// <summary>
 	/// プレイヤーのパラメータ
 	/// </summary>
 	struct CHARA_PARAM
 	{
-		VECTOR pos;		  // 位置
-		VECTOR prePos;	  // 前フレームの位置
-		VECTOR posChatch; // つかみ位置
+		// 位置
+		VECTOR pos;
+
+		// 前フレームの位置
+		VECTOR prePos;
+
+		// つかみ位置
+		VECTOR posChatch;
+
+		// モデル位置調整値
+		VECTOR posLocal;
 
 
-		VECTOR velocity;  // 移動量
-		VECTOR knockBack; // 吹っ飛ばし量
-		VECTOR dir;       // 移動方向
+		// 移動量
+		VECTOR velocity;
 
-		VECTOR rot;				// 回転(オイラー角)
-		Quaternion quaRot;		// 回転(クォータニオン)
-		Quaternion quaRotLocal; // ローカル回転(クォータニオン)
+		// 吹っ飛ばし量
+		VECTOR knockBack;
 
-		VECTOR scale;		// スケール
-		VECTOR localPos; // モデル位置調整値
+		// 移動方向
+		VECTOR dir;
 
-		int handle;   // ハンドルID
-		int frameMax; // メッシュ数
-		std::map<int, std::string> frameNameIndex; // メッシュ描画リスト
+		// 回転(オイラー角)
+		VECTOR rot;
 
-		int hp;	      // HP
+		// 回転(クォータニオン)
+		Quaternion quaRot;
 
-		int power;   // 攻撃力
+		// ローカル回転(クォータニオン)
+		Quaternion quaRotLocal;
 
-		float speed;  // 移動速度
+		// スケール
+		VECTOR scale;
 
-		float speedAcc;  // 移動時の加速度
 
-		float timeAct; // 攻撃時間
+		// ハンドルID
+		int handle;
 
-		bool isGround; // 地面にいるか否か
+		// フレームのリスト
+		std::vector<Frame> frames;
 
-		float timeInv; // 無敵時間
+		std::string bodyFrameName;
 
-		COLOR_F damageColor; // ダメージ時の色
+		// HP
+		int hp;
+
+		// 攻撃力
+		int power;
+
+		// 移動速度
+		float speed;
+
+		// 移動時の加速度
+		float speedAcc;
+
+		// 攻撃時間
+		float timeAct;
+
+		// 地面にいるか否か
+		bool isGround;
+
+		// 無敵時間
+		float timeInv;
+
+		// ダメージ時の色
+		COLOR_F damageColor;
+
+		// 攻撃状態
+		ATTACK_STATE attackState;
 	};
 	CHARA_PARAM paramChara_;
 
@@ -190,9 +249,25 @@ protected:
 	float DecVelocityXZ(const float* acc);
 
 	/// <summary>
-	/// アニメーション割り当て処理
+	/// アニメーション初期化
 	/// </summary>
 	virtual void InitAnim(void) = 0;
+
+	/// <summary>
+	/// フレーム初期化
+	/// </summary>
+	virtual void InitModelFrame(void);
+
+	/// <summary>
+	/// アニメーション更新処理
+	/// </summary>
+	virtual void UpdateAnim(void) = 0;
+	
+	/// <summary>
+	/// フレーム番号を検索
+	/// </summary>
+	/// <param name="name">フレーム名</param>
+	int FindFrameNum(const std::string& name);
 
 
 public:
@@ -220,7 +295,12 @@ public:
 	/// <summary>
 	/// 描画処理
 	/// </summary>
-	void Draw(void);
+	virtual void Draw(void);
+
+	/// <summary>
+	/// デバッグ描画
+	/// </summary>
+	virtual void DrawDebug(void);
 
 	/// <summary>
 	/// 解放処理
@@ -237,6 +317,11 @@ public:
 	/// 行列割り当て処理
 	/// </summary>
 	void SetMatrixModel(void);
+
+	/// <summary>
+	/// フレーム割り当て処理
+	/// </summary>
+	void UpdateModelFrame(void);
 
 	/// <summary>
 	/// XZ軸を戻す処理
@@ -276,25 +361,26 @@ public:
 	/// <param name="minPowerXZ">最低限の横方向の吹っ飛ばし力</param>
 	void KnockBack(const VECTOR& targetPos, float invTime,
 		float powerY, float powerXZ = 1.0f, float minPowerXZ = 1.0f);
-
+	
+	/// <summary>
+	/// 攻撃をできるかどうかの判定
+	/// </summary>
+	bool CheckActiveAttack(void) const;
 
 
 	/// <summary>
 	/// 位置割り当て
 	/// </summary>
-	/// <param name="pos">移動後の位置</param>
 	void SetPos(const VECTOR& pos) { paramChara_.pos = pos; };
 
 	/// <summary>
 	/// 前位置を割り当て
 	/// </summary>
-	/// <param name="pos">移動後の位置</param>
 	void SetPrePos(const VECTOR& pos) { paramChara_.prePos = pos; };
 
 	/// <summary>
 	/// 加速度を割り当て
 	/// </summary>
-	/// <param name="velo">加速度</param>
 	void SetVelocity(const VECTOR& velo) { paramChara_.velocity = velo; };
 
 	/// <summary>
@@ -302,6 +388,21 @@ public:
 	/// </summary>
 	/// <param name="flag">着地している否か</param>
 	void SetIsGround(bool flag) { if (paramChara_.isGround != flag) { paramChara_.isGround = flag; } };
+
+	/// <summary>
+	/// 攻撃状態を遷移
+	/// </summary>
+	/// <param name = "_state">攻撃状態</param>
+	/// <param name = "_activeTime">行動時間</param>
+	void ChangeAttackState(ATTACK_STATE state, float _activeTime = 0.0f);
+
+	/// <summary>
+	/// 攻撃状態を遷移
+	/// </summary>
+	/// <param name = "_activeTime">行動時間</param>
+	void ChangeAttackStateNext(float _activeTime = 0.0f);
+
+
 
 	/// <summary>
 	/// 現在位置取得
@@ -316,7 +417,7 @@ public:
 	/// <summary>
 	/// ローカル座標取得
 	/// </summary>
-	const VECTOR& GetPosLocal(void) const { return paramChara_.localPos; };
+	const VECTOR& GetPosLocal(void) const { return paramChara_.posLocal; };
 
 	/// <summary>
 	/// 持ちあげ位置取得

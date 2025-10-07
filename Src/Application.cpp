@@ -9,6 +9,7 @@
 #include "./Common/FrameRate.h"
 #include "./Common/Font.h"
 #include "./Object/Status/StatusData.h"
+#include "./Manager/ConfigManager.h"
 #include "./Manager/InputManager.h"
 #include "./Manager/SceneManager.h"
 #include "./Manager/EffectManager.h"
@@ -110,9 +111,11 @@ void Application::CreateManagers(void)
 	// エフェクトマネージャー生成
 	EffectManager::CreateInstance();
 
-	// シーンマネージャー生成
+	// シーンマネージャ生成
 	SceneManager::CreateInstance();
 
+	// コンフィグマネージャ生成
+	ConfigManager::CreateInstance();
 
 	//フォントマネージャー生成
 	Font::CreateInstance();
@@ -162,6 +165,15 @@ void Application::Run(void)
 			
 			// 描画処理
 			Draw();
+
+
+			// データ再ロード
+			if (scene.GetIsDebugMode() &&
+				input.KeyIsTrgDown(KEY_INPUT_DELETE))
+			{
+				StatusData::GetInstance().Load();
+				OutputDebugString("\nリソースデータを再ロードしました。\n");
+			}
 		}
 	}
 }
@@ -169,20 +181,25 @@ void Application::Run(void)
 void Application::Draw(void)
 {
 	/* 描画処理 */
+	SceneManager& scene = SceneManager::GetInstance();
 	SetDrawScreen(DX_SCREEN_BACK);
 	ClearDrawScreen(); // 描画した画像を解放
 
 	Camera::GetInstance().SetBeforeDraw(); // カメラセット
 
 	// シーン描画
-	SceneManager::GetInstance().Draw();
+	scene.Draw();
 
 	// 終了メニュー
 	exit_->Draw();
 
-#ifdef _DEBUG
-	FrameRate::GetInstance().Draw(); // フレームレート描画
-#endif
+//#ifdef _DEBUG
+
+	// フレームレート描画
+	if (scene.GetIsDebugMode()){ FrameRate::GetInstance().Draw(); }
+
+	scene.DrawDebug();
+//#endif
 
 	ScreenFlip(); // 裏画面を表にコピー
 }
@@ -193,6 +210,9 @@ void Application::Destroy(void)
 
 	// フォントファイルの解放
 	Font::GetInstance().Destroy();
+
+	// コンフィグマネージャ解放
+	ConfigManager::GetInstance().Destroy();
 
 	// シーンマネージャ
 	SceneManager::GetInstance().Destroy();

@@ -6,6 +6,7 @@
 #include <string>
 #include <memory>
 #include <cassert>
+#include <map>
 
 #include "./StatusPlayer.h"
 #include "./StatusEnemy.h"
@@ -49,14 +50,16 @@ StatusData::StatusData(void)
 
 void StatusData::Load(void)
 {
-	LoadPlayer();
+	LoadPlayerStatus();
+
+	LoadPlayerMortion();
 
 	LoadEnemy();
 
 	LoadWeapon();
 }
 
-void StatusData::LoadPlayer(void)
+void StatusData::LoadPlayerStatus(void)
 {
 	/*　csvファイル読み込み処理　*/
 
@@ -116,8 +119,74 @@ void StatusData::LoadPlayer(void)
 
 	// 数値読込
 	player_ = std::make_unique<StatusPlayer>();
-	player_->LoadParam(std::to_array(dataText));
-	
+	player_->LoadStatusParam(std::to_array(dataText));
+}
+
+void StatusData::LoadPlayerMortion(void)
+{
+	/*　csvファイル読み込み処理　*/
+
+	// 文字列の一時格納配列
+	int max = static_cast<int>(StatusPlayer::MORTION_TYPE::MAX);
+	std::string dataText[static_cast<int>(StatusPlayer::MORTION_TYPE::MAX)][static_cast<int>(StatusPlayer::MORTION_PARAM::MAX)];
+
+	// 行
+	std::string line;
+	std::string path = (PATH_CSV_FILE + PATH_PLAYER_MORTION);
+
+	// セーブファイルパス
+	std::ifstream file = std::ifstream(path);
+
+	int length = 0;
+	int param = 0; // 種類
+
+
+	if (!file.is_open())
+	{
+		// ファイル読み込み失敗
+		std::string error = "\ncsvファイルが読み込まれませんでした。\nファイルパス：";
+		error += path;
+		assert(error.c_str());
+	}
+
+	// 行読み込み
+	while (getline(file, line))
+	{
+		std::stringstream ss(line);
+		std::string text;
+
+		if (param == 0)
+		{
+			// ラベルはスキップ
+			param++;
+			length = 0;
+			continue;
+		}
+
+		// 列読み込み(コンマごと)
+		while (getline(ss, text, ','))
+		{
+			// カンマごとに区別されていない
+			if (length < max)
+			{
+				dataText[(param - 1)][length] = text;
+				length++;
+			}
+		}
+
+		length = 0;
+		param++;
+	}
+	file.close();
+
+	for (int i = 0; i < (param - 1); i++)
+	{
+		// プレイヤーのモーション時間の登録
+		StatusPlayer::MORTION_TYPE type = static_cast<StatusPlayer::MORTION_TYPE>(i);
+
+		// モーション格納
+		player_->LoadMortionParam(type, std::to_array(dataText[i]));
+	}
 }
 
 void StatusData::LoadEnemy(void)

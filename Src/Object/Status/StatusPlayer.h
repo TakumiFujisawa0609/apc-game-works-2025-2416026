@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
 #include <array>
+#include <vector>
+#include <map>
 #include "../../Utility/UtilityCommon.h"
 
 class StatusPlayer
@@ -31,12 +33,37 @@ public:
 		MAX,
 	};
 
+	enum class MORTION_TYPE
+	{
+		NONE = -1,
+		JUB_1,
+		JUB_2,
+		JUB_3,
+
+		SPECIAL,
+		STRONG_1,
+		STRONG_2,
+		STRONG_3,
+
+		MAX,
+	};
+	enum class MORTION_PARAM
+	{
+		NAME = 0,
+		START,
+		ACTIVE,
+		END,
+		SPEED,
+
+		MAX,
+	};
+
 
 	StatusPlayer(void);
 
 	~StatusPlayer(void) = default;
 
-	void LoadParam(const std::array<std::string, static_cast<int>(PARAM::MAX)>& _loadString)
+	void LoadStatusParam(const std::array<std::string, static_cast<int>(PARAM::MAX)>& _loadString)
 	{
 		startName_  = _loadString[static_cast<int>(PARAM::START_NAME)];
 		handlePath_ = _loadString[static_cast<int>(PARAM::HANDLE_PATH)];
@@ -56,6 +83,18 @@ public:
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_IDLE)], animSpeedIdle_, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_WALK)], animSpeedWalk_, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_RUN)], animSpeedRun_, 0.0f);
+	}
+
+	void LoadMortionParam(MORTION_TYPE type, const std::array<std::string, static_cast<int>(MORTION_PARAM::MAX)>& _loadString)
+	{
+		Mortion mortion = Mortion();
+
+		mortion.name = _loadString[static_cast<int>(MORTION_PARAM::NAME)];
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(MORTION_PARAM::START)], mortion.start, 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(MORTION_PARAM::ACTIVE)], mortion.active, 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(MORTION_PARAM::END)], mortion.end, 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(MORTION_PARAM::SPEED)], mortion.animSpeed, 0.0f);
+		mortionTimes_.emplace(type, mortion);
 	}
 
 
@@ -105,6 +144,19 @@ public:
 	float& GetAnimSpeedRun(void) { return animSpeedRun_; };
 	
 
+	// モーション開始時間
+	float& GetMortionStart(MORTION_TYPE type) { return mortionTimes_[type].start; };
+
+	// 有効時間
+	float& GetMortionActive(MORTION_TYPE type) { return mortionTimes_[type].start; };
+
+	// モーション終了時間
+	float& GetMortionEnd(MORTION_TYPE type) { return mortionTimes_[type].start; };
+
+	// モーション終了時間
+	float& GetMortionSpeed(MORTION_TYPE type) { return mortionTimes_[type].animSpeed; };
+
+
 private:
 
 	std::string startName_;
@@ -141,4 +193,17 @@ private:
 	float animSpeedWalk_;
 
 	float animSpeedRun_;
+
+	struct Mortion
+	{
+		Mortion(void);
+
+		std::string name;
+		float start;
+		float active;
+		float end;
+		float animSpeed;
+	};
+
+	std::map<MORTION_TYPE, Mortion> mortionTimes_;
 };

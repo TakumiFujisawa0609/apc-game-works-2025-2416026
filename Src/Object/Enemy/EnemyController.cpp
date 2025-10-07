@@ -1,10 +1,14 @@
 #include "EnemyController.h"
 #include <DxLib.h>
+#include <vector>
 #include "../Object.h"
 #include "./Enemy.h"
 #include "./EnemyWarrior.h"
+#include "../Player.h"
 
-EnemyController::EnemyController(void)
+
+EnemyController::EnemyController(Player& player)
+	:player_(player)
 {
 	
 }
@@ -13,7 +17,19 @@ void EnemyController::Init(void)
 {
 	enemys_.clear();
 
-	EnemySpawn(ENEMY_TYPE::SKELETON_WARRIOR, {0.0f, 0.0f, 50.0f});
+	const float rangeXZ = 1000.0f;
+	
+	for (int i = 0; i < 100; i++)
+	{
+		float x = static_cast<int>(GetRand(rangeXZ + rangeXZ) - rangeXZ);
+		float z = static_cast<int>(GetRand(rangeXZ + rangeXZ) - rangeXZ);
+		
+		//EnemySpawn(ENEMY_TYPE::SKELETON_WARRIOR, { x, 0.0f, z });
+	}
+
+	EnemySpawn(ENEMY_TYPE::SKELETON_WARRIOR, { static_cast<float>(GetRand(rangeXZ)),
+											   0.0f,
+										       static_cast<float>(GetRand(rangeXZ)) });
 }
 
 void EnemyController::Update(void)
@@ -34,13 +50,23 @@ void EnemyController::Draw(void)
 
 	for (auto& enemy : enemys_)
 	{
-		//if (!enemy->GetIsActive()) continue;
+		if (!enemy->GetIsActive()) continue;
 
 		enemy->Draw();
 
 		DrawFormatString(0, 148, 0xff0000, "ePos:(%.1f,%.1f,%.1f)",
 			enemy->GetPos().x, enemy->GetPos().y, enemy->GetPos().z);
 	}
+}
+
+void EnemyController::DrawDebug(void)
+{
+	for (auto& enemy : enemys_)
+	{
+		if (!enemy->GetIsActive()) continue;
+		enemy->DrawDebug();
+	}
+
 }
 
 void EnemyController::Release(void)
@@ -56,7 +82,7 @@ void EnemyController::EnemySpawn(ENEMY_TYPE type, const VECTOR& posField)
 {
 	Enemy* enemy = nullptr;
 
-	enemy = new EnemyWarrior();
+	enemy = new EnemyWarrior(player_);
 
 	if (type == ENEMY_TYPE::SKELETON_WARRIOR)
 	{

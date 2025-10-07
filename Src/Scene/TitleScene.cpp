@@ -292,8 +292,8 @@ void TitleScene::DrawTitieText(int posY, const char* text, TitleScene::TITLE_STA
 	// テキストの長さ
 	int strWidth = font.GetDefaultTextWidth(text);
 
-	int x = (Application::SCREEN_SIZE_X / 2) - strWidth;
-	int y = (Application::SCREEN_SIZE_Y / 2) + TEXT_POS.y + posY;
+	int x = (Application::SCREEN_HALF_X - strWidth);
+	int y = (Application::SCREEN_HALF_Y + TEXT_POS.y + posY);
 
 	// 状態が選択している時、
 	if (state_ == state)
@@ -357,8 +357,8 @@ void TitleScene::DrawInfo(void)
 	int x = 0;
 	int y = 0;
 	// 中心座標
-	int midX = (Application::SCREEN_SIZE_X / 2);
-	int midY = (Application::SCREEN_SIZE_Y / 2);
+	int midX = Application::SCREEN_HALF_X;
+	int midY = Application::SCREEN_HALF_Y;
 
 	// 背景 半透明描画
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, INFO_COLOR.a);
@@ -414,31 +414,17 @@ bool TitleScene::IsSelectUp(void)
 	bool ret = false;
 	InputManager& input = InputManager::GetInstance();
 
-	int pad1 = static_cast<int>(PAD_NO::PAD1);
-	int pad2 = static_cast<int>(PAD_NO::PAD2);
-
-	if (input.PadIsAlgKeyTrgDown(pad1, PAD_ALGKEY::LEFT) &&
-		input.PadAlgKeyX(pad1, PAD_ALGKEY::LEFT) < 0 ||
-		input.PadIsAlgKeyTrgDown(pad1, PAD_ALGKEY::LEFT) &&
-		input.PadAlgKeyY(pad1, PAD_ALGKEY::LEFT) < 0 ||
-		input.PadIsAlgKeyTrgDown(pad1, PAD_ALGKEY::RIGHT) &&
-		input.PadAlgKeyX(pad1, PAD_ALGKEY::RIGHT) < 0 ||
-		input.PadIsAlgKeyTrgDown(pad1, PAD_ALGKEY::RIGHT) &&
-		input.PadAlgKeyY(pad1, PAD_ALGKEY::RIGHT) < 0 ||
-
-		input.PadIsAlgKeyTrgDown(pad2, PAD_ALGKEY::LEFT) &&
-		input.PadAlgKeyX(pad2, PAD_ALGKEY::LEFT) < 0 ||
-		input.PadIsAlgKeyTrgDown(pad2, PAD_ALGKEY::LEFT) &&
-		input.PadAlgKeyY(pad2, PAD_ALGKEY::LEFT) < 0 ||
-		input.PadIsAlgKeyTrgDown(pad2, PAD_ALGKEY::RIGHT) &&
-		input.PadAlgKeyX(pad2, PAD_ALGKEY::RIGHT) < 0 ||
-		input.PadIsAlgKeyTrgDown(pad2, PAD_ALGKEY::RIGHT) &&
-		input.PadAlgKeyY(pad2, PAD_ALGKEY::RIGHT) < 0 ||
+	if (input.PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::LEFT) &&
+		input.PadAlgKeyX(PAD_NO::PAD1, PAD_ALGKEY::LEFT) < 0 ||
+		input.PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::LEFT) &&
+		input.PadAlgKeyY(PAD_NO::PAD1, PAD_ALGKEY::LEFT) < 0 ||
+		input.PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) &&
+		input.PadAlgKeyX(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) < 0 ||
+		input.PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) &&
+		input.PadAlgKeyY(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) < 0 ||
 
 		input.KeyIsTrgDown(KEY_INPUT_W) ||
 		input.KeyIsTrgDown(KEY_INPUT_A) ||
-		input.KeyIsTrgDown(KEY_INPUT_O) ||
-		input.KeyIsTrgDown(KEY_INPUT_K) ||
 		input.KeyIsTrgDown(KEY_INPUT_LEFT) ||
 		input.KeyIsTrgDown(KEY_INPUT_UP))
 	{
@@ -452,31 +438,17 @@ bool TitleScene::IsSelectDown(void)
 	bool ret = false;
 	InputManager& input = InputManager::GetInstance();
 
-	int pad1 = static_cast<int>(PAD_NO::PAD1);
-	int pad2 = static_cast<int>(PAD_NO::PAD2);
-
-	if (input.PadIsAlgKeyTrgDown(pad1, PAD_ALGKEY::LEFT) &&
-		input.PadAlgKeyX(pad1, PAD_ALGKEY::LEFT) > 0 ||
-		input.PadIsAlgKeyTrgDown(pad1, PAD_ALGKEY::LEFT) &&
-		input.PadAlgKeyY(pad1, PAD_ALGKEY::LEFT) > 0 ||
-		input.PadIsAlgKeyTrgDown(pad1, PAD_ALGKEY::RIGHT) &&
-		input.PadAlgKeyX(pad1, PAD_ALGKEY::RIGHT) > 0 ||
-		input.PadIsAlgKeyTrgDown(pad1, PAD_ALGKEY::RIGHT) &&
-		input.PadAlgKeyY(pad1, PAD_ALGKEY::RIGHT) > 0 ||
-
-		input.PadIsAlgKeyTrgDown(pad2, PAD_ALGKEY::LEFT) &&
-		input.PadAlgKeyX(pad2, PAD_ALGKEY::LEFT) > 0 ||
-		input.PadIsAlgKeyTrgDown(pad2, PAD_ALGKEY::LEFT) &&
-		input.PadAlgKeyY(pad2, PAD_ALGKEY::LEFT) > 0 ||
-		input.PadIsAlgKeyTrgDown(pad2, PAD_ALGKEY::RIGHT) &&
-		input.PadAlgKeyX(pad2, PAD_ALGKEY::RIGHT) > 0 ||
-		input.PadIsAlgKeyTrgDown(pad2, PAD_ALGKEY::RIGHT) &&
-		input.PadAlgKeyY(pad2, PAD_ALGKEY::RIGHT) > 0 ||
+	if (input.PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::LEFT) &&
+		input.PadAlgKeyX(PAD_NO::PAD1, PAD_ALGKEY::LEFT) > 0 ||
+		input.PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::LEFT) &&
+		input.PadAlgKeyY(PAD_NO::PAD1, PAD_ALGKEY::LEFT) > 0 ||
+		input.PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) &&
+		input.PadAlgKeyX(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) > 0 ||
+		input.PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) &&
+		input.PadAlgKeyY(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) > 0 ||
 
 		input.KeyIsTrgDown(KEY_INPUT_S) ||
 		input.KeyIsTrgDown(KEY_INPUT_D) ||
-		input.KeyIsTrgDown(KEY_INPUT_L) ||
-		input.KeyIsTrgDown(KEY_INPUT_SEMICOLON) ||
 		input.KeyIsTrgDown(KEY_INPUT_RIGHT) ||
 		input.KeyIsTrgDown(KEY_INPUT_DOWN))
 	{
@@ -489,16 +461,9 @@ bool TitleScene::IsCheck(void)
 	bool ret = false;
 	InputManager& input = InputManager::GetInstance();
 
-	int pad1 = static_cast<int>(PAD_NO::PAD1);
-	int pad2 = static_cast<int>(PAD_NO::PAD2);
-
-	if (input.PadIsBtnTrgDown(pad1, PAD_BTN::START) ||
-		input.PadIsBtnTrgDown(pad1, PAD_BTN::RIGHT) ||
-		input.PadIsBtnTrgDown(pad1, PAD_BTN::DOWN) ||
-
-		input.PadIsBtnTrgDown(pad2, PAD_BTN::START) ||
-		input.PadIsBtnTrgDown(pad2, PAD_BTN::RIGHT) ||
-		input.PadIsBtnTrgDown(pad2, PAD_BTN::DOWN) ||
+	if (input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::START) ||
+		input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::RIGHT) ||
+		input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::DOWN) ||
 
 		input.KeyIsTrgDown(KEY_INPUT_SPACE) ||
 		input.KeyIsTrgDown(KEY_INPUT_RETURN))
@@ -512,15 +477,10 @@ bool TitleScene::IsCansel(void)
 	bool ret = false;
 	InputManager& input = InputManager::GetInstance();
 
-	int pad1 = static_cast<int>(PAD_NO::PAD1);
-	int pad2 = static_cast<int>(PAD_NO::PAD2);
-
 	if (input.KeyIsTrgDown(KEY_INPUT_ESCAPE) ||
 		input.KeyIsTrgDown(KEY_INPUT_X) ||
-		input.PadIsBtnTrgDown(pad1, PAD_BTN::BACK) ||
-		input.PadIsBtnTrgDown(pad1, PAD_BTN::RIGHT) ||
-		input.PadIsBtnTrgDown(pad2, PAD_BTN::BACK) ||
-		input.PadIsBtnTrgDown(pad2, PAD_BTN::RIGHT))
+		input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::BACK) ||
+		input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::RIGHT))
 	{
 		ret = true;
 	}

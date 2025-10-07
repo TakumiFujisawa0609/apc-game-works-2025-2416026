@@ -1,5 +1,5 @@
 #pragma once
-#include "../Utility/Quaternion.h"
+#include "../Common/Quaternion.h"
 #include <DxLib.h>
 #include <vector>
 #include <memory>
@@ -51,7 +51,8 @@ public:
 	// 注視点への視点移動速度(0～1.0)
 	static constexpr float CAMERA_LOOK_SPEED = 0.0f;
 
-	static constexpr VECTOR CAMERA_DISTANCE = { 0.0, 150.0f, -400.0f };
+	static constexpr VECTOR CAMERA_DISTANCE = { 0.0, 250.0f, -750.0f };
+
 
 	/// <summary>
 	/// インスタンス生成
@@ -230,6 +231,9 @@ private:
 	// カメラ移動処理
 	void DebugMove(void);
 
+	/// <summary>
+	/// 定点カメラ処理
+	/// </summary>
 	void SetBeforeDraw_FixexPoint(void);
 
 	void SetBeforeDraw_Follow(void);

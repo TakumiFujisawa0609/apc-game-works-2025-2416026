@@ -1,5 +1,6 @@
 #include <string>
 #include <memory>
+#include <array>
 #include <map>
 
 class StatusPlayer;
@@ -34,6 +35,7 @@ public:
 
 	// セーブデータのハンドル
 	const char* PATH_PLAYER = "PlayerData.csv";
+	const char* PATH_PLAYER_MORTION = "PlayerMortionData.csv";
 	const char* PATH_ENEMY = "EnemyData.csv";
 	const char* PATH_WEAPON = "WeaponData.csv";
 
@@ -125,7 +127,8 @@ private:
 	// コピーコンストラクタ
 	StatusData(const StatusData& other) = default;
 
-	void LoadPlayer(void);
+	void LoadPlayerStatus(void);
+	void LoadPlayerMortion(void);
 	void LoadEnemy(void);
 	void LoadWeapon(void);
 };

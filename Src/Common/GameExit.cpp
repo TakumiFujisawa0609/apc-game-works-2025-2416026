@@ -125,8 +125,8 @@ void GameExit::Draw(void)
 	SceneManager& scene = SceneManager::GetInstance();
 
 	// 画面の中央座標
-	int midX = (Application::SCREEN_SIZE_X / 2);
-	int midY = (Application::SCREEN_SIZE_Y / 2);
+	int midX = Application::SCREEN_HALF_X;
+	int midY = Application::SCREEN_HALF_Y;
 
 	// 決定テキスト位置
 	int yesX = ((midX - TEXT_OFFSET.x) - font.GetDefaultTextWidth(TEXT_YES));
@@ -220,12 +220,8 @@ bool GameExit::IsActive(void)
 	bool ret = false;
 	InputManager& input = InputManager::GetInstance();
 
-	int pad1 = static_cast<int>(PAD_NO::PAD1);
-	int pad2 = static_cast<int>(PAD_NO::PAD2);
-
 	if (input.KeyIsTrgDown(KEY_INPUT_ESCAPE) ||
-		input.PadIsBtnTrgDown(pad1, PAD_BTN::BACK) ||
-		input.PadIsBtnTrgDown(pad2, PAD_BTN::BACK))
+		input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::BACK))
 	{
 		ret = true;
 	}
@@ -238,16 +234,9 @@ bool GameExit::IsSelect(void)
 	bool ret = false;
 	InputManager& input = InputManager::GetInstance();
 
-	int pad1 = static_cast<int>(PAD_NO::PAD1);
-	int pad2 = static_cast<int>(PAD_NO::PAD2);
-
-	if (input.PadIsAlgKeyTrgDown(pad1, PAD_ALGKEY::LEFT)  ||
-		input.PadIsAlgKeyTrgDown(pad1, PAD_ALGKEY::D_PAD) ||
-		input.PadIsAlgKeyTrgDown(pad1, PAD_ALGKEY::RIGHT) ||
-
-		input.PadIsAlgKeyTrgDown(pad2, PAD_ALGKEY::LEFT)  ||
-		input.PadIsAlgKeyTrgDown(pad2, PAD_ALGKEY::RIGHT) ||
-		input.PadIsAlgKeyTrgDown(pad2, PAD_ALGKEY::D_PAD) ||
+	if (input.PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::LEFT)  ||
+		input.PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::D_PAD) ||
+		input.PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) ||
 
 		input.KeyIsTrgDown(KEY_INPUT_W) || input.KeyIsTrgDown(KEY_INPUT_UP) || input.KeyIsTrgDown(KEY_INPUT_O) ||
 		input.KeyIsTrgDown(KEY_INPUT_S) || input.KeyIsTrgDown(KEY_INPUT_DOWN) || input.KeyIsTrgDown(KEY_INPUT_L) ||
@@ -265,18 +254,10 @@ bool GameExit::IsCheck(void)
 	bool ret = false;
 	InputManager& input = InputManager::GetInstance();
 
-	int pad1 = static_cast<int>(PAD_NO::PAD1);
-	int pad2 = static_cast<int>(PAD_NO::PAD2);
-
-	if (input.PadIsBtnTrgDown(pad1, PAD_BTN::START) ||
-		input.PadIsBtnTrgDown(pad1, PAD_BTN::BACK)  ||
-		input.PadIsBtnTrgDown(pad1, PAD_BTN::RIGHT) ||
-		input.PadIsBtnTrgDown(pad1, PAD_BTN::DOWN)  ||
-
-		input.PadIsBtnTrgDown(pad2, PAD_BTN::START) ||
-		input.PadIsBtnTrgDown(pad2, PAD_BTN::BACK)  ||
-		input.PadIsBtnTrgDown(pad2, PAD_BTN::RIGHT) ||
-		input.PadIsBtnTrgDown(pad2, PAD_BTN::DOWN)  ||
+	if (input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::START) ||
+		input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::BACK)  ||
+		input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::RIGHT) ||
+		input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::DOWN)  ||
 
 		input.KeyIsTrgDown(KEY_INPUT_SPACE) ||
 		input.KeyIsTrgDown(KEY_INPUT_RETURN))
