@@ -25,6 +25,7 @@ public:
 		HANDLE_PATH,	 // ハンドルパス
 		ENEMY_TYPE,		 // 敵の種類
 		SCALE,			 // モデルのスケール
+		RADIUS,          // 半径
 		HP,              // HP
 		POWER,           // 攻撃力
 		SPEED,			 // 移動速度
@@ -57,6 +58,7 @@ public:
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::SCALE)], scale_, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::HP)], hp_, 1);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::POWER)], power_, 0);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::RADIUS)], radius_, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::SPEED)], speed_, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::SPEED_ACC)], speedAcc_, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ATTACK_INTERVAL)], atkInterval_, 0.0f);
@@ -75,29 +77,36 @@ public:
 
 	TYPE& GetEnemyType(void) { return type_; };
 
-	float GetScale(void) { return scale_; };
+	float GetScale(void)const { return scale_; };
 
-	int GetMaxHp(void) { return hp_; };
+	float GetRadius(void)const { return radius_; };
 
-	int GetPower(void) { return power_; };
+	int GetMaxHp(void)const { return hp_; };
 
-	float GetSpeed(void) { return speed_; };
+	int GetPower(void)const { return power_; };
 
-	float GetSpeedAcc(void) { return speedAcc_; }
+	float GetSpeed(void)const { return speed_; };
 
-	float GetAtkInterval(void) { return atkInterval_; }
+	float GetSpeedAcc(void)const { return speedAcc_; }
 
-	float GetAtkRange(void) { return atkRange_; }
+	float GetAtkInterval(void)const { return atkInterval_; }
 
-	float GetSearchRange(void) { return searchRange_; }
+	float GetAtkRange(void)const { return atkRange_; }
 
-	float GetAnimSpeedIdle(void) { return animSpeed_.idle; }
+	float GetSearchRange(void)const { return searchRange_; }
 
-	float GetAnimSpeedAtk(void) { return animSpeed_.attack; }
 
-	float GetAnimSpeedWalk(void) { return animSpeed_.walk; }
+	// 待機アニメーション速度取得
+	float GetAnimSpeedIdle(void)const { return animSpeed_.idle; }
 
-	float GetAnimSpeedSpawn(void) { return animSpeed_.spawn; }
+	// 攻撃アニメーション速度取得
+	float GetAnimSpeedAtk(void)const { return animSpeed_.attack; }
+
+	// 移動アニメーション速度取得
+	float GetAnimSpeedWalk(void)const { return animSpeed_.walk; }
+
+	// 生成アニメーション速度取得
+	float GetAnimSpeedSpawn(void)const { return animSpeed_.spawn; }
 
 	
 
@@ -118,6 +127,8 @@ private:
 	TYPE type_;
 
 	float scale_;
+
+	float radius_;
 
 	int hp_;
 

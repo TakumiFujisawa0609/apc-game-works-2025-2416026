@@ -17,7 +17,7 @@ void EnemyController::Init(void)
 {
 	enemys_.clear();
 
-	const float rangeXZ = 1000.0f;
+	const float rangeXZ = 300.0f;
 	
 	for (int i = 0; i < 100; i++)
 	{

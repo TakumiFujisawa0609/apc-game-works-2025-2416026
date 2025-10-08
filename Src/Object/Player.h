@@ -20,14 +20,6 @@ class Player : public Object
 
 public:
 
-	/// <summary>
-	/// プレイヤー種類
-	/// </summary>
-	enum class PLAYER_TYPE
-	{
-		NONE = -1,
-		PLAYER_BEAR, // くま
-	};
 
 	enum class ACTION_STATE
 	{
@@ -50,24 +42,23 @@ public:
 	enum class ANIM_STATE
 	{
 		NONE = -1,
-		DEATH, // ゲームオーバー
-		DEFEAT,
-		IDLE,		 // 待機
-
-		JUMP, // ジャンプ
-		PICK_UP, // 拾う
-		RECIEVE_HIT,
-		ATTACK, // 攻撃
-		ROLL,   // 回避
-		RUN,    // 走る
-		RUN_CARRY,
-		SHOOT_ONEHANDED,
-		SHIT_DOWN,
-		STAND_UP,
-		SWORD_SLASH,
-		VICTORY,
-		WALK, // 歩く
-		WALK_CARRY,
+		DEATH = 0, // ゲームオーバー
+		//DEFEAT,
+		IDLE = 2,    // 待機
+		JUMP = 3,    // ジャンプ
+		PICK_UP = 4, // 拾う
+		//RECIEVE_HIT,
+		ATTACK = 6,  // 攻撃
+		ROLL = 7,    // 回避
+		DASH = 8,    // 走る
+		//DASH_CARRY,
+		//SHOOT_ONEHANDED,
+		//SHIT_DOWN,
+		//STAND_UP,
+		SWORD_SLASH = 13,
+		//VICTORY,
+		WALK = 15, // 歩く
+		//WALK_CARRY,
 		MAX,
 	};
 
@@ -92,7 +83,7 @@ public:
 		ATTACK_JUB,    // 弱攻撃
 		ATTACK_STRONG, // 強攻撃
 
-		RUN,		  // ダッシュ
+		DASH,		  // ダッシュ
 
 		MAX,
 	};
@@ -231,30 +222,42 @@ protected:
 
 	struct PlayerParam
 	{
-		ACTION_STATE actionState; // 行動状態
+		// 行動状態
+		ACTION_STATE actionState;
 
-		float parryTime; // パリィ時間
-		float parryMag; // パリィ倍率
+		// パリィ時間
+		float parryTime;
 
-		float dodgeTime; // 回避時間
-		float dodgeMag; // 回避倍率
+		// パリィ倍率
+		float parryMag;
 
-		int luck; // 運
+		// 回避時間
+		float dodgeTime;
 
-		int combo; // コンボ数
+		// 回避倍率
+		float dodgeMag;
 
-		int weaponId; // 武器ID
+		// 運
+		int luck;
 
-		bool isRun; // ダッシュフラグ
+		// コンボ数
+		int combo;
+
+		// 武器ID
+		int weaponId;
+
+		// ダッシュ時の増加場率
+		float dashMult;
+
+		// ダッシュフラグ
+		bool isDash;
 
 		std::unordered_map<ANIM_STATE, float> animSpeed;
 	};
 	PlayerParam paramPlayer_;
 
-	StatusPlayer& status_;
 
-	// プレイヤー種類
-	PLAYER_TYPE type_;
+	StatusPlayer& status_;
 
 	// 入力種類
 	INPUT_TYPE inputType_;
@@ -262,8 +265,6 @@ protected:
 	// 入力するキーの種類
 	std::unordered_map<INPUT_TYPE, unsigned int> inputKey_;
 
-	// 入力するゲームパッド識別番号
-	int inputPad_;
 
 	// ジャンプ力
 	float jumpPower_;
@@ -295,6 +296,13 @@ protected:
 	void Move(void);
 
 	/// <summary>
+	/// ダッシュ処理
+	/// </summary>
+	/// <param name="_acc">加速度</param>
+	/// <param name="_max">最大速度</param>
+	void DashProc(float& _acc, float& _max);
+
+	/// <summary>
 	/// アニメーション割り当て
 	/// </summary>
 	void InitAnim(void)override;
@@ -305,9 +313,9 @@ protected:
 	void UpdateAnim(void)override;
 
 	/// <summary>
-	/// 各アニメーション遷移処理
+	/// 待機状態のアニメーション遷移処理
 	/// </summary>
-	void AnimationState(void);
+	void AnimStateIdle(void);
 
 	/// <summary>
 	/// 攻撃入力をしているか否か
@@ -322,7 +330,7 @@ protected:
 	/// <summary>
 	/// ダッシュ入力をしているか否か
 	/// </summary>
-	bool IsInputRun(void);
+	bool IsInputDash(void);
 
 
 	/// <summary>

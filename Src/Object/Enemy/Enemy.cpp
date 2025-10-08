@@ -46,7 +46,12 @@ void Enemy::SetParam(void)
 {
 	paramEnemy_.name = status_.GetName();
 
-	int frameNum = FindFrameNum(paramChara_.bodyFrameName);
+	int frameNum = FindFrameNum(paramChara_.frameNames[COLLISION_TYPE::BODY]);// ÉtÉåÅ[ÉÄñºäÑÇËìñÇƒ
+	paramChara_.frameNames.emplace(COLLISION_TYPE::BODY, "Torso");
+	paramChara_.frameNames.emplace(COLLISION_TYPE::HEAD, "Head");
+	paramChara_.frameNames.emplace(COLLISION_TYPE::BOTTOM, "Bone");
+	paramChara_.frameNames.emplace(COLLISION_TYPE::HAND_L, "Fist.L");
+	paramChara_.frameNames.emplace(COLLISION_TYPE::HAND_R, "Fist.R");
 	VECTOR sub = VSub(paramChara_.frames[frameNum].pos, paramChara_.pos);
 	paramChara_.posLocal = VSub(paramChara_.pos, sub);
 
@@ -66,6 +71,8 @@ void Enemy::SetParam(void)
 
 	float scale = status_.GetScale();
 	paramChara_.scale = { scale, scale, scale };
+	paramChara_.radius = status_.GetRadius();
+
 	paramChara_.hp = status_.GetMaxHp();
 	paramChara_.power = status_.GetPower();
 	paramChara_.speed = status_.GetSpeed();

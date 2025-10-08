@@ -3,6 +3,7 @@
 #include "../Common/Quaternion.h"
 #include <DxLib.h>
 #include <memory>
+#include <unordered_map>
 #include <vector>
 #include <string>
 
@@ -22,6 +23,18 @@ public:
 		END,       // 終了
 		MAX
 	};
+
+	enum class COLLISION_TYPE
+	{
+		HEAD,
+		BODY,
+		BOTTOM,
+		HAND_L,
+		HAND_R,
+
+		MAX,
+	};
+
 
 	// 殴る最低限の横吹っ飛ばし量
 	static constexpr float KNOCK_PUNCH_XZ_MIN = 5.0f;
@@ -107,7 +120,7 @@ protected:
 	/// <summary>
 	/// プレイヤーのパラメータ
 	/// </summary>
-	struct CHARA_PARAM
+	struct CharaParam
 	{
 		// 位置
 		VECTOR pos;
@@ -143,6 +156,8 @@ protected:
 		// スケール
 		VECTOR scale;
 
+		// 半径
+		float radius;
 
 		// ハンドルID
 		int handle;
@@ -150,7 +165,7 @@ protected:
 		// フレームのリスト
 		std::vector<Frame> frames;
 
-		std::string bodyFrameName;
+		std::unordered_map<COLLISION_TYPE, std::string> frameNames;
 
 		// HP
 		int hp;
@@ -179,7 +194,7 @@ protected:
 		// 攻撃状態
 		ATTACK_STATE attackState;
 	};
-	CHARA_PARAM paramChara_;
+	CharaParam paramChara_;
 
 	// アニメーション
 	AnimationController* anim_;
@@ -462,6 +477,10 @@ public:
 	/// </summary>
 	const VECTOR& GetScale(void) const { return paramChara_.scale; };
 
+	/// <summary>
+	/// 半径取得
+	/// </summary>
+	float GetRadius(void)const { return paramChara_.radius; };
 
 	/// <summary>
 	/// キャラモデルハンドル取得

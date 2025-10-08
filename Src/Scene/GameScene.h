@@ -79,9 +79,6 @@ private:
 	//ステージオブジェクト
 	GameStageController* gameStage_;
 
-	// 当たり判定マネージャ
-	CollisionManager* colManager_;
-
 
 	/// <summary>
 	/// 再初期化処理

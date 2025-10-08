@@ -2,7 +2,7 @@
 #include <string>
 #include <array>
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include "../../Utility/UtilityCommon.h"
 
 class StatusPlayer
@@ -15,11 +15,13 @@ public:
 		START_NAME,  // 初期の名前
 		HANDLE_PATH, // モデルのハンドルパス
 		SCALE, // モデルのスケール
+		RADIUS, // 半径
 		HP,    // HP
 		POWER, // 攻撃力
 		LUCK,  // 幸運
 		SPEED, // 移動速度
 		SPEED_ACC, // 移動時の加速度
+		DASH_MULT, // ダッシュ時の増加倍率
 		WEAPON_NUM,      // 武器番号
 		TIME_INVINCIBLE, // 無敵時間
 		TIME_PARRY,		 // パリィ時間
@@ -28,7 +30,7 @@ public:
 
 		ANIM_SPEED_IDLE, // 待機アニメーション速度
 		ANIM_SPEED_WALK, // 移動アニメーション速度
-		ANIM_SPEED_RUN, // ダッシュアニメーション速度
+		ANIM_SPEED_DASH, // ダッシュアニメーション速度
 
 		MAX,
 	};
@@ -50,10 +52,11 @@ public:
 	enum class MORTION_PARAM
 	{
 		NAME = 0,
-		START,
-		ACTIVE,
-		END,
-		SPEED,
+		TIME_START,
+		TIME_ACTIVE,
+		TIME_END,
+		SPEED,  // モーションアニメーション速度
+		RADIUS, // 半径
 
 		MAX,
 	};
@@ -70,10 +73,12 @@ public:
 
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::SCALE)], scale_, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::HP)], hp_, 0);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::RADIUS)], radius_, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::POWER)], power_, 0);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::LUCK)], luck_, 0);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::SPEED)], speed_, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::SPEED_ACC)], speedAcc_, 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::DASH_MULT)], dashMult_, 1.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::WEAPON_NUM)], weaponId_, 0);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::TIME_INVINCIBLE)], timeInv_, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::TIME_PARRY)], timeParry_, 0.0f);
@@ -82,19 +87,20 @@ public:
 
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_IDLE)], animSpeedIdle_, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_WALK)], animSpeedWalk_, 0.0f);
-		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_RUN)], animSpeedRun_, 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_DASH)], animSpeedDash_, 0.0f);
 	}
 
-	void LoadMortionParam(MORTION_TYPE type, const std::array<std::string, static_cast<int>(MORTION_PARAM::MAX)>& _loadString)
+	void LoadMortionParam(MORTION_TYPE _type, const std::array<std::string, static_cast<int>(MORTION_PARAM::MAX)>& _loadString)
 	{
 		Mortion mortion = Mortion();
 
 		mortion.name = _loadString[static_cast<int>(MORTION_PARAM::NAME)];
-		UtilityCommon::ChangeString(_loadString[static_cast<int>(MORTION_PARAM::START)], mortion.start, 0.0f);
-		UtilityCommon::ChangeString(_loadString[static_cast<int>(MORTION_PARAM::ACTIVE)], mortion.active, 0.0f);
-		UtilityCommon::ChangeString(_loadString[static_cast<int>(MORTION_PARAM::END)], mortion.end, 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(MORTION_PARAM::TIME_START)], mortion.timeStart, 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(MORTION_PARAM::TIME_ACTIVE)], mortion.timeActive, 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(MORTION_PARAM::TIME_END)], mortion.timeEnd, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(MORTION_PARAM::SPEED)], mortion.animSpeed, 0.0f);
-		mortionTimes_.emplace(type, mortion);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(MORTION_PARAM::RADIUS)], mortion.radius, 0.0f);
+		mortion_.emplace(_type, mortion);
 	}
 
 
@@ -102,59 +108,66 @@ public:
 
 	std::string& GetHandlePath(void) { return handlePath_; }
 
-	float GetScale(void) { return scale_; }
+	float GetScale(void)const { return scale_; }
 
-	int GetHp(void) { return hp_; }
+	float GetRadius(void)const { return radius_; }
 
-	int GetPower(void) { return power_; }
+	int GetHp(void)const { return hp_; }
 
-	int GetLuck(void) { return luck_; }
+	int GetPower(void)const { return power_; }
 
-	int GetWeaponId(void) { return weaponId_; }
+	int GetLuck(void)const { return luck_; }
 
-	float GetSpeed(void) { return speed_; }
+	int GetWeaponId(void)const { return weaponId_; }
 
-	float GetSpeedAcc(void) { return speed_; }
+	float GetSpeed(void)const { return speed_; }
+
+	float GetSpeedAcc(void)const { return speedAcc_; }
+
+	float GetDashMult(void)const { return dashMult_; }
 
 	/// <summary>
 	/// 無敵時間取得
 	/// </summary>
-	float GetTimeInvicible(void) { return timeInv_; }
+	float GetTimeInvicible(void)const { return timeInv_; }
 
 	/// <summary>
 	/// パリィ時間
 	/// </summary>
-	float GetTimeParry(void) { return timeParry_; }
+	float GetTimeParry(void)const { return timeParry_; }
 
 	/// <summary>
 	/// 回避時間
 	/// </summary>
-	float GetTimeEvasion(void) { return timeEvasion_; }
+	float GetTimeEvasion(void)const { return timeEvasion_; }
 
 	/// <summary>
 	/// コンボ倍率
 	/// </summary>
-	float GetComboMag(void) { return comboMag_; }
+	float GetComboMag(void)const { return comboMag_; }
 
 	// アニメーション速度
-	float& GetAnimSpeedIdle(void) { return animSpeedIdle_; };
+	float GetAnimSpeedIdle(void)const { return animSpeedIdle_; }
 
-	float& GetAnimSpeedWalk(void) { return animSpeedWalk_; };
+	float GetAnimSpeedWalk(void)const { return animSpeedWalk_; }
 
-	float& GetAnimSpeedRun(void) { return animSpeedRun_; };
+	float GetAnimSpeedDash(void)const { return animSpeedDash_; }
 	
 
 	// モーション開始時間
-	float& GetMortionStart(MORTION_TYPE type) { return mortionTimes_[type].start; };
+	float GetMortionStart(MORTION_TYPE _type) { return mortion_[_type].timeStart; }
 
 	// 有効時間
-	float& GetMortionActive(MORTION_TYPE type) { return mortionTimes_[type].start; };
+	float GetMortionActive(MORTION_TYPE _type) { return mortion_[_type].timeActive; }
 
 	// モーション終了時間
-	float& GetMortionEnd(MORTION_TYPE type) { return mortionTimes_[type].start; };
+	float GetMortionEnd(MORTION_TYPE _type) { return mortion_[_type].timeEnd; }
 
 	// モーション終了時間
-	float& GetMortionSpeed(MORTION_TYPE type) { return mortionTimes_[type].animSpeed; };
+	float GetMortionSpeed(MORTION_TYPE _type) { return mortion_[_type].animSpeed; }
+
+	// モーション半径取得
+	float GetMortionRadius(MORTION_TYPE _type) { return mortion_[_type].radius; }
 
 
 private:
@@ -164,6 +177,8 @@ private:
 	std::string handlePath_;
 
 	float scale_;
+
+	float radius_;
 
 	int hp_;
 
@@ -176,6 +191,8 @@ private:
 	float speed_;
 
 	float speedAcc_;
+
+	float dashMult_;
 
 	float timeParry_;
 
@@ -192,18 +209,24 @@ private:
 
 	float animSpeedWalk_;
 
-	float animSpeedRun_;
+	float animSpeedDash_;
 
 	struct Mortion
 	{
 		Mortion(void);
 
 		std::string name;
-		float start;
-		float active;
-		float end;
+
+		float timeStart;
+
+		float timeActive;
+
+		float timeEnd;
+
 		float animSpeed;
+
+		float radius;
 	};
 
-	std::map<MORTION_TYPE, Mortion> mortionTimes_;
+	std::unordered_map<MORTION_TYPE, Mortion> mortion_;
 };

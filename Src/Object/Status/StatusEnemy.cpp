@@ -10,6 +10,8 @@ StatusEnemy::StatusEnemy(void)
 
 	scale_ = 0.0f;
 
+	radius_ = 0.0f;
+
 	hp_ = 0;
 
 	power_ = 0;

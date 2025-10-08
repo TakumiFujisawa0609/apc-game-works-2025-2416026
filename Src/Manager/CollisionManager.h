@@ -4,7 +4,7 @@
 #include <map>
 #include "../Object/Object.h"
 class Player;
-class Npc;
+class EnemyController;
 
 
 class CollisionManager
@@ -56,16 +56,21 @@ public:
 	static constexpr float BOUNCE_PLAYER_Y = 20.0f;
 
 
+	/// <summary>
+	/// インスタンス生成
+	/// </summary>
+	static void CreateInstance(Player& _player, EnemyController _enemys);
 
 	/// <summary>
-	/// デフォルトコンストラクタ
+	/// インスタンス取得
 	/// </summary>
-	CollisionManager(void);
+	static CollisionManager& GetInstance(void) { return *instance_; };
 
 	/// <summary>
-	/// デフォルトデストラクタ
+	/// インスタンス削除
 	/// </summary>
-	~CollisionManager(void) = default;
+	static void Destroy(void);
+
 
 	/// <summary>
 	/// 初期化処理
@@ -89,10 +94,6 @@ public:
 	/// </summary>
 	void DrawDebug(void);
 
-	/// <summary>
-	/// メモリ解放処理
-	/// </summary>
-	void Release(void);
 
 	/// <summary>
 	/// 当たり判定を行うキャラクター割り当て処理
@@ -129,6 +130,14 @@ public:
 
 private:
 
+	static CollisionManager* instance_;
+
+
+	Player& player_;
+
+	EnemyController& enemys_;
+
+
 	// キャラクター当たり判定対象リスト
 	//std::map < int, CharaBase* > colChara_;
 
@@ -143,6 +152,23 @@ private:
 	// ステージ当たり判定対象リスト
 	//std::map < COL_TARGET, VECTOR* > collisionStage_;
 
+
+	/// <summary>
+	/// デフォルトコンストラクタ
+	/// </summary>
+	/// <param name="_player">プレイヤー</param>
+	/// <param name="_enemys">敵管理クラス</param>
+	CollisionManager(Player& _player, EnemyController& _enemys);
+
+	/// <summary>
+	/// デフォルトデストラクタ
+	/// </summary>
+	~CollisionManager(void) = default;
+
+	/// <summary>
+	/// コピーコンストラクタ
+	/// </summary>
+	CollisionManager(CollisionManager& other) = default;
 
 	/// <summary>
 	/// キャラクター同士の当たり判定

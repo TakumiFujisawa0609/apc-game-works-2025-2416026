@@ -47,7 +47,7 @@ public:
 	/// <summary>
 	/// 実行処理
 	/// </summary>
-	void Run(void);
+	void Dash(void);
 
 	/// <summary>
 	/// インスタンス削除処理

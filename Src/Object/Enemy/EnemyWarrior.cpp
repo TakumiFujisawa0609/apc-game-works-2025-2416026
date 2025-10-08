@@ -15,7 +15,7 @@ EnemyWarrior::EnemyWarrior(Player& player)
 
 void EnemyWarrior::SetParam(void)
 {
-	paramChara_.bodyFrameName = "Skeleton_Warrior_Eyes";
+	//paramChara_.frameNames[] = "Skeleton_Warrior_Eyes";
 	Enemy::SetParam();
 }
 

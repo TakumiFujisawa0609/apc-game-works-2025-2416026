@@ -102,7 +102,7 @@ void Object::Draw(void)
 	MV1DrawModel(paramChara_.handle);
 
 	VECTOR pos = VAdd(paramChara_.pos, paramChara_.posLocal);
-	DrawSphere3D(pos, paramChara_.scale.y, 8, 0xaaaaaa, 0xaaaaaa, false);
+	DrawSphere3D(pos, paramChara_.radius, 8, 0xaaaaaa, 0xaaaaaa, false);
 }
 
 void Object::DrawDebug(void)

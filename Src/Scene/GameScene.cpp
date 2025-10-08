@@ -30,6 +30,7 @@ GameScene::GameScene(void)
 	Load();
 }
 
+
 void GameScene::Load(void)
 {
 	// プレイヤー処理
@@ -40,7 +41,7 @@ void GameScene::Load(void)
 	enemys_ = new EnemyController(*player_);
 
 	// 当たり判定マネージャ
-	colManager_ = new CollisionManager();
+	CollisionManager::CreateInstance(*player_, *enemys_);
 }
 
 void GameScene::Init(void)
@@ -90,7 +91,7 @@ void GameScene::Update(void)
 	//gameStage_->Update();
 
 	// 当たり判定更新
-	colManager_->Update();
+	CollisionManager::GetInstance().Update();
 
 
 	if (gameState_ == GAME_STATE::IDLE)
@@ -147,7 +148,7 @@ void GameScene::Draw(void)
 
 #ifdef _DEBUG
 
-	//colManager_->DrawDebug();
+	CollisionManager::GetInstance().DrawDebug();
 
 	enemys_->DrawDebug();
 
@@ -160,9 +161,6 @@ void GameScene::Draw(void)
 void GameScene::Release(void)
 {
 	/*　解放処理　*/
-
-	// 当たり判定マネージャ解放
-	delete colManager_;
 
 	// 敵マネージャ解放
 	enemys_->Release();

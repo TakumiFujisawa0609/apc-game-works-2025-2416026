@@ -8,6 +8,10 @@ StatusPlayer::StatusPlayer(void)
 
 	scale_ = 0.0f;
 
+	radius_ = 0.0f;
+
+	hp_ = 0;
+
 	power_ = 0;
 
 	luck_ = 0;
@@ -17,6 +21,8 @@ StatusPlayer::StatusPlayer(void)
 	speed_ = 0.0f;
 
 	speedAcc_ = 0.0f;
+
+	dashMult_ = 1.0f;
 
 	timeParry_ = 0.0f;
 
@@ -31,20 +37,22 @@ StatusPlayer::StatusPlayer(void)
 
 	animSpeedWalk_ = 0.0f;
 
-	animSpeedRun_ = 0.0f;
+	animSpeedDash_ = 0.0f;
 
-	mortionTimes_.clear();
+	mortion_.clear();
 }
 
 StatusPlayer::Mortion::Mortion(void)
 {
 	name = "";
 
-	start = 0.0f;
+	timeStart = 0.0f;
 
-	active = 0.0f;
+	timeActive = 0.0f;
 
-	end = 0.0f;
+	timeEnd = 0.0f;
 
 	animSpeed = 0.0f;
+
+	radius = 0.0f;
 }

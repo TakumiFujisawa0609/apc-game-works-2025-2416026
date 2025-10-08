@@ -16,6 +16,7 @@
 #include "./Manager/ResourceManager.h"
 #include "./Manager/Resource.h"
 #include "./Manager/SoundManager.h"
+#include "./Manager/CollisionManager.h"
 
 
 // シングルトンインスタンス
@@ -122,7 +123,7 @@ void Application::CreateManagers(void)
 }
 
 
-void Application::Run(void)
+void Application::Dash(void)
 {
 	/*　実行処理　*/
 	
@@ -213,6 +214,9 @@ void Application::Destroy(void)
 
 	// コンフィグマネージャ解放
 	ConfigManager::GetInstance().Destroy();
+
+	// 当たり判定マネージャ解放
+	CollisionManager::GetInstance().Destroy();
 
 	// シーンマネージャ
 	SceneManager::GetInstance().Destroy();

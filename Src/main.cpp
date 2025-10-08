@@ -15,7 +15,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// マネージャ取得
 	Application& app = Application::GetInstance();
 
-	app.Run();	   // 実行処理
+	app.Dash();	   // 実行処理
 
 	app.Destroy(); // アプリケーションマネージャ削除処理	
 	

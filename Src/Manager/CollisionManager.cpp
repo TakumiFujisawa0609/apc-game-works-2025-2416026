@@ -6,6 +6,7 @@
 #include "../Utility/AsoUtility.h"
 #include "../Object/Object.h"
 #include "../Object/Player.h"
+#include "../Object/Enemy/EnemyController.h"
 #include "../Object/Enemy/Enemy.h"
 #include "../Manager/ResourceManager.h"
 #include "../Manager/Resource.h"
@@ -13,8 +14,21 @@
 #include "../Manager/SoundManager.h"
 #include "../Manager/EffectManager.h"
 
+// シングルトンクラス
+CollisionManager* CollisionManager::instance_ = nullptr;
 
-CollisionManager::CollisionManager(void)
+void CollisionManager::CreateInstance(Player& _player, EnemyController _enemys)
+{
+	if (instance_ == nullptr)
+	{
+		instance_ = new CollisionManager(_player, _enemys);
+	}
+
+	//instance_->Init();
+}
+
+CollisionManager::CollisionManager(Player& _player, EnemyController& _enemys)
+	:player_(_player), enemys_(_enemys)
 {
 	stageColHandle_ = -1;
 	stageDamageHandle_ = -1;
@@ -96,7 +110,6 @@ void CollisionManager::Update(void)
 void CollisionManager::DrawDebug(void)
 {
 #ifdef _DEBUG
- 
 	/*
 	for (auto& chara : colChara_)
 	{
@@ -105,21 +118,25 @@ void CollisionManager::DrawDebug(void)
 
 	if (stageColHandle_ != -1)
 	{
-		MV1DrawModel(stageColHandle_);
+		//MV1DrawModel(stageColHandle_);
 	}
 	
 	if (stageDamageHandle_ != -1)
 	{
-		MV1DrawModel(stageDamageHandle_);
+		//MV1DrawModel(stageDamageHandle_);
 	}
 
 #endif // _DEBUG
 }
 
-void CollisionManager::Release(void)
+void CollisionManager::Destroy(void)
 {
 	// リストクリア
 	//colChara_.clear();
+	if (instance_ != nullptr)
+	{
+		delete instance_;
+	}
 }
 
 
