@@ -5,6 +5,7 @@
 #include "../Object/Object.h"
 class Player;
 class EnemyController;
+class Enemy;
 
 
 class CollisionManager
@@ -61,9 +62,7 @@ public:
 	/// </summary>
 	static void CreateInstance(Player& _player, EnemyController _enemys);
 
-	/// <summary>
-	/// インスタンス取得
-	/// </summary>
+	/// @brief インスタンス取得
 	static CollisionManager& GetInstance(void) { return *instance_; };
 
 	/// <summary>
@@ -84,14 +83,10 @@ public:
 	void Init(int& stageHandle, const VECTOR& stagePos, const VECTOR& stageScale,
 			  int& damageHandle, const VECTOR& damagePos = {}, const VECTOR& damageScale = {});
 
-	/// <summary>
-	/// 更新処理
-	/// </summary>
+	/// @brief 更新処理
 	void Update(void);
 
-	/// <summary>
-	/// デバッグ描画処理
-	/// </summary>
+	/// @brief デバッグ描画処理
 	void DrawDebug(void);
 
 
@@ -160,25 +155,20 @@ private:
 	/// <param name="_enemys">敵管理クラス</param>
 	CollisionManager(Player& _player, EnemyController& _enemys);
 
-	/// <summary>
-	/// デフォルトデストラクタ
-	/// </summary>
+	/// @briefデフォルトデストラクタ
 	~CollisionManager(void) = default;
 
-	/// <summary>
-	/// コピーコンストラクタ
-	/// </summary>
+	/// @brief コピーコンストラクタ
 	CollisionManager(CollisionManager& other) = default;
 
-	/// <summary>
-	/// キャラクター同士の当たり判定
-	/// </summary>
+
+	/// @brief キャラクター同士の当たり判定
 	void CollisionChara(void);
 
+	/// @brief 敵の当たり判定 
+	void CollisionEnemys(void);
 
-	/// <summary>
-	/// 各キャラクターのステージ床の当たり判定
-	/// </summary>
+	/// @brief 各キャラクターのステージ床の当たり判定
 	void CollisionsGround(void);
 
 	/// <summary>
@@ -199,9 +189,7 @@ private:
 	bool CheckGroundCollision(const VECTOR& top, const VECTOR& bottom, MV1_COLL_RESULT_POLY* result, float offset);
 
 
-	/// <summary>
-	/// 各キャラクターのステージ壁の当たり判定
-	/// </summary>
+	/// @brief 各キャラクターのステージ壁の当たり判定
 	void CollisionsWall(void);
 
 	/// <summary>
@@ -223,9 +211,7 @@ private:
 						MV1_COLL_RESULT_POLY_DIM* result, float radius = 1.0f);
 
 
-	/// <summary>
-	/// ダメージ領域当たり判定処理
-	/// </summary>
+	/// @brief ダメージ領域当たり判定処理
 	void CollisionsStageDamage(void);
 
 	/// <summary>
@@ -238,5 +224,10 @@ private:
 	/// <param name="offset">当たり判定のオフセット</param>
 	//bool CheckStageDamageCollision(CharaBase* chara, const VECTOR& topPos, const VECTOR& bottomPos,
 	//							   MV1_COLL_RESULT_POLY_DIM* result, float offset);
+
+	/// @brief 
+	/// @param _enemy 
+	/// @param _damage 
+	void EnemyDamageProc(Enemy& _enemy, int _damage);
 
 };

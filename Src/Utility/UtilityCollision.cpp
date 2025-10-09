@@ -4,7 +4,7 @@
 #include "./AsoUtility.h"
 
 
-bool UtilityCollision::IsHitBoxToBox(const Vector2& _pos1, const Vector2& _pos2, const Vector2& _size1, const Vector2& _size2)
+bool UtilityCollision::IsHitBoxToBox(const Vector2& _pos1, const Vector2& _size1, const Vector2& _pos2, const Vector2& _size2)
 {
 	/*　2D矩形当たり判定処理　*/
 	bool isX = (_pos1.x < (_pos2.x + _size2.x)) && ((_pos1.x + _size1.x) > _pos2.x);
@@ -12,7 +12,7 @@ bool UtilityCollision::IsHitBoxToBox(const Vector2& _pos1, const Vector2& _pos2,
 
 	return (isX && isY);
 }
-bool UtilityCollision::IsHitBoxToBox(const VECTOR& _pos1, const VECTOR& _pos2, const VECTOR& _size1, const VECTOR& _size2)
+bool UtilityCollision::IsHitBoxToBox(const VECTOR& _pos1, const VECTOR& _size1, const VECTOR& _pos2, const VECTOR& _size2)
 {
 	/*　3D矩形当たり判定処理　*/
 
@@ -23,7 +23,7 @@ bool UtilityCollision::IsHitBoxToBox(const VECTOR& _pos1, const VECTOR& _pos2, c
 	return (isX && isY && isZ);
 }
 
-bool UtilityCollision::IsHitCircleCollision2D(const Vector2& _pos1, const Vector2& _pos2, float _radius1, float _radius2)
+bool UtilityCollision::IsHitCircleCollision2D(const Vector2& _pos1, float _radius1, const Vector2& _pos2, float _radius2)
 {
 	/*　2D円形当たり判定処理　*/
 
@@ -40,8 +40,8 @@ bool UtilityCollision::IsHitCircleCollision2D(const Vector2& _pos1, const Vector
 	return (midPos <= (rad * rad));
 }
 
-bool UtilityCollision::IsHitSphareToSphere(const VECTOR& _pos1, const VECTOR& _pos2,
-	                                       float _radius1, float _radius2)
+bool UtilityCollision::IsHitSphereToSphere(const VECTOR& _pos1, float _radius1,
+	                                       const VECTOR& _pos2, float _radius2)
 {
 	/*　3D円形同士の当たり判定処理　*/
 
@@ -62,7 +62,8 @@ bool UtilityCollision::IsHitSphareToSphere(const VECTOR& _pos1, const VECTOR& _p
 	return (length <= (rad * rad));
 }
 
-bool UtilityCollision::IsHitSphereToCapsule(const VECTOR& _sphPos, float _sphRadius, const VECTOR& _capTopPos1, const VECTOR& _capBottomPos2, float _capRadius)
+bool UtilityCollision::IsHitSphereToCapsule(const VECTOR& _sphPos, float _sphRadius,
+	                                        const VECTOR& _capTopPos1, const VECTOR& _capBottomPos2, float _capRadius)
 {
 	/*　球体とカプセルの当たり判定　*/
 
@@ -115,7 +116,7 @@ bool UtilityCollision::IsHitSphereToCapsule(const VECTOR& _sphPos, float _sphRad
 	}
 
 	// 球体同士の当たり判定
-	if (IsHitSphareToSphere(centerPos, _sphPos, _sphRadius, _capRadius))
+	if (IsHitSphereToSphere(centerPos, _capRadius, _sphPos, _sphRadius))
 	{
 		ret = true;
 	}

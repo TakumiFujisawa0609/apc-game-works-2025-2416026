@@ -125,46 +125,32 @@ public:
 	static constexpr float ANIM_SPEED_JUMP_ACTIVE = 50.0f;
 
 
-	// デフォルトコンストラクタ
+	// @brief デフォルトコンストラクタ
 	Player(void);
 
-	// デフォルトデストラクタ
+	// @brief デフォルトデストラクタ
 	~Player(void)override = default;
 
-	/// <summary>
-	/// 
-	/// </summary>
+	/// @brief 読み込み処理
 	void Load(void)override;
 
-	/// <summary>
-	/// 初期化処理
-	/// </summary>
+	/// @brief 初期化処理
 	void Init(const VECTOR& pos, float angleY = 0.0f);
 
-	/// <summary>
-	/// 更新処理
-	/// </summary>
+	/// @brief 更新処理
 	void Update(void) override;
 
-	/// <summary>
-	/// デバッグ表示
-	/// </summary>
+	/// @brief デバッグ表示
 	void DrawDebug(void);
-
-	/// <summary>
-	/// 解放処理
-	/// </summary>
+	
+	/// @brief 解放処理
 	void Release(void) override;
 
 
-	/// <summary>
-	/// パラメータ割り当て処理
-	/// </summary>
+	/// @brief パラメータ割り当て
 	void SetParam(void) override;
 
-	/// <summary>
-	/// 移動入力をしているか否か
-	/// </summary>
+	/// @brief 移動入力をしているか否か
 	bool IsInputMove(void);
 
 
@@ -175,19 +161,13 @@ public:
 	void SetIsAttack(bool flag);
 
 
-	/// <summary>
-	/// 行動状態
-	/// </summary>
+	/// @brief 行動状態
 	void ChangeActionState(ACTION_STATE state);
 
-	/// <summary>
-	/// パリィ増加倍率割り当て
-	/// </summary>
+	/// @breif パリィ増加倍率割り当て
 	void SetParryMag(float mag) { paramPlayer_.parryMag = mag; };
 
-	/// <summary>
-	/// パリィ時間割り当て
-	/// </summary>
+	/// @brief パリィ時間割り当て
 	void SetParryTime(float time) { paramPlayer_.parryTime = time; };
 
 	void SetDodgeMag(float mag) { paramPlayer_.dodgeMag = mag; };
@@ -216,6 +196,8 @@ public:
 	int GetCombo(void) { return paramPlayer_.combo; };
 
 	int GetWeaponId(void) { return paramPlayer_.weaponId; };
+
+	bool GetIsAttack(void)const;
 
 
 protected:
@@ -269,30 +251,20 @@ protected:
 	// ジャンプ力
 	float jumpPower_;
 
-	/// <summary>
-	/// 状態更新処理
-	/// </summary>
+	/// @brief 状態更新処理
 	void UpdateActionState(void);
 
-	/// <summary>
-	/// 待機更新処理
-	/// </summary>
+	/// @brief 待機更新処理
 	void UpdateStateIdle(void);
 
-	/// <summary>
-	/// 攻撃更新処理
-	/// </summary>
+	/// @brief 攻撃更新処理
 	void UpdateStateAtk(void);
 
-	/// <summary>
-	/// ゲームオーバー状態の更新処理
-	/// </summary>
+	/// @brief ゲームオーバー状態の更新処理|
 	void UpdateStateOver(void);
 
 
-	/// <summary>
-	/// 移動処理
-	/// </summary>
+	/// @brief 移動処理
 	void Move(void);
 
 	/// <summary>
@@ -302,34 +274,25 @@ protected:
 	/// <param name="_max">最大速度</param>
 	void DashProc(float& _acc, float& _max);
 
-	/// <summary>
-	/// アニメーション割り当て
-	/// </summary>
+	/// @brief モデ 
+	void InitModelFrame(void)override;
+
+	/// @brief アニメーション割り当て
 	void InitAnim(void)override;
 
-	/// <summary>
-	/// アニメーション処理
-	/// </summary>
+	/// @briefアニメーション処理
 	void UpdateAnim(void)override;
 
-	/// <summary>
-	/// 待機状態のアニメーション遷移処理
-	/// </summary>
+	/// @brief待機状態のアニメーション遷移処理
 	void AnimStateIdle(void);
 
-	/// <summary>
-	/// 攻撃入力をしているか否か
-	/// </summary>
+	/// @brief 攻撃入力をしているか否か
 	bool IsInputAtkStrong(void);
 
-	/// <summary>
-	/// 弱攻撃入力をしているか否か
-	/// </summary>
+	/// @brief弱攻撃入力をしているか否か
 	bool IsInputAtkJub(void);
 
-	/// <summary>
-	/// ダッシュ入力をしているか否か
-	/// </summary>
+	/// @brief ダッシュ入力をしているか否か
 	bool IsInputDash(void);
 
 
@@ -339,8 +302,6 @@ protected:
 	/// <param name="_type">モーションの種類</param>
 	void UpdateMortion(MORTION_TYPE _type);
 
-	/// <summary>
-	/// 行動可能か否か判定
-	/// </summary>
+	/// @brief行動可能か否か判定
 	bool IsActiveAction(void)const;
 };

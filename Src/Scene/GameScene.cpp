@@ -123,7 +123,6 @@ void GameScene::Draw(void)
 	Font& font = Font::GetInstance();
 	Vector2 textPos = {};
 	Vector2 midPos = { Application::SCREEN_HALF_X, Application::SCREEN_HALF_Y };
-	int x;
 
 	// ƒOƒŠƒbƒhü•`‰æ
 	SceneManager::GetInstance().DrawGrid();

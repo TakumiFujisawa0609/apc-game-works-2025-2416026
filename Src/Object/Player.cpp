@@ -2,6 +2,8 @@
 #include <DxLib.h>
 #include <cassert>
 #include <string>
+#include <map>
+#include <unordered_map>
 
 #include "./Object.h"
 #include "../Application.h"
@@ -74,9 +76,6 @@ void Player::SetParam(void)
 	// 行動状態
 	paramPlayer_.actionState = ACTION_STATE::IDLE;
 
-	// フレーム番号
-	//paramChara_.frameNames[] = "Body";
-	int frameNum = FindFrameNum(paramChara_.frameNames[COLLISION_TYPE::BODY]);
 	paramChara_.posLocal = {};
 
 	// 角度初期化
@@ -133,14 +132,27 @@ void Player::InitAnim(void)
 
 	// 待機アニメーション再生
 	anim_->Play(static_cast<int>(ANIM_STATE::IDLE));
+}
 
+void Player::InitModelFrame(void)
+{
+	Object::InitModelFrame();
 
-	// フレーム名割り当て
-	paramChara_.frameNames.emplace(COLLISION_TYPE::BODY, "Torso");
-	paramChara_.frameNames.emplace(COLLISION_TYPE::HEAD, "Head");
-	paramChara_.frameNames.emplace(COLLISION_TYPE::BOTTOM, "Bone");
-	paramChara_.frameNames.emplace(COLLISION_TYPE::HAND_L, "Fist.L");
-	paramChara_.frameNames.emplace(COLLISION_TYPE::HAND_R, "Fist.R");
+	int index;
+	index = FindFrameNum("Torso");
+	paramChara_.colList.emplace(COLLISION_TYPE::BODY, &paramChara_.frames[index]);
+
+	index = FindFrameNum("Head");
+	paramChara_.colList.emplace(COLLISION_TYPE::HEAD, &paramChara_.frames[index]);
+
+	index = FindFrameNum("Bone");
+	paramChara_.colList.emplace(COLLISION_TYPE::BOTTOM, &paramChara_.frames[index]);
+
+	index = FindFrameNum("Fist.L");
+	paramChara_.colList.emplace(COLLISION_TYPE::HAND_L, &paramChara_.frames[index]);
+
+	index = FindFrameNum("Fist.R");
+	paramChara_.colList.emplace(COLLISION_TYPE::HAND_R, &paramChara_.frames[index]);
 }
 
 
@@ -163,9 +175,6 @@ void Player::Update(void)
 
 	// アニメーション更新
 	UpdateAnim();
-
-	// フレーム更新
-	UpdateModelFrame();
 
 	// 行列更新
 	SetMatrixModel();
@@ -435,6 +444,28 @@ void Player::ChangeActionState(ACTION_STATE state)
 		paramChara_.velocity = AsoUtility::VECTOR_ZERO;
 	}
 
+}
+
+bool Player::GetIsAttack(void) const
+{
+	bool ret = false;
+
+	// 攻撃状態で攻撃有効時true
+	if (paramChara_.attackState == Object::ATTACK_STATE::ACTIVE)
+	{
+		if (paramPlayer_.actionState == ACTION_STATE::ATTACK_JUB_1 ||
+			paramPlayer_.actionState == ACTION_STATE::ATTACK_JUB_2 ||
+			paramPlayer_.actionState == ACTION_STATE::ATTACK_JUB_3 ||
+			paramPlayer_.actionState == ACTION_STATE::ATTACK_SPECIAL ||
+			paramPlayer_.actionState == ACTION_STATE::ATTACK_STRONG_1 ||
+			paramPlayer_.actionState == ACTION_STATE::ATTACK_STRONG_2 ||
+			paramPlayer_.actionState == ACTION_STATE::ATTACK_STRONG_3)
+		{
+			ret = true;
+		}
+	}
+
+	return ret;
 }
 
 

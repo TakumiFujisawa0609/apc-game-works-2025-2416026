@@ -46,12 +46,7 @@ void Enemy::SetParam(void)
 {
 	paramEnemy_.name = status_.GetName();
 
-	int frameNum = FindFrameNum(paramChara_.frameNames[COLLISION_TYPE::BODY]);// フレーム名割り当て
-	paramChara_.frameNames.emplace(COLLISION_TYPE::BODY, "Torso");
-	paramChara_.frameNames.emplace(COLLISION_TYPE::HEAD, "Head");
-	paramChara_.frameNames.emplace(COLLISION_TYPE::BOTTOM, "Bone");
-	paramChara_.frameNames.emplace(COLLISION_TYPE::HAND_L, "Fist.L");
-	paramChara_.frameNames.emplace(COLLISION_TYPE::HAND_R, "Fist.R");
+	int frameNum = FindFrameNum(paramChara_.colList[Object::COLLISION_TYPE::BODY]->name);// フレーム名割り当て
 	VECTOR sub = VSub(paramChara_.frames[frameNum].pos, paramChara_.pos);
 	paramChara_.posLocal = VSub(paramChara_.pos, sub);
 
@@ -100,9 +95,6 @@ void Enemy::Update(void)
 	
 	// アニメーション更新
 	UpdateAnim();
-
-	// フレーム更新
-	UpdateModelFrame();
 
 	// 行列更新
 	SetMatrixModel();

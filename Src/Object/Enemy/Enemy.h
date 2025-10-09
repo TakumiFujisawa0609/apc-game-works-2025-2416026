@@ -28,8 +28,12 @@ public:
 	
 	Enemy(StatusEnemy::TYPE type, Player& players);
 
+	/// @brief デフォルトデストラクタ
 	virtual ~Enemy(void) = default;
 
+
+	/// @brief 初回読み込み処理
+	/// @param  
 	void Load(void)override;
 
 	void Init(const VECTOR& pos, float angleY = 0.0f, ACTION_STATE state = ACTION_STATE::IDLE);
@@ -43,9 +47,7 @@ public:
 
 	void SetParam(void) override;
 
-	/// <summary>
-	/// 行動状態取得
-	/// </summary>
+	/// @brief 行動状態取得
 	ACTION_STATE GetActionState(void)const { return paramEnemy_.actionState; };
 
 	bool GetIsActive(void)const { return (paramEnemy_.actionState != ACTION_STATE::INACTIVE);  };
@@ -56,9 +58,11 @@ public:
 	/// <param name="_isView">表示するか否か</param>
 	void SetIsView(bool _isView);
 
+	
+
 protected:
 
-	struct ENEMY_PARAM
+	struct EnemyParam
 	{
 		std::string name;
 
@@ -76,7 +80,7 @@ protected:
 		bool isHearing;
 	};
 
-	ENEMY_PARAM paramEnemy_;
+	EnemyParam paramEnemy_;
 
 	
 
@@ -87,10 +91,11 @@ protected:
 
 	void LoadResource(void);
 
-	/// <summary>
-	/// プレイヤーの方向を追尾
-	/// </summary>
+	/// @brief プレイヤーの方向を追尾
 	void LookPlayerPos(void);
+
+
+	virtual void InitModelFrame(void)override = 0;
 
 	virtual void InitAnim(void) = 0;
 

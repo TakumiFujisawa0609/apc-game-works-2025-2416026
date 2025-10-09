@@ -27,6 +27,9 @@ protected:
 
 	void SetParam(void)override;
 
+	/// @brief ƒtƒŒ[ƒ€‰Šú‰»
+	void InitModelFrame(void)override;
+
 	void InitAnim(void)override;
 
 private:

@@ -4,6 +4,7 @@
 
 #include "../Common/Vector2.h"
 #include "../Utility/AsoUtility.h"
+#include "../Utility/UtilityCollision.h"
 #include "../Object/Object.h"
 #include "../Object/Player.h"
 #include "../Object/Enemy/EnemyController.h"
@@ -272,6 +273,28 @@ void CollisionManager::CollisionChara(void)
 		checkNum++;
 		targetNum = 0;
 	}*/
+}
+
+void CollisionManager::CollisionEnemys(void)
+{
+	VECTOR pForward = VScale(player_.GetFramePos(Object::COLLISION_TYPE::BODY), player_.GetRadius());
+	float pRad = player_.GetRadius();
+
+	for (auto& enemy : enemys_.GetEnemys())
+	{
+		if (!enemy->GetIsActive())continue;
+
+		VECTOR ePos = enemy->GetFramePos(Object::COLLISION_TYPE::BODY);
+		float eRad = enemy->GetRadius();
+
+
+		if (UtilityCollision::IsHitSphereToSphere(pForward, pRad, ePos, eRad)
+			&& player_.GetIsAttack())
+		{
+			enemy->SetDamage();
+		}
+	}
+	
 }
 
 void CollisionManager::CollisionsGround(void)

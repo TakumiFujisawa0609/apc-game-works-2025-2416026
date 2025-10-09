@@ -156,33 +156,29 @@ void Object::SetMatrixModel(void)
 	paramChara_.rot = paramChara_.quaRot.ToEuler();
 }
 
-void Object::UpdateModelFrame(void)
+void Object::UpdateModelFrame(Object::COLLISION_TYPE _type)
 {
-	int handle = paramChara_.handle;
+	std::string name = paramChara_.colList[_type]->name;
+	int index = FindFrameNum(name);
 
-	for (auto& frame : paramChara_.frames)
-	{
-		// ワールド座標割り当て
-		frame.pos = MV1GetFramePosition(handle, frame.num);
-
-		// ローカル行列割り当て
-		frame.localMat = MV1GetFrameLocalMatrix(handle, frame.num);
-
-		// フレームを表示
-		MV1SetFrameVisible(handle, frame.num, frame.isVisible);
-	}
+	// フレーム状態更新
+	paramChara_.frames[index].pos = MV1GetFramePosition(paramChara_.handle, index);
+	paramChara_.frames[index].localMat = MV1GetFrameLocalMatrix(paramChara_.handle, index);
 }
 int Object::FindFrameNum(const std::string& name)
 {
+	int num = -1;
 	for (auto& frame : paramChara_.frames)
 	{
 		// 名前と一致時フレーム番号を返す
 		if (frame.name == name)
 		{
-			return frame.num;
+			num = frame.num;
+			break;
 		}
 	}
 	assert("\nフレーム名が一致しませんでした。\n");
+	return num;
 }
 
 
@@ -476,4 +472,16 @@ const VECTOR& Object::GetPosDelta(void) const
 {
 	/* 移動量を取得 */
 	return VSub(paramChara_.pos, paramChara_.prePos);
+}
+
+const VECTOR& Object::GetFramePos(COLLISION_TYPE _type)
+{
+	std::string name = paramChara_.colList[_type]->name;
+	int frameIndex = FindFrameNum(name);
+
+	// 座標更新して値を返す
+	VECTOR pos = MV1GetFramePosition(paramChara_.handle, frameIndex);
+	paramChara_.frames[frameIndex].pos = pos;
+
+	return paramChara_.frames[frameIndex].pos;
 }

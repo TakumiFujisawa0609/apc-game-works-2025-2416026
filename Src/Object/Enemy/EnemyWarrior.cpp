@@ -1,10 +1,10 @@
-#include "../Object.h"
 #include "EnemyWarrior.h"
 #include <map>
 #include "../../Manager/ResourceManager.h"
 #include "../Status/StatusData.h"
 #include "../Status/StatusEnemy.h"
 #include "../AnimationController.h"
+#include "../Object.h"
 #include "../Player.h"
 
 EnemyWarrior::EnemyWarrior(Player& player)
@@ -15,8 +15,29 @@ EnemyWarrior::EnemyWarrior(Player& player)
 
 void EnemyWarrior::SetParam(void)
 {
-	//paramChara_.frameNames[] = "Skeleton_Warrior_Eyes";
 	Enemy::SetParam();
+}
+
+void EnemyWarrior::InitModelFrame(void)
+{
+	Object::InitModelFrame();
+
+	// ìñÇΩÇËîªíËÇÃÉtÉåÅ[ÉÄäÑÇËìñÇƒ
+	int index;
+	index = FindFrameNum("chest");
+	paramChara_.colList.emplace(COLLISION_TYPE::BODY, &paramChara_.frames[index]);
+
+	index = FindFrameNum("head");
+	paramChara_.colList.emplace(COLLISION_TYPE::HEAD, &paramChara_.frames[index]);
+
+	index = FindFrameNum("Rig");
+	paramChara_.colList.emplace(COLLISION_TYPE::BOTTOM, &paramChara_.frames[index]);
+
+	index = FindFrameNum("hand.l");
+	paramChara_.colList.emplace(COLLISION_TYPE::HAND_L, &paramChara_.frames[index]);
+
+	index = FindFrameNum("hand.r");
+	paramChara_.colList.emplace(COLLISION_TYPE::HAND_R, &paramChara_.frames[index]);
 }
 
 void EnemyWarrior::InitAnim(void)

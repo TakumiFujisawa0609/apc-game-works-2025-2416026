@@ -3,7 +3,7 @@
 #include "../Common/Quaternion.h"
 #include <DxLib.h>
 #include <memory>
-#include <unordered_map>
+#include <map>
 #include <vector>
 #include <string>
 
@@ -165,7 +165,7 @@ protected:
 		// フレームのリスト
 		std::vector<Frame> frames;
 
-		std::unordered_map<COLLISION_TYPE, std::string> frameNames;
+		std::map<COLLISION_TYPE, Frame*> colList;
 
 		// HP
 		int hp;
@@ -246,14 +246,10 @@ protected:
 	/// <returns>加算後の値</returns>
 	float _Move(const float* _curVelo, float _movePow, float _maxVelo);
 
-	/// <summary>
-	/// 回転処理
-	/// </summary>
+	/// @brief 回転処理
 	void Rotation(bool isRevert = false);
 
-	/// <summary>
-	/// 重力加算処理
-	/// </summary>
+	/// @brief 重力加算処理
 	void Gravity(void);
 
 	/// <summary>
@@ -263,19 +259,13 @@ protected:
 	/// <returns></returns>
 	float DecVelocityXZ(const float* acc);
 
-	/// <summary>
-	/// アニメーション初期化
-	/// </summary>
+	/// @brief アニメーション初期化
 	virtual void InitAnim(void) = 0;
 
-	/// <summary>
-	/// フレーム初期化
-	/// </summary>
+	/// @brief フレーム初期化
 	virtual void InitModelFrame(void);
 
-	/// <summary>
-	/// アニメーション更新処理
-	/// </summary>
+	/// @brief アニメーション更新処理
 	virtual void UpdateAnim(void) = 0;
 	
 	/// <summary>
@@ -288,75 +278,55 @@ protected:
 public:
 
 
-	/// <summary>
-	/// デフォルトコンストラクタ
-	/// </summary>
+	/// @brief デフォルトコンストラクタ
 	Object(void);
 
-	/// <summary>
-	/// 通常のデストラクタ
-	/// </summary>
-	virtual ~Object(void) = default; // defaultさん やっておしまいなさい
+	/// @brief デフォルトデストラクタ
+	virtual ~Object(void) = default;
 
 	virtual void Load(void) {};
 
 	void Init(void);
 
-	/// <summary>
-	/// 更新処理
-	/// </summary>
+	/// @brief 更新処理
 	virtual void Update(void) = 0;
 
-	/// <summary>
-	/// 描画処理
-	/// </summary>
+	/// @brief 描画処理
 	virtual void Draw(void);
 
-	/// <summary>
-	/// デバッグ描画
-	/// </summary>
+	/// @brief デバッグ描画
 	virtual void DrawDebug(void);
 
-	/// <summary>
-	/// 解放処理
-	/// </summary>
+	/// @brief 解放処理
 	virtual void Release(void) {};
 
-	/// <summary>
-	/// パラメータ割り当て
-	/// </summary>
+	/// @brief パラメータ割り当て
 	virtual void SetParam(void) = 0;
 
 
-	/// <summary>
-	/// 行列割り当て処理
-	/// </summary>
+	/// @brief 行列割り当て処理
 	void SetMatrixModel(void);
 
-	/// <summary>
-	/// フレーム割り当て処理
-	/// </summary>
-	void UpdateModelFrame(void);
-
-	/// <summary>
-	/// XZ軸を戻す処理
-	/// </summary>
-	/// <param name="pos">戻す位置</param>
-	/// <param name="power">戻す力</param>
-	void RevertPosXZ(const VECTOR& pos, float power = 1.0f);
+	/// @brief フレーム更新処理
+	void UpdateModelFrame(COLLISION_TYPE _type);
+	
+	/// @brief XZ軸を戻す処理
+	/// @param _pos 戻す位置
+	/// @param _power 戻す力
+	void RevertPosXZ(const VECTOR& _pos, float _power = 1.0f);
 
 	/// <summary>
 	/// Y軸を戻す処理
 	/// </summary>
-	/// <param name="pos">戻すY軸位置</param>
-	/// <param name="isVeloReset">加速度を初期化するか否か</param>
-	void RevertPosY(float revPos, bool isVeloReset = false);
+	/// <param name="_pos">戻すY軸位置</param>
+	/// <param name="_isVeloReset">加速度を初期化するか否か</param>
+	void RevertPosY(float _revPos, bool _isVeloReset = false);
 
 	/// <summary>
 	/// 被ダメージ処理
 	/// </summary>
-	/// <param name="damage">ダメージ量</param>
-	void SetDamage(int damage = 1);
+	/// <param name="_damage">ダメージ量</param>
+	void SetDamage(int _damage = 1);
 
 	/// <summary>
 	/// 重量の計算
@@ -377,25 +347,17 @@ public:
 	void KnockBack(const VECTOR& targetPos, float invTime,
 		float powerY, float powerXZ = 1.0f, float minPowerXZ = 1.0f);
 	
-	/// <summary>
-	/// 攻撃をできるかどうかの判定
-	/// </summary>
+	/// @brief 攻撃をできるかどうかの判定
 	bool CheckActiveAttack(void) const;
 
 
-	/// <summary>
-	/// 位置割り当て
-	/// </summary>
+	/// @brief 位置割り当て
 	void SetPos(const VECTOR& pos) { paramChara_.pos = pos; };
 
-	/// <summary>
-	/// 前位置を割り当て
-	/// </summary>
+	/// @brief 前位置を割り当て
 	void SetPrePos(const VECTOR& pos) { paramChara_.prePos = pos; };
 
-	/// <summary>
-	/// 加速度を割り当て
-	/// </summary>
+	/// @brief 加速度を割り当て
 	void SetVelocity(const VECTOR& velo) { paramChara_.velocity = velo; };
 
 	/// <summary>
@@ -404,118 +366,82 @@ public:
 	/// <param name="flag">着地している否か</param>
 	void SetIsGround(bool flag) { if (paramChara_.isGround != flag) { paramChara_.isGround = flag; } };
 
-	/// <summary>
-	/// 攻撃状態を遷移
-	/// </summary>
-	/// <param name = "_state">攻撃状態</param>
-	/// <param name = "_activeTime">行動時間</param>
-	void ChangeAttackState(ATTACK_STATE state, float _activeTime = 0.0f);
+	/// @brief 攻撃状態を遷移
+	/// @param _state 攻撃状態
+	/// @param _activeTime 行動時間
+	void ChangeAttackState(ATTACK_STATE _state, float _activeTime = 0.0f);
 
-	/// <summary>
-	/// 攻撃状態を遷移
-	/// </summary>
-	/// <param name = "_activeTime">行動時間</param>
+
+	/// @brief  攻撃状態を遷移
+	/// @param _activeTime 行動時間
 	void ChangeAttackStateNext(float _activeTime = 0.0f);
 
 
 
-	/// <summary>
-	/// 現在位置取得
-	/// </summary>
+	/// @brief 現在位置取得
 	VECTOR& GetPos(void) { return paramChara_.pos; };
 
-	/// <summary>
-	/// 前フレーム位置取得
-	/// </summary>
+	/// @brief 前フレーム位置取得
 	VECTOR& GetPrePos(void) { return paramChara_.prePos; };
 
-	/// <summary>
-	/// ローカル座標取得
-	/// </summary>
+	/// @brief ローカル座標取得
 	const VECTOR& GetPosLocal(void) const { return paramChara_.posLocal; };
 
-	/// <summary>
-	/// 持ちあげ位置取得
-	/// </summary>
+	/// @brief 持ちあげ位置取得
 	VECTOR& GetPosChatch(void);
 
 
-	/// <summary>
-	/// 加速度取得
-	/// </summary>
+	/// @brief 加速度取得
 	const VECTOR& GetVelocity(void) const { return paramChara_.velocity; };
 
-	/// <summary>
-	/// 移動量取得
-	/// </summary>
+	/// @brief 移動量取得
 	const VECTOR& GetPosDelta(void) const;
 
-	/// <summary>
-	/// 向きベクトル取得
-	/// </summary>
+	/// @brief 向きベクトル取得
 	const VECTOR& GetDir(void) const { return paramChara_.dir; };
 
 
-	/// <summary>
-	/// オイラー角の向き取得
-	/// </summary>
+	/// @brief オイラー角の向き取得
 	const VECTOR& GetRotationEuler(void) const { return paramChara_.rot; };
 
-	/// <summary>
-	/// クォータニオン角の向き取得
-	/// </summary>
+	/// @brief クォータニオン角の向き取得
 	Quaternion& GetRotation(void) { return paramChara_.quaRot; };
 
-	/// <summary>
-	/// ローカル座標のクォータニオン角の向き取得
-	/// </summary>
+	/// @brief ローカル座標のクォータニオン角の向き取得
 	const Quaternion& GetRotationLocal(void) const { return paramChara_.quaRotLocal; };
 
 
-	/// <summary>
-	/// スケール取得
-	/// </summary>
+	/// @brief スケール取得
 	const VECTOR& GetScale(void) const { return paramChara_.scale; };
 
-	/// <summary>
-	/// 半径取得
-	/// </summary>
+	/// @brief 半径取得
 	float GetRadius(void)const { return paramChara_.radius; };
+	
 
-	/// <summary>
-	/// キャラモデルハンドル取得
-	/// </summary>
+	/// @brief キャラモデルハンドル取得
 	int GetHandle(void) const { return paramChara_.handle; };
 
 
-	/// <summary>
-	/// 現在HP取得
-	/// </summary>
+	/// @brief 現在HP取得
 	int GetCurHp(void) const { return paramChara_.hp; };
 
-	/// <summary>
-	/// 攻撃力取得
-	/// </summary>
+	/// @brief 攻撃力取得
 	int GetPower(void) const { return paramChara_.power; };
 
-	/// <summary>
-	/// 移動速度取得
-	/// </summary>
+	/// @brief 移動速度取得
 	float GetSpeed(void) const { return paramChara_.speed; };
 
-	/// <summary>
-	/// 無敵時間取得
-	/// </summary>
+	/// @brief 無敵時間取得
 	float GetTimeInv(void) const { return paramChara_.timeInv; };
 
-	/// <summary>
-	/// 地面にあるか否か
-	/// </summary>
+	/// @brief 地面にあるか否か
 	bool GetIsGround(void) const { return paramChara_.isGround; };
 
 
-	/// <summary>
-	/// 攻撃有効する猶予時間取得
-	/// </summary>
+	/// @brief 攻撃有効する猶予時間取得 
 	float GetActionTime(void) const { return paramChara_.timeAct; };
+
+	/// @brief フレームの座標取得
+	/// @param _type 当たり判定の種類
+	const VECTOR& GetFramePos(COLLISION_TYPE _type);
 };
