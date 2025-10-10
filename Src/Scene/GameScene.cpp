@@ -38,10 +38,12 @@ void GameScene::Load(void)
 	player_->Load();
 
 	// 敵マネージャー
-	enemys_ = new EnemyController(*player_);
+	EnemyController::CreateInstance(*player_);
+
+	EnemyController& enemys = EnemyController::GetInstance();
 
 	// 当たり判定マネージャ
-	CollisionManager::CreateInstance(*player_, *enemys_);
+	CollisionManager::CreateInstance(*player_);
 }
 
 void GameScene::Init(void)
@@ -62,8 +64,7 @@ void GameScene::ReInit(void)
 	gameState_ = GAME_STATE::IDLE;
 
 	// 敵初期化処理
-	enemys_->Release();
-	enemys_->Init();
+	EnemyController::GetInstance().Init();
 
 	// プレイヤー処理
 	player_->Init(POS_START_PLAYER, 90.0f);
@@ -131,7 +132,7 @@ void GameScene::Draw(void)
 	UpdateEffekseer3D();
 
 	// 敵描画
-	enemys_->Draw();
+	EnemyController::GetInstance().Draw();
 
 	// プレイヤー描画
 	player_->Draw();
@@ -149,7 +150,7 @@ void GameScene::Draw(void)
 
 	CollisionManager::GetInstance().DrawDebug();
 
-	enemys_->DrawDebug();
+	EnemyController::GetInstance().DrawDebug();
 
 	player_->DrawDebug();
 
@@ -161,9 +162,14 @@ void GameScene::Release(void)
 {
 	/*　解放処理　*/
 
+	// 当たり判定マネージャ解放
+	CollisionManager::GetInstance().Destroy();
+
 	// 敵マネージャ解放
-	enemys_->Release();
-	delete enemys_;
+	EnemyController::GetInstance().Destroy();
+
+	// 当たり判定解放
+	//CollisionManager::Destroy();
 
 	// プレイヤー解放・削除
 	player_->Release();
@@ -209,7 +215,7 @@ void GameScene::GameIdleProc(void)
 	player_->Update();
 
 	// 敵マネージャ更新
-	enemys_->Update();
+	EnemyController::GetInstance().Update();
 }
 
 void GameScene::GameOverProc(void)

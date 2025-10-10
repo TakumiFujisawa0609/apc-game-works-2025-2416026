@@ -135,6 +135,7 @@ void SceneManager::Draw(void)
 //#ifdef _DEBUG
 	if (isDebugMode_)
 	{
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 50);
 		Vector2 midPos = { Application::SCREEN_HALF_X, Application::SCREEN_HALF_Y };
 
 		// 三分割法グリッド線
@@ -149,6 +150,8 @@ void SceneManager::Draw(void)
 			0x0, true);
 		DrawBox(((lineGlid.x * 2) - 1), 0, ((lineGlid.x * 2) + 1), (midPos.y * 2),
 			0x0, true);
+
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND,0);
 	}
 //#endif
 }
@@ -157,7 +160,7 @@ void SceneManager::DrawDebug(void)
 {
 	if (isDebugMode_)
 	{
-		int x = Application::SCREEN_SIZE_X - 500;
+		int x = (Application::SCREEN_SIZE_X - 175);
 		DrawString(x, 0, "デバッグモード有効中", 0xff0000);
 	}
 }

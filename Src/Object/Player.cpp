@@ -264,6 +264,12 @@ void Player::UpdateStateIdle(void)
 
 	// アニメーション遷移処理
 	AnimStateIdle();
+
+	// 移動時、フレーム位置更新
+	if (!AsoUtility::EqualsVZero(paramChara_.velocity))
+	{
+		UpdateModelFrames();
+	}
 }
 
 
@@ -278,6 +284,8 @@ void Player::UpdateStateAtk(void)
 	}
 
 	UpdateMortion(type);
+
+	UpdateModelFrames();
 }
 
 
@@ -652,6 +660,9 @@ void Player::AnimStateIdle(void)
 	// 待機アニメーション状態
 	if (state == ANIM_STATE::IDLE)
 	{
+		// アニメーションを遷移しない
+		if (AsoUtility::EqualsVZero(paramChara_.velocity)) return;
+
 		// ダッシュ
 		if (IsInputDash() && IsInputMove()) { anim_->Play(static_cast<int>(ANIM_STATE::DASH)); }
 
@@ -666,6 +677,9 @@ void Player::AnimStateIdle(void)
 
 		// 待機
 		else if (!IsInputMove()) { anim_->Play(static_cast<int>(ANIM_STATE::IDLE)); }
+
+		// 待機状態に戻す
+		if (AsoUtility::EqualsVZero(paramChara_.velocity)) { anim_->Play(static_cast<int>(ANIM_STATE::IDLE)); }
 	}
 	else if (state == ANIM_STATE::DASH)
 	{
@@ -674,6 +688,9 @@ void Player::AnimStateIdle(void)
 
 		// 待機
 		else if (!IsInputMove()){ anim_->Play(static_cast<int>(ANIM_STATE::IDLE)); }
+
+		// 待機状態に戻す
+		if (AsoUtility::EqualsVZero(paramChara_.velocity)) { anim_->Play(static_cast<int>(ANIM_STATE::IDLE)); }
 	}
 }
 

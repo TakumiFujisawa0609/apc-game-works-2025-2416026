@@ -163,7 +163,7 @@ private:
 	std::map<SRC, Sound> sounds_;
 
 	// Žå‰¹—Ê
-	int volumeMaster_;
+	float volumeMaster_;
 
 
 	/// <summary>

@@ -4,7 +4,6 @@
 #include <map>
 #include "../Object/Object.h"
 class Player;
-class EnemyController;
 class Enemy;
 
 
@@ -57,17 +56,14 @@ public:
 	static constexpr float BOUNCE_PLAYER_Y = 20.0f;
 
 
-	/// <summary>
-	/// インスタンス生成
-	/// </summary>
-	static void CreateInstance(Player& _player, EnemyController _enemys);
+	/// @brief インスタンス生成
+	/// @param _player プレイヤークラス
+	static void CreateInstance(Player& _player);
 
 	/// @brief インスタンス取得
 	static CollisionManager& GetInstance(void) { return *instance_; };
 
-	/// <summary>
-	/// インスタンス削除
-	/// </summary>
+	/// @brief インスタンス削除
 	static void Destroy(void);
 
 
@@ -128,9 +124,7 @@ private:
 	static CollisionManager* instance_;
 
 
-	Player& player_;
-
-	EnemyController& enemys_;
+	Player* player_;
 
 
 	// キャラクター当たり判定対象リスト
@@ -152,13 +146,12 @@ private:
 	/// デフォルトコンストラクタ
 	/// </summary>
 	/// <param name="_player">プレイヤー</param>
-	/// <param name="_enemys">敵管理クラス</param>
-	CollisionManager(Player& _player, EnemyController& _enemys);
+	CollisionManager(Player& _player);
 
 	/// @briefデフォルトデストラクタ
 	~CollisionManager(void) = default;
 
-	/// @brief コピーコンストラクタ
+	/// @brief コピーコンストラクタ対策
 	CollisionManager(CollisionManager& other) = default;
 
 

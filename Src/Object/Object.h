@@ -131,6 +131,9 @@ protected:
 		// つかみ位置
 		VECTOR posChatch;
 
+		// 正面の位置
+		VECTOR posForward;
+
 		// モデル位置調整値
 		VECTOR posLocal;
 
@@ -307,6 +310,10 @@ public:
 	/// @brief 行列割り当て処理
 	void SetMatrixModel(void);
 
+
+	/// @brief 当たり判定フレーム全更新
+	void UpdateModelFrames(void);
+
 	/// @brief フレーム更新処理
 	void UpdateModelFrame(COLLISION_TYPE _type);
 	
@@ -359,6 +366,8 @@ public:
 
 	/// @brief 加速度を割り当て
 	void SetVelocity(const VECTOR& velo) { paramChara_.velocity = velo; };
+
+	void SetPosForward(void);
 
 	/// <summary>
 	/// 地面判定を割り当て

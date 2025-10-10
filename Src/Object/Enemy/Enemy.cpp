@@ -113,6 +113,11 @@ void Enemy::UpdateStateIdle(void)
 	{
 		ChangeActionState(ACTION_STATE::SEARCH);
 	}
+
+	if (!AsoUtility::EqualsVZero(paramChara_.velocity))
+	{
+		UpdateModelFrames();
+	}
 }
 
 void Enemy::UpdateStateSpawn(void)
@@ -134,6 +139,11 @@ void Enemy::UpdateStateMove(void)
 {
 	// ÉvÉåÉCÉÑÅ[í«è]
 	LookPlayerPos();
+
+	if (!AsoUtility::EqualsVZero(paramChara_.velocity))
+	{
+		UpdateModelFrames();
+	}
 }
 
 void Enemy::UpdateStateAtk(void)

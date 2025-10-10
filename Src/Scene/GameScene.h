@@ -4,7 +4,6 @@
 
 class Player;
 class GameStageController;
-class EnemyController;
 class CollisionManager;
 class EffectManager;
 class HpBer;
@@ -72,9 +71,6 @@ private:
 
 	// プレイヤー
 	Player* player_;
-
-	// 敵マネージャー
-	EnemyController* enemys_;
 
 	//ステージオブジェクト
 	GameStageController* gameStage_;

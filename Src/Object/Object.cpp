@@ -20,6 +20,7 @@ Object::Object(void)
 
 	paramChara_.pos = paramChara_.prePos = {};
 	paramChara_.posLocal = {};
+	paramChara_.posForward = {};
 
 	paramChara_.quaRot = Quaternion::Identity();
 	paramChara_.quaRotLocal = Quaternion::Identity();
@@ -58,6 +59,9 @@ void Object::Init(void)
 
 	// モデル位置割り当て処理
 	SetMatrixModel();
+
+	// 当たり判定位置更新
+	UpdateModelFrames();
 }
 void Object::InitModelFrame(void)
 {
@@ -101,19 +105,46 @@ void Object::Draw(void)
 	// モデル描画処理
 	MV1DrawModel(paramChara_.handle);
 
-	VECTOR pos = VAdd(paramChara_.pos, paramChara_.posLocal);
-	DrawSphere3D(pos, paramChara_.radius, 8, 0xaaaaaa, 0xaaaaaa, false);
-}
-
-void Object::DrawDebug(void)
-{
-	//#ifdef _DEBUG
 	if (SceneManager::GetInstance().GetIsDebugMode())
 	{
 		// 向き描画
 		VECTOR pos = VAdd(paramChara_.pos, paramChara_.posLocal);
 		AsoUtility::DrawLineXYZ(pos, paramChara_.quaRot);
+
+		// 当たり判定表示
+		unsigned color = 0xaaaaaa;
+
+		for (auto& col : paramChara_.colList)
+		{
+			if (col.first == COLLISION_TYPE::BODY) continue;
+
+			color = ((col.first == COLLISION_TYPE::HEAD) ? 0xff0000 : color);
+			color = ((col.first == COLLISION_TYPE::BOTTOM) ? 0x00ff00 : color);
+			color = ((col.first == COLLISION_TYPE::HAND_L) ? 0x0000ff : color);
+			color = ((col.first == COLLISION_TYPE::HAND_R) ? 0x0000ff : color);
+
+			// 当たり判定位置
+			DrawSphere3D(col.second->pos, 8, 16, color, 0xffffff, true);
+
+			// 当たり判定範囲
+			DrawSphere3D(col.second->pos, paramChara_.radius / 2.0f, 16,
+				color, 0xffffff, false);
+		}
+
+		// 胴体の当たり判定
+		DrawSphere3D(paramChara_.colList[COLLISION_TYPE::BODY]->pos, paramChara_.radius, 8,
+			0xffffff, 0xffffff, false);
+
+		// 正面座標
+		DrawSphere3D(paramChara_.posForward, paramChara_.radius, 16,
+			0xffaaaa, 0xffffff, false);
 	}
+}
+
+void Object::DrawDebug(void)
+{
+	//#ifdef _DEBUG
+	
 	//#endif
 }
 
@@ -132,7 +163,6 @@ void Object::SetMatrixModel(void)
 	// 位置
 	VECTOR pos = VAdd(paramChara_.pos, paramChara_.posLocal);
 	MATRIX matPos = MGetTranslate(pos);
-
 
 	/* 行列の合成 */
 
@@ -154,6 +184,17 @@ void Object::SetMatrixModel(void)
 
 	// クォータニオン角からオイラー角に割り当て
 	paramChara_.rot = paramChara_.quaRot.ToEuler();
+}
+
+void Object::UpdateModelFrames(void)
+{
+	// 当たり判定位置更新
+	for (auto& col : paramChara_.colList)
+	{
+		UpdateModelFrame(col.first);
+	}
+
+	SetPosForward();
 }
 
 void Object::UpdateModelFrame(Object::COLLISION_TYPE _type)
@@ -237,16 +278,13 @@ void Object::SetDamage(int damage)
 {
 	/*　被ダメージ処理　*/
 
-	if (damage == 0)
-	{
-		// ダメージが０の時は処理終了
-		return;
-	}
+	// ダメージが０の時は処理終了
+	if (damage == 0) { return; }
 
 	// ダメージがマイナス時、正の数に変換する
 	int damageValue = ((damage < 0) ? -damage : damage);
 
-	// HP自体にダメージ
+	// HP減少
 	paramChara_.hp -= damageValue;
 
 
@@ -435,6 +473,14 @@ float Object::DecVelocityXZ(const float* acc)
 
 
 
+
+void Object::SetPosForward(void)
+{
+	VECTOR forward = VScale(paramChara_.quaRot.GetForward(), paramChara_.radius);
+	VECTOR pos = VAdd(paramChara_.colList[COLLISION_TYPE::BODY]->pos, forward);
+
+	paramChara_.posForward = pos;
+}
 
 void Object::ChangeAttackState(ATTACK_STATE state, float _activeTime)
 {

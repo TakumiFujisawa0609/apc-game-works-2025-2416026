@@ -18,19 +18,20 @@
 // シングルトンクラス
 CollisionManager* CollisionManager::instance_ = nullptr;
 
-void CollisionManager::CreateInstance(Player& _player, EnemyController _enemys)
+void CollisionManager::CreateInstance(Player& _player)
 {
 	if (instance_ == nullptr)
 	{
-		instance_ = new CollisionManager(_player, _enemys);
+		instance_ = new CollisionManager(_player);
 	}
 
+	instance_->player_ = &_player;
 	//instance_->Init();
 }
 
-CollisionManager::CollisionManager(Player& _player, EnemyController& _enemys)
-	:player_(_player), enemys_(_enemys)
+CollisionManager::CollisionManager(Player& _player)
 {
+	player_ = &_player;
 	stageColHandle_ = -1;
 	stageDamageHandle_ = -1;
 
@@ -95,6 +96,9 @@ void CollisionManager::SetStageCollision(int& stageHandle, const VECTOR& stagePo
 
 void CollisionManager::Update(void)
 {
+	// プレイヤーと敵の当たり判定
+	CollisionEnemys();
+
 	// キャラクター同士の当たり判定
 	CollisionChara();
 
@@ -137,6 +141,8 @@ void CollisionManager::Destroy(void)
 	if (instance_ != nullptr)
 	{
 		delete instance_;
+
+		instance_ = nullptr;
 	}
 }
 
@@ -277,24 +283,36 @@ void CollisionManager::CollisionChara(void)
 
 void CollisionManager::CollisionEnemys(void)
 {
-	VECTOR pForward = VScale(player_.GetFramePos(Object::COLLISION_TYPE::BODY), player_.GetRadius());
-	float pRad = player_.GetRadius();
+	auto& enemys = EnemyController::GetInstance().GetEnemys();
+	VECTOR pForward = player_->GetFramePos(Object::COLLISION_TYPE::HAND_L);
+	float pRad = player_->GetRadius();
 
-	for (auto& enemy : enemys_.GetEnemys())
+	// 攻撃していないとき、終了
+	if (!player_->GetIsAttack()) return;
+
+	for (auto& enemy : enemys)
 	{
 		if (!enemy->GetIsActive())continue;
 
+		enemy->UpdateModelFrames();
 		VECTOR ePos = enemy->GetFramePos(Object::COLLISION_TYPE::BODY);
 		float eRad = enemy->GetRadius();
 
-
-		if (UtilityCollision::IsHitSphereToSphere(pForward, pRad, ePos, eRad)
-			&& player_.GetIsAttack())
+		if (UtilityCollision::IsHitSphereToSphere(pForward, pRad, ePos, eRad))
 		{
-			enemy->SetDamage();
+			bool temp = false;
 		}
 	}
 	
+}
+void CollisionManager::EnemyDamageProc(Enemy& _enemy, int _damage)
+{
+	// 被ダメージ処理
+	_enemy.SetDamage();
+
+	// 
+
+	// 
 }
 
 void CollisionManager::CollisionsGround(void)
