@@ -284,7 +284,7 @@ void CollisionManager::CollisionChara(void)
 void CollisionManager::CollisionEnemys(void)
 {
 	auto& enemys = EnemyController::GetInstance().GetEnemys();
-	VECTOR pForward = player_->GetFramePos(Object::COLLISION_TYPE::HAND_L);
+	VECTOR pForward = player_->GetPosForward();
 	float pRad = player_->GetRadius();
 
 	// UŒ‚‚µ‚Ä‚¢‚È‚¢‚Æ‚«AI—¹

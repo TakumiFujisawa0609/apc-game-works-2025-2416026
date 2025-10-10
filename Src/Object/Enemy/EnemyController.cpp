@@ -78,9 +78,6 @@ void EnemyController::Draw(void)
 		if (!enemy->GetIsActive()) continue;
 
 		enemy->Draw();
-
-		DrawFormatString(0, 148, 0xff0000, "ePos:(%.1f,%.1f,%.1f)",
-			enemy->GetPos().x, enemy->GetPos().y, enemy->GetPos().z);
 	}
 }
 

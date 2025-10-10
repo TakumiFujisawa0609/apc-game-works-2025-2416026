@@ -140,6 +140,9 @@ public:
 	/// @brief 更新処理
 	void Update(void) override;
 
+	/// @brief 描画処理
+	void Draw(void)override;
+
 	/// @brief デバッグ表示
 	void DrawDebug(void);
 	
@@ -199,13 +202,18 @@ public:
 
 	bool GetIsAttack(void)const;
 
+	float GetRadiusForward(void)const override
+		{ return status_.GetMortionRadius(paramPlayer_.mortionType); };
+
 
 protected:
-
+	
 	struct PlayerParam
 	{
 		// 行動状態
 		ACTION_STATE actionState;
+
+		MORTION_TYPE mortionType;
 
 		// パリィ時間
 		float parryTime;
@@ -304,4 +312,6 @@ protected:
 
 	/// @brief行動可能か否か判定
 	bool IsActiveAction(void)const;
+
+	void SetPosForward(void)override;
 };

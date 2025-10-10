@@ -134,10 +134,6 @@ void Object::Draw(void)
 		// ì∑ëÃÇÃìñÇΩÇËîªíË
 		DrawSphere3D(paramChara_.colList[COLLISION_TYPE::BODY]->pos, paramChara_.radius, 8,
 			0xffffff, 0xffffff, false);
-
-		// ê≥ñ ç¿ïW
-		DrawSphere3D(paramChara_.posForward, paramChara_.radius, 16,
-			0xffaaaa, 0xffffff, false);
 	}
 }
 

@@ -75,6 +75,7 @@ void Player::SetParam(void)
 	
 	// 行動状態
 	paramPlayer_.actionState = ACTION_STATE::IDLE;
+	paramPlayer_.mortionType = MORTION_TYPE::NONE;
 
 	paramChara_.posLocal = {};
 
@@ -181,6 +182,17 @@ void Player::Update(void)
 
 	// 当たり判定更新
 	//collision_->Update();
+}
+
+void Player::Draw(void)
+{
+	Object::Draw();
+	if (SceneManager::GetInstance().GetIsDebugMode())
+	{
+		// 正面座標
+		DrawSphere3D(paramChara_.posForward, status_.GetMortionRadius(paramPlayer_.mortionType),
+			         16, 0xffaaaa, 0xffffff, false);
+	}
 }
 
 void Player::DrawDebug(void)
@@ -438,10 +450,14 @@ void Player::ChangeActionState(ACTION_STATE state)
 	{
 		anim_->Play(static_cast<int>(ANIM_STATE::IDLE));
 		paramChara_.attackState = ATTACK_STATE::NONE;
+		paramPlayer_.mortionType = MORTION_TYPE::NONE;
+
 		paramChara_.timeAct = 0.0f;
 	}
 	else if (state == ACTION_STATE::ATTACK_JUB_1)
 	{
+		paramPlayer_.mortionType = MORTION_TYPE::JUB_1;
+
 		anim_->Play(static_cast<int>(ANIM_STATE::SWORD_SLASH), false);
 
 		paramPlayer_.isDash = false;
@@ -459,18 +475,10 @@ bool Player::GetIsAttack(void) const
 	bool ret = false;
 
 	// 攻撃状態で攻撃有効時true
-	if (paramChara_.attackState == Object::ATTACK_STATE::ACTIVE)
+	if (paramChara_.attackState == Object::ATTACK_STATE::ACTIVE &&
+		paramPlayer_.mortionType != MORTION_TYPE::NONE)
 	{
-		if (paramPlayer_.actionState == ACTION_STATE::ATTACK_JUB_1 ||
-			paramPlayer_.actionState == ACTION_STATE::ATTACK_JUB_2 ||
-			paramPlayer_.actionState == ACTION_STATE::ATTACK_JUB_3 ||
-			paramPlayer_.actionState == ACTION_STATE::ATTACK_SPECIAL ||
-			paramPlayer_.actionState == ACTION_STATE::ATTACK_STRONG_1 ||
-			paramPlayer_.actionState == ACTION_STATE::ATTACK_STRONG_2 ||
-			paramPlayer_.actionState == ACTION_STATE::ATTACK_STRONG_3)
-		{
-			ret = true;
-		}
+		ret = true;
 	}
 
 	return ret;
@@ -749,4 +757,13 @@ bool Player::IsActiveAction(void)const
 	}
 
 	return ret;
+}
+
+void Player::SetPosForward(void)
+{
+	float frameRad = status_.GetMortionRadius(paramPlayer_.mortionType);
+	VECTOR forward = VScale(paramChara_.quaRot.GetForward(), frameRad);
+	VECTOR pos = VAdd(paramChara_.colList[COLLISION_TYPE::BODY]->pos, forward);
+
+	paramChara_.posForward = pos;
 }

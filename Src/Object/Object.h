@@ -162,6 +162,9 @@ protected:
 		// 半径
 		float radius;
 
+		// 正面の半径
+		float radiusForward;
+
 		// ハンドルID
 		int handle;
 
@@ -270,6 +273,8 @@ protected:
 
 	/// @brief アニメーション更新処理
 	virtual void UpdateAnim(void) = 0;
+
+	virtual void SetPosForward(void);
 	
 	/// <summary>
 	/// フレーム番号を検索
@@ -367,8 +372,6 @@ public:
 	/// @brief 加速度を割り当て
 	void SetVelocity(const VECTOR& velo) { paramChara_.velocity = velo; };
 
-	void SetPosForward(void);
-
 	/// <summary>
 	/// 地面判定を割り当て
 	/// </summary>
@@ -399,6 +402,8 @@ public:
 	/// @brief 持ちあげ位置取得
 	VECTOR& GetPosChatch(void);
 
+	/// @brief 正面の座標取得
+	VECTOR& GetPosForward(void) { return paramChara_.posForward; };
 
 	/// @brief 加速度取得
 	const VECTOR& GetVelocity(void) const { return paramChara_.velocity; };
@@ -425,6 +430,8 @@ public:
 
 	/// @brief 半径取得
 	float GetRadius(void)const { return paramChara_.radius; };
+
+	virtual float GetRadiusForward(void)const { return paramChara_.radiusForward; };
 	
 
 	/// @brief キャラモデルハンドル取得
