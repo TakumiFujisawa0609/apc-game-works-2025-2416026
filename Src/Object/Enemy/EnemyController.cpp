@@ -71,7 +71,7 @@ void EnemyController::Update(void)
 
 void EnemyController::Draw(void)
 {
-	//if (enemys_.empty()) return;
+	if (enemys_.empty()) return;
 
 	for (auto& enemy : enemys_)
 	{
@@ -87,6 +87,9 @@ void EnemyController::DrawDebug(void)
 	{
 		if (!enemy->GetIsActive()) continue;
 		enemy->DrawDebug();
+		DrawFormatString(0, 128, 0xff0000, "enemy: pos(%.2f,%.2f,%.2f), hp(%d), inv(%.2f)",
+			enemy->GetPos().x,enemy->GetPos().y,enemy->GetPos().z,
+			enemy->GetCurHp(), enemy->GetTimeInv());
 	}
 
 }

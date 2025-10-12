@@ -39,7 +39,20 @@ public:
 		ANIM_SPEED_ATTACK, // 攻撃アニメーション速度
 		ANIM_SPEED_WALK, // 移動アニメーション速度
 		ANIM_SPEED_SPAWN, // 生成時のアニメーション速度
+		ANIM_SPEED_HIT_1, // 弱被ダメージアニメーション速度
+		ANIM_SPEED_HIT_2, // 強被ダメージアニメーション速度
 
+		MAX,
+	};
+
+	enum class ANIM_TYPE
+	{
+		IDLE,
+		ATTACK,
+		WALK,
+		SPAWN,
+		HIT_1,
+		HIT_2,
 		MAX,
 	};
 
@@ -64,10 +77,13 @@ public:
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ATTACK_INTERVAL)], atkInterval_, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ATTACK_RANEGE)], atkRange_, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::SEARCH_RANGE)], searchRange_, 0.0f);
-		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_IDLE)], animSpeed_.idle, 0.0f);
-		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_ATTACK)], animSpeed_.attack, 0.0f);
-		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_WALK)], animSpeed_.walk, 0.0f);
-		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_SPAWN)], animSpeed_.spawn, 0.0f);
+
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_IDLE)], animSpeed_[static_cast<int>(ANIM_TYPE::IDLE)], 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_ATTACK)], animSpeed_[static_cast<int>(ANIM_TYPE::ATTACK)], 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_WALK)], animSpeed_[static_cast<int>(ANIM_TYPE::WALK)], 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_SPAWN)], animSpeed_[static_cast<int>(ANIM_TYPE::SPAWN)], 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_SPAWN)], animSpeed_[static_cast<int>(ANIM_TYPE::HIT_1)], 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_SPAWN)], animSpeed_[static_cast<int>(ANIM_TYPE::HIT_2)], 0.0f);
 	}
 
 
@@ -96,19 +112,10 @@ public:
 	float GetSearchRange(void)const { return searchRange_; }
 
 
-	// 待機アニメーション速度取得
-	float GetAnimSpeedIdle(void)const { return animSpeed_.idle; }
+	// アニメーション速度取得
+	float GetAnimSpeed(ANIM_TYPE _type) { return animSpeed_[static_cast<int>(_type)]; };
+	float GetAnimSpeed(int _type) { return animSpeed_[_type]; };
 
-	// 攻撃アニメーション速度取得
-	float GetAnimSpeedAtk(void)const { return animSpeed_.attack; }
-
-	// 移動アニメーション速度取得
-	float GetAnimSpeedWalk(void)const { return animSpeed_.walk; }
-
-	// 生成アニメーション速度取得
-	float GetAnimSpeedSpawn(void)const { return animSpeed_.spawn; }
-
-	
 
 private:
 
@@ -144,14 +151,7 @@ private:
 
 	float searchRange_;
 
-	struct AnimSpeed
-	{
-		float idle;
-		float attack;
-		float walk;
-		float spawn;
-	};
-	AnimSpeed animSpeed_;
+	float animSpeed_[static_cast<int>(ANIM_TYPE::MAX)];
 
 	void SetType(const std::string& text);
 };

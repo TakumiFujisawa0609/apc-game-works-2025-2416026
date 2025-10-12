@@ -41,6 +41,8 @@ void Enemy::Init(const VECTOR& pos, float angleY, Enemy::ACTION_STATE state)
 	paramEnemy_.actionState = state;
 
 	paramEnemy_.isHearing = false;
+
+	paramChara_.isActive = true;
 }
 void Enemy::SetParam(void)
 {
@@ -74,18 +76,19 @@ void Enemy::SetParam(void)
 	paramChara_.speedAcc = status_.GetSpeedAcc();
 }
 
-void Enemy::SetIsView(bool _isView)
+void Enemy::SetDamage(int _damage)
 {
-	// 非表示状態以外の時、非表示状態
-	if (paramEnemy_.actionState != ACTION_STATE::INACTIVE && !_isView) { paramEnemy_.actionState = ACTION_STATE::INACTIVE; }
+	Object::SetDamage(_damage);
 
-	// 非表示状態時。待機状態
-	else if (paramEnemy_.actionState == ACTION_STATE::INACTIVE && _isView) { paramEnemy_.actionState = ACTION_STATE::IDLE; }
+	// ダメージ演出
+	DamagePerform();
 }
 
 void Enemy::Update(void)
 {
-	if (paramEnemy_.actionState == ACTION_STATE::INACTIVE) return;
+	if (!paramChara_.isActive) return;
+
+	Object::Update();
 
 	// 索敵範囲有効
 	SearchField();
@@ -155,9 +158,10 @@ void Enemy::ChangeActionState(ACTION_STATE state)
 	paramEnemy_.actionState = state;
 }
 
+
 void Enemy::Draw(void)
 {
-	if (paramEnemy_.actionState == ACTION_STATE::INACTIVE) return;
+	if (!paramChara_.isActive) return;
 
 	SceneManager& scene = SceneManager::GetInstance();
 
@@ -170,7 +174,7 @@ void Enemy::Draw(void)
 }
 void Enemy::Release(void)
 {
-
+	Object::Release();
 }
 
 
@@ -193,6 +197,8 @@ void Enemy::UpdateAnim(void)
 {
 	// アニメーション更新
 	anim_->Update();
+
+	AnimState();
 }
 
 void Enemy::SearchField(void)

@@ -8,10 +8,14 @@ class EnemyWarrior : public Enemy
 {
 public:
 
-	enum class ANIM_STATE
+	enum class WARRIER_ANIM
 	{
 		NONE = 0,
 		ATTACK = 10,
+		DEATH = 25,
+		DEATH_STOP = 26,
+		HIT_1 = 39,
+		HIT_2 = 40,
 		IDLE = 42,
 		WALK = 56,
 		SPAWN = 81,
@@ -32,18 +36,15 @@ protected:
 
 	void InitAnim(void)override;
 
+	void DamagePerform(void)override;
+
+	void AnimState(void)override;
+
+
 private:
 
 	// アニメーション速度
-	std::map<ANIM_STATE, float> animSpeed_;
+	std::map<WARRIER_ANIM, float> animSpeed_;
 	
-	ANIM_STATE animState_;
-
-	/// <summary>
-	/// アニメーション速度割り当て
-	/// </summary>
-	/// <param name="_state">指定するアニメーション</param>
-	/// <param name="_speed">アニメーション速度</param>
-	void SetAnimSpeed(ANIM_STATE _state, float _speed)
-		{ animSpeed_.emplace(_state, _speed); };
+	WARRIER_ANIM animState_;
 };

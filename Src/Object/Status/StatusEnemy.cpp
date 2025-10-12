@@ -26,13 +26,10 @@ StatusEnemy::StatusEnemy(void)
 
 	searchRange_ = 0.0f;
 
-	animSpeed_.idle = 0.0f;
-
-	animSpeed_.attack = 0.0f;
-
-	animSpeed_.walk = 0.0f;
-
-	animSpeed_.spawn = 0.0f;
+	for (int i = 0; i < static_cast<int>(ANIM_TYPE::MAX); i++)
+	{
+ 		animSpeed_[i] = 0.0f;
+	}
 }
 
 void StatusEnemy::SetType(const std::string& text)

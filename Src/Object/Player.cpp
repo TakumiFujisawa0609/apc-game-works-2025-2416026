@@ -107,6 +107,11 @@ void Player::SetParam(void)
 	paramPlayer_.luck = status_.GetLuck();
 }
 
+void Player::SetDamage(int _damage)
+{
+	Object::SetDamage(_damage);
+}
+
 void Player::InitAnim(void)
 {
 	int type;
@@ -162,6 +167,8 @@ void Player::Update(void)
 {
 	/*　更新処理　*/
 
+	Object::Update();
+
 	// 反転回転フラグ
 	bool isRevert = false;
 
@@ -215,8 +222,7 @@ void Player::DrawDebug(void)
 void Player::Release(void)
 {
 	/*　解放処理　*/
-
-	paramPlayer_.animSpeed.clear();
+	Object::Release();
 
 	// アニメーション解放
 	anim_->Release();

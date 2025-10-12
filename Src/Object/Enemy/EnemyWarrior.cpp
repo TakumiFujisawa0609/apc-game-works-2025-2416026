@@ -10,7 +10,7 @@
 EnemyWarrior::EnemyWarrior(Player& player)
 		:Enemy(StatusEnemy::TYPE::SKELETON_WARRIOR, player)
 {
-	animSpeed_.clear();
+
 }
 
 void EnemyWarrior::SetParam(void)
@@ -48,10 +48,14 @@ void EnemyWarrior::InitAnim(void)
 	// アニメーション初期化
 	anim_ = new AnimationController(paramChara_.handle);
 
-	animSpeed_.emplace(ANIM_STATE::IDLE, status_.GetAnimSpeedIdle());
-	animSpeed_.emplace(ANIM_STATE::ATTACK, status_.GetAnimSpeedAtk());
-	animSpeed_.emplace(ANIM_STATE::WALK, status_.GetAnimSpeedWalk());
-	animSpeed_.emplace(ANIM_STATE::SPAWN, status_.GetAnimSpeedSpawn());
+	animSpeed_.emplace(WARRIER_ANIM::IDLE, status_.GetAnimSpeed(StatusEnemy::ANIM_TYPE::IDLE));
+	animSpeed_.emplace(WARRIER_ANIM::ATTACK, status_.GetAnimSpeed(StatusEnemy::ANIM_TYPE::ATTACK));
+	animSpeed_.emplace(WARRIER_ANIM::WALK, status_.GetAnimSpeed(StatusEnemy::ANIM_TYPE::WALK));
+	animSpeed_.emplace(WARRIER_ANIM::SPAWN, status_.GetAnimSpeed(StatusEnemy::ANIM_TYPE::SPAWN));
+	animSpeed_.emplace(WARRIER_ANIM::SPAWN, status_.GetAnimSpeed(StatusEnemy::ANIM_TYPE::SPAWN));
+	animSpeed_.emplace(WARRIER_ANIM::HIT_1, status_.GetAnimSpeed(StatusEnemy::ANIM_TYPE::HIT_1));
+	animSpeed_.emplace(WARRIER_ANIM::HIT_2, status_.GetAnimSpeed(StatusEnemy::ANIM_TYPE::HIT_2));
+	animSpeed_.emplace(WARRIER_ANIM::DEATH, 30);
 	
 
 	for (auto& anim : animSpeed_)
@@ -65,5 +69,31 @@ void EnemyWarrior::InitAnim(void)
 	}
 
 	// 待機アニメーション再生
-	anim_->Play(static_cast<int>(ANIM_STATE::IDLE));
+	animState_ = WARRIER_ANIM::IDLE;
+	anim_->Play(static_cast<int>(WARRIER_ANIM::IDLE));
 }
+
+void EnemyWarrior::DamagePerform(void)
+{
+	if (paramChara_.hp > 0)
+	{
+		animState_ = WARRIER_ANIM::HIT_1;
+		anim_->Play(static_cast<int>(WARRIER_ANIM::HIT_1), false);
+	}
+	else
+	{
+		animState_ = WARRIER_ANIM::DEATH;
+		anim_->Play(static_cast<int>(WARRIER_ANIM::DEATH), false);
+	}
+}
+
+void EnemyWarrior::AnimState(void)
+{
+
+	if (animState_ == WARRIER_ANIM::HIT_1 && anim_->IsEnd())
+	{
+		animState_ = WARRIER_ANIM::IDLE;
+		anim_->Play(static_cast<int>(WARRIER_ANIM::IDLE));
+	}
+}
+

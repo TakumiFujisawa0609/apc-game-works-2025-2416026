@@ -9,6 +9,7 @@
 #include "../Object/Player.h"
 #include "../Object/Enemy/EnemyController.h"
 #include "../Object/Enemy/Enemy.h"
+#include "../Object/Enemy/EnemyWarrior.h"
 #include "../Manager/ResourceManager.h"
 #include "../Manager/Resource.h"
 #include "../Manager/SceneManager.h"
@@ -285,7 +286,7 @@ void CollisionManager::CollisionEnemys(void)
 {
 	auto& enemys = EnemyController::GetInstance().GetEnemys();
 	VECTOR pForward = player_->GetPosForward();
-	float pRad = player_->GetRadius();
+	float pRad = player_->GetRadiusForward();
 
 	// 攻撃していないとき、終了
 	if (!player_->GetIsAttack()) return;
@@ -300,15 +301,16 @@ void CollisionManager::CollisionEnemys(void)
 
 		if (UtilityCollision::IsHitSphereToSphere(pForward, pRad, ePos, eRad))
 		{
-			bool temp = false;
+			EnemyDamageProc(*enemy);
 		}
+		int temp = 0;
 	}
 	
 }
 void CollisionManager::EnemyDamageProc(Enemy& _enemy, int _damage)
 {
 	// 被ダメージ処理
-	_enemy.SetDamage();
+	_enemy.SetDamage(_damage);
 
 	// 
 

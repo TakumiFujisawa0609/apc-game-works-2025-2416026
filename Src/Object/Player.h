@@ -153,6 +153,9 @@ public:
 	/// @brief パラメータ割り当て
 	void SetParam(void) override;
 
+	/// @brief 被ダメージ処理
+	void SetDamage(int _damage = 1)override;
+
 	/// @brief 移動入力をしているか否か
 	bool IsInputMove(void);
 
@@ -208,7 +211,7 @@ public:
 
 protected:
 	
-	struct PlayerParam
+	struct ParamPlayer
 	{
 		// 行動状態
 		ACTION_STATE actionState;
@@ -244,7 +247,7 @@ protected:
 
 		std::unordered_map<ANIM_STATE, float> animSpeed;
 	};
-	PlayerParam paramPlayer_;
+	ParamPlayer paramPlayer_;
 
 
 	StatusPlayer& status_;

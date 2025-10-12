@@ -120,7 +120,7 @@ protected:
 	/// <summary>
 	/// プレイヤーのパラメータ
 	/// </summary>
-	struct CharaParam
+	struct ParamChara
 	{
 		// 位置
 		VECTOR pos;
@@ -191,6 +191,8 @@ protected:
 		// 地面にいるか否か
 		bool isGround;
 
+		bool isActive;
+		
 		// 無敵時間
 		float timeInv;
 
@@ -200,7 +202,7 @@ protected:
 		// 攻撃状態
 		ATTACK_STATE attackState;
 	};
-	CharaParam paramChara_;
+	ParamChara paramChara_;
 
 	// アニメーション
 	AnimationController* anim_;
@@ -297,7 +299,7 @@ public:
 	void Init(void);
 
 	/// @brief 更新処理
-	virtual void Update(void) = 0;
+	virtual void Update(void);
 
 	/// @brief 描画処理
 	virtual void Draw(void);
@@ -306,7 +308,7 @@ public:
 	virtual void DrawDebug(void);
 
 	/// @brief 解放処理
-	virtual void Release(void) {};
+	virtual void Release(void);
 
 	/// @brief パラメータ割り当て
 	virtual void SetParam(void) = 0;
@@ -334,11 +336,9 @@ public:
 	/// <param name="_isVeloReset">加速度を初期化するか否か</param>
 	void RevertPosY(float _revPos, bool _isVeloReset = false);
 
-	/// <summary>
-	/// 被ダメージ処理
-	/// </summary>
-	/// <param name="_damage">ダメージ量</param>
-	void SetDamage(int _damage = 1);
+	/// @brief 被ダメージ処理\
+	/// @param _damage ダメージ量
+	virtual void SetDamage(int _damage = 1);
 
 	/// <summary>
 	/// 重量の計算
@@ -377,6 +377,8 @@ public:
 	/// </summary>
 	/// <param name="flag">着地している否か</param>
 	void SetIsGround(bool flag) { if (paramChara_.isGround != flag) { paramChara_.isGround = flag; } };
+
+	void SetIsActive(bool flag) { paramChara_.isActive = flag; };
 
 	/// @brief 攻撃状態を遷移
 	/// @param _state 攻撃状態
@@ -452,6 +454,8 @@ public:
 
 	/// @brief 地面にあるか否か
 	bool GetIsGround(void) const { return paramChara_.isGround; };
+
+	bool GetIsActive(void) const { return paramChara_.isActive; };
 
 
 	/// @brief 攻撃有効する猶予時間取得 

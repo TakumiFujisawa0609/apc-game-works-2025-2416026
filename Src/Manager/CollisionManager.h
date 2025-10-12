@@ -221,6 +221,6 @@ private:
 	/// @brief 
 	/// @param _enemy 
 	/// @param _damage 
-	void EnemyDamageProc(Enemy& _enemy, int _damage);
+	void EnemyDamageProc(Enemy& _enemy, int _damage = 1);
 
 };

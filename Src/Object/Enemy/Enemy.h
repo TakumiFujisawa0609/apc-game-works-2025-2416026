@@ -9,10 +9,23 @@ class Enemy : public Object
 {
 public:
 
+	enum class ANIM_STATE
+	{
+		NONE = 0,
+		ATTACK,
+		DEATH,
+		DEATH_STOP,
+		HIT_1,
+		HIT_2,
+		IDLE,
+		WALK,
+		SPAWN,
+		MAX,
+	};
+
 	enum class ACTION_STATE
 	{
 		NONE = -1,
-		INACTIVE, // 非表示状態
 		SPAWN,    // 生成状態
 		IDLE,	  // 待機状態
 		SEARCH,   // プレイヤー追従
@@ -47,22 +60,15 @@ public:
 
 	void SetParam(void) override;
 
+	void SetDamage(int _damage = 1)override;
+
 	/// @brief 行動状態取得
 	ACTION_STATE GetActionState(void)const { return paramEnemy_.actionState; };
-
-	bool GetIsActive(void)const { return (paramEnemy_.actionState != ACTION_STATE::INACTIVE);  };
-
-	/// <summary>
-	/// 敵表示処理
-	/// </summary>
-	/// <param name="_isView">表示するか否か</param>
-	void SetIsView(bool _isView);
-
 	
 
 protected:
 
-	struct EnemyParam
+	struct ParamEnemy
 	{
 		std::string name;
 
@@ -80,7 +86,7 @@ protected:
 		bool isHearing;
 	};
 
-	EnemyParam paramEnemy_;
+	ParamEnemy paramEnemy_;
 
 	
 
@@ -112,4 +118,8 @@ protected:
 	virtual void UpdateStateAtk(void);
 
 	void ChangeActionState(ACTION_STATE state);
+
+	virtual void AnimState(void) = 0;
+
+	virtual void DamagePerform(void) = 0;
 };

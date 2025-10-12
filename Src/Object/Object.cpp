@@ -21,6 +21,7 @@ Object::Object(void)
 	paramChara_.pos = paramChara_.prePos = {};
 	paramChara_.posLocal = {};
 	paramChara_.posForward = {};
+	paramChara_.isActive = false;	
 
 	paramChara_.quaRot = Quaternion::Identity();
 	paramChara_.quaRotLocal = Quaternion::Identity();
@@ -84,6 +85,16 @@ void Object::InitModelFrame(void)
 	}
 }
 
+void Object::Update(void)
+{
+	float delta = SceneManager::GetInstance().GetDeltaTime();
+
+	if(paramChara_.timeInv > 0.0f)
+	{
+		paramChara_.timeInv -= delta;
+	}
+}
+
 void Object::Draw(void)
 {
 	/*　描画処理　*/
@@ -93,11 +104,13 @@ void Object::Draw(void)
 
 	if (paramChara_.timeInv > 0.0f)
 	{
+		color = {255,0,0};
+		/*
 		int team = static_cast<int>(paramChara_.timeAct * 10.0f);
 		if (team % COLOR_TEAM == 0)
 		{
 			color = paramChara_.damageColor;
-		}
+		}*/
 	}
 
 	MV1SetDifColorScale(paramChara_.handle, color);
@@ -144,6 +157,10 @@ void Object::DrawDebug(void)
 	//#endif
 }
 
+void Object::Release(void)
+{
+	//animSpeed_.clear();
+}
 
 void Object::SetMatrixModel(void)
 {
@@ -270,23 +287,26 @@ void Object::RevertPosY(float revPosY, bool isVeloReset)
 	paramChara_.pos.y = paramChara_.prePos.y;
 }
 
-void Object::SetDamage(int damage)
+void Object::SetDamage(int _damage)
 {
 	/*　被ダメージ処理　*/
-
+	
 	// ダメージが０の時は処理終了
-	if (damage == 0) { return; }
+	if (_damage == 0 || paramChara_.timeInv > 0.0f) { return; }
 
 	// ダメージがマイナス時、正の数に変換する
-	int damageValue = ((damage < 0) ? -damage : damage);
+	int damageValue = ((_damage < 0) ? -_damage : _damage);
 
 	// HP減少
 	paramChara_.hp -= damageValue;
 
+	paramChara_.timeInv = 0.75f;
 
 	if (paramChara_.hp < 0)
 	{
 		paramChara_.hp = 0;
+
+		paramChara_.isActive = false;
 	}
 }
 
