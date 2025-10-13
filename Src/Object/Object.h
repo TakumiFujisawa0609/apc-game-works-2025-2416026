@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Common/Quaternion.h"
+#include "../Manager/SoundManager.h"
 #include <DxLib.h>
 #include <memory>
 #include <map>
@@ -31,6 +32,7 @@ public:
 		BOTTOM,
 		HAND_L,
 		HAND_R,
+		FORWARD,
 
 		MAX,
 	};
@@ -258,7 +260,7 @@ protected:
 	void Rotation(bool isRevert = false);
 
 	/// @brief d—Í‰ÁZˆ—
-	void Gravity(void);
+	void GravityKnock(void);
 
 	/// <summary>
 	/// ˆÚ“®—ÊŒ¸­ˆ—
@@ -383,12 +385,14 @@ public:
 	/// @brief UŒ‚ó‘Ô‚ğ‘JˆÚ
 	/// @param _state UŒ‚ó‘Ô
 	/// @param _activeTime s“®ŠÔ
-	void ChangeAttackState(ATTACK_STATE _state, float _activeTime = 0.0f);
+	/// @param _se Œø‰Ê‰¹
+	void ChangeAttackState(ATTACK_STATE _state, float _activeTime = 0.0f, SoundManager::SRC _se = SoundManager::SRC::NONE);
 
 
 	/// @brief  UŒ‚ó‘Ô‚ğ‘JˆÚ
 	/// @param _activeTime s“®ŠÔ
-	void ChangeAttackStateNext(float _activeTime = 0.0f);
+	/// @param _se Œø‰Ê‰¹ƒ\[ƒX
+	void ChangeAttackStateNext(float _activeTime = 0.0f, SoundManager::SRC _se = SoundManager::SRC::NONE);
 
 
 
@@ -431,7 +435,8 @@ public:
 	const VECTOR& GetScale(void) const { return paramChara_.scale; };
 
 	/// @brief ”¼Œaæ“¾
-	float GetRadius(void)const { return paramChara_.radius; };
+	/// @param “–‚½‚è”»’è‚Ìí—Ş
+	float GetRadius(COLLISION_TYPE _type);
 
 	virtual float GetRadiusForward(void)const { return paramChara_.radiusForward; };
 	
@@ -456,6 +461,8 @@ public:
 	bool GetIsGround(void) const { return paramChara_.isGround; };
 
 	bool GetIsActive(void) const { return paramChara_.isActive; };
+
+	const VECTOR& GetKnockVelo(void) { return paramChara_.knockBack; };
 
 
 	/// @brief UŒ‚—LŒø‚·‚é—P—\ŠÔæ“¾ 

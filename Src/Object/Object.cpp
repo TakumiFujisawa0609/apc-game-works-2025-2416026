@@ -10,8 +10,6 @@
 #include "../Utility/AsoUtility.h"
 #include "../Manager/SceneManager.h"
 #include "../Manager/SoundManager.h"
-#include "../Manager/SoundManager.h"
-#include "../Manager/Sound.h"
 
 Object::Object(void)
 {
@@ -89,31 +87,25 @@ void Object::Update(void)
 {
 	float delta = SceneManager::GetInstance().GetDeltaTime();
 
+	// 現在位置割り当て
+	paramChara_.prePos = paramChara_.pos;
+
 	if(paramChara_.timeInv > 0.0f)
 	{
 		paramChara_.timeInv -= delta;
+	}
+
+	if (!AsoUtility::EqualsVZero(paramChara_.knockBack))
+	{
+		GravityKnock();
+
+		UpdateModelFrames();
 	}
 }
 
 void Object::Draw(void)
 {
 	/*　描画処理　*/
-
-	COLOR_F defaultColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-	COLOR_F color = defaultColor;
-
-	if (paramChara_.timeInv > 0.0f)
-	{
-		color = {255,0,0};
-		/*
-		int team = static_cast<int>(paramChara_.timeAct * 10.0f);
-		if (team % COLOR_TEAM == 0)
-		{
-			color = paramChara_.damageColor;
-		}*/
-	}
-
-	MV1SetDifColorScale(paramChara_.handle, color);
 
 	// モデル描画処理
 	MV1DrawModel(paramChara_.handle);
@@ -310,26 +302,28 @@ void Object::SetDamage(int _damage)
 	}
 }
 
-void Object::Gravity(void)
+void Object::GravityKnock(void)
 {
-	if (paramChara_.isGround) return;
-
 	// 重力加速
-	paramChara_.velocity.y -= Application::GRAVITY_ACC;
+	paramChara_.knockBack.y -= Application::GRAVITY_ACC;
 
-
-	// 下への加速度の制限
-	if (paramChara_.velocity.y < VELOCITY_Y_MIN)
+	if (paramChara_.knockBack.y < Application::GRAVITY_MAX)
 	{
-		paramChara_.velocity.y = VELOCITY_Y_MIN;
+		paramChara_.knockBack.y = Application::GRAVITY_MAX;
 	}
 
-	// 重力加速制限
-	if (paramChara_.velocity.y > Application::GRAVITY_MAX)
-	{
-		paramChara_.velocity.y = Application::GRAVITY_MAX;
-	}
+	// 加速度に反映
+	paramChara_.velocity = VAdd(paramChara_.velocity, paramChara_.knockBack);
 
+	// 位置に反映
+	paramChara_.pos = VAdd(paramChara_.pos, paramChara_.velocity);
+	
+	if (paramChara_.knockBack.y < 0.0f &&
+		paramChara_.pos.y <= 0.0f)
+	{
+		paramChara_.pos.y = 0.0f;
+		paramChara_.velocity = paramChara_.knockBack = AsoUtility::VECTOR_ZERO;
+	}
 }
 
 
@@ -380,7 +374,7 @@ void Object::KnockBack(const VECTOR& targetPos, float invTime,
 	paramChara_.timeInv = invTime;
 
 	// 移動量に加算
-	paramChara_.velocity = VAdd(paramChara_.velocity, knockVelo);
+	paramChara_.knockBack = VAdd(paramChara_.velocity, knockVelo);
 }
 
 bool Object::CheckActiveAttack(void) const
@@ -498,16 +492,22 @@ void Object::SetPosForward(void)
 	paramChara_.posForward = pos;
 }
 
-void Object::ChangeAttackState(ATTACK_STATE state, float _activeTime)
+void Object::ChangeAttackState(ATTACK_STATE _state, float _activeTime, SoundManager::SRC _se)
 {
 	// 状態割り当て
-	paramChara_.attackState = state;
+	paramChara_.attackState = _state;
 
 	// 行動時間割り当て
 	paramChara_.timeAct = _activeTime;
+
+	if (_state == ATTACK_STATE::ACTIVE)
+	{
+		// 効果音再生
+		SoundManager::GetInstance().Play(_se, false);
+	}
 }
 
-void Object::ChangeAttackStateNext(float _activeTime)
+void Object::ChangeAttackStateNext(float _activeTime, SoundManager::SRC _se)
 {
 	// 次の行動状態に遷移
 	ATTACK_STATE state = paramChara_.attackState;
@@ -516,6 +516,9 @@ void Object::ChangeAttackStateNext(float _activeTime)
 
 	// 攻撃が終了時、無効状態に戻す
 	if (state == ATTACK_STATE::MAX) { state = ATTACK_STATE::NONE; }
+
+	// 効果音再生
+	if (state == ATTACK_STATE::ACTIVE) { SoundManager::GetInstance().Play(_se, false); }
 
 	// 状態割り当て
 	paramChara_.attackState = state;
@@ -534,6 +537,13 @@ const VECTOR& Object::GetPosDelta(void) const
 {
 	/* 移動量を取得 */
 	return VSub(paramChara_.pos, paramChara_.prePos);
+}
+
+float Object::GetRadius(COLLISION_TYPE _type)
+{
+	//paramChara_.colList[_type].radius;
+
+	return paramChara_.radius;
 }
 
 const VECTOR& Object::GetFramePos(COLLISION_TYPE _type)

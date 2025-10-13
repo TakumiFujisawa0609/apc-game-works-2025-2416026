@@ -55,7 +55,7 @@ void TitleScene::Init(void)
 	state_ = TITLE_STATE::START_GAME;
 	isViewInfo_ = false; // —V‚Ñ•û•\Ž¦
 
-	SoundManager::GetInstance().Play(SoundManager::SRC::BGM_TITLE, Sound::TIMES::LOOP);
+	SoundManager::GetInstance().Play(SoundManager::SRC::BGM_TITLE, true);
 
 	selectScale_ = 0.35f;
 	isPvActive_ = false;
@@ -85,7 +85,7 @@ void TitleScene::Update(void)
 		{
 		case TITLE_STATE::START_GAME:
 		{
-			sound.Play(SoundManager::SRC::SE_CLICK, Sound::TIMES::ONCE);
+			sound.Play(SoundManager::SRC::SE_CLICK, false);
 
 			Application::GetInstance().SetIsExitMenu(true);
 
@@ -174,7 +174,7 @@ void TitleScene::Update(void)
 			PauseMovieToGraph(pv_);
 			isPvActive_ = false;
 			pvTime_ = 0.0f;
-			sound.Play(SoundManager::SRC::BGM_TITLE);
+			sound.Play(SoundManager::SRC::BGM_TITLE, true);
 		}
 	}
 }

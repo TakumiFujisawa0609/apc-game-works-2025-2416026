@@ -30,6 +30,7 @@ public:
 		IDLE,	  // 待機状態
 		SEARCH,   // プレイヤー追従
 		MOVE,     // 移動状態
+		KNOCK,    // 吹っ飛ばし状態
 		ATTACK_START, 
 		ATTACK_ACTIVE,
 		ATTACK_END,
@@ -74,6 +75,8 @@ protected:
 
 		ACTION_STATE actionState;
 
+		ANIM_STATE animState;
+
 		StatusEnemy::TYPE type;
 
 		float curAtkInterval;
@@ -84,6 +87,9 @@ protected:
 
 		// 索敵有効フラグ
 		bool isHearing;
+
+		// 攻撃有効フラグ
+		bool isAttack;
 	};
 
 	ParamEnemy paramEnemy_;
@@ -108,17 +114,26 @@ protected:
 	void UpdateAnim(void)override;
 
 	void SearchField(void);
+
+	/// @brief 索敵位置描画処理
 	void DrawSearchRange(void);
 
+	void SearchAttackField(void);
+
+	/// @brief 索敵位置描画処理
+	void DrawAttackRange(void);
+
+
 	void UpdateState(void);
-	virtual void UpdateStateIdle(void);
 	virtual void UpdateStateSpawn(void);
-	virtual void UpdateStateSearch(void);
+	virtual void UpdateStateIdle(void);
 	virtual void UpdateStateMove(void);
+	virtual void UpdateStateKnock(void);
 	virtual void UpdateStateAtk(void);
 
-	void ChangeActionState(ACTION_STATE state);
+	void ChangeActionState(ACTION_STATE _state);
 
+	virtual void ChangeAnimState(ANIM_STATE _state, bool _isLoop = true) { paramEnemy_.animState = _state; };
 	virtual void AnimState(void) = 0;
 
 	virtual void DamagePerform(void) = 0;

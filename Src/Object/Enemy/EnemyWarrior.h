@@ -40,11 +40,11 @@ protected:
 
 	void AnimState(void)override;
 
+	void ChangeAnimState(ANIM_STATE _state, bool isLoop = true)override;
+
 
 private:
 
 	// アニメーション速度
 	std::map<WARRIER_ANIM, float> animSpeed_;
-	
-	WARRIER_ANIM animState_;
 };

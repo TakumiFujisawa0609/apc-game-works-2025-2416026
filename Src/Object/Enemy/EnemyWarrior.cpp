@@ -69,31 +69,56 @@ void EnemyWarrior::InitAnim(void)
 	}
 
 	// 待機アニメーション再生
-	animState_ = WARRIER_ANIM::IDLE;
-	anim_->Play(static_cast<int>(WARRIER_ANIM::IDLE));
+	ChangeAnimState(ANIM_STATE::IDLE);
 }
 
 void EnemyWarrior::DamagePerform(void)
 {
 	if (paramChara_.hp > 0)
 	{
-		animState_ = WARRIER_ANIM::HIT_1;
-		anim_->Play(static_cast<int>(WARRIER_ANIM::HIT_1), false);
+		ChangeAnimState(ANIM_STATE::HIT_1, false);
 	}
 	else
 	{
-		animState_ = WARRIER_ANIM::DEATH;
-		anim_->Play(static_cast<int>(WARRIER_ANIM::DEATH), false);
+		ChangeAnimState(ANIM_STATE::DEATH, false);
 	}
 }
 
 void EnemyWarrior::AnimState(void)
 {
-
-	if (animState_ == WARRIER_ANIM::HIT_1 && anim_->IsEnd())
+	if (paramEnemy_.animState == ANIM_STATE::HIT_1 ||
+		paramEnemy_.animState == ANIM_STATE::HIT_2)
 	{
-		animState_ = WARRIER_ANIM::IDLE;
-		anim_->Play(static_cast<int>(WARRIER_ANIM::IDLE));
+		if (anim_->IsEnd())
+		{
+			ChangeAnimState(ANIM_STATE::IDLE);
+		}
+		return;
 	}
+
+	if (paramEnemy_.actionState == ACTION_STATE::MOVE && paramChara_.timeInv <= 0.0f)
+	{
+		ChangeAnimState(ANIM_STATE::WALK);
+	}
+	else
+	{
+		ChangeAnimState(ANIM_STATE::IDLE);
+	}
+}
+
+void EnemyWarrior::ChangeAnimState(ANIM_STATE _state, bool _isLoop)
+{
+	paramEnemy_.animState = _state;
+	WARRIER_ANIM animType = WARRIER_ANIM::NONE;
+
+	if (_state == ANIM_STATE::SPAWN) { animType = WARRIER_ANIM::SPAWN; }
+	if (_state == ANIM_STATE::IDLE) { animType = WARRIER_ANIM::IDLE; }
+	if (_state == ANIM_STATE::WALK) { animType = WARRIER_ANIM::WALK; }
+	if (_state == ANIM_STATE::ATTACK) { animType = WARRIER_ANIM::ATTACK; }
+	if (_state == ANIM_STATE::HIT_1) { animType = WARRIER_ANIM::HIT_1; }
+	if (_state == ANIM_STATE::HIT_2) { animType = WARRIER_ANIM::HIT_2; }
+	if (_state == ANIM_STATE::DEATH) { animType = WARRIER_ANIM::DEATH; }
+
+	anim_->Play(static_cast<int>(animType), _isLoop);
 }
 

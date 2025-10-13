@@ -9,6 +9,9 @@ class Enemy;
 
 class CollisionManager
 {
+
+	using COLLISION_TYPE = Object::COLLISION_TYPE;
+
 public:
 
 	/// <summary>

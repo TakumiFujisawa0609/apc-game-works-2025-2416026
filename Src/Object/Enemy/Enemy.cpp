@@ -55,6 +55,7 @@ void Enemy::SetParam(void)
 	paramEnemy_.type = status_.GetEnemyType();
 	paramEnemy_.actionState = ACTION_STATE::IDLE;
 	paramEnemy_.searchRange = status_.GetSearchRange();
+	paramEnemy_.atkRange = status_.GetAtkRange();
 
 	paramChara_.quaRot = Quaternion::Identity();
 	paramChara_.quaRotLocal = Quaternion::Identity(); // ローカル回転初期化
@@ -78,7 +79,24 @@ void Enemy::SetParam(void)
 
 void Enemy::SetDamage(int _damage)
 {
+	if (paramChara_.timeInv > 0.0f) { return; }
+
 	Object::SetDamage(_damage);
+
+	const float knockXZ = 1.0f;
+	const float knockY = 4.5f;
+
+	//　吹っ飛ばし処理
+	VECTOR dir = paramChara_.dir;
+	dir.x /= 5.0f;
+	dir.z /= 5.0f;
+
+	// 後方+上に吹っ飛ばす
+	dir.y = knockY;
+	dir.x *= -(knockXZ);
+	dir.z *= -(knockXZ);
+	paramChara_.knockBack = dir;
+	ChangeActionState(ACTION_STATE::KNOCK);
 
 	// ダメージ演出
 	DamagePerform();
@@ -86,12 +104,15 @@ void Enemy::SetDamage(int _damage)
 
 void Enemy::Update(void)
 {
-	if (!paramChara_.isActive) return;
+	if (!paramChara_.isActive ||
+		paramEnemy_.animState == ANIM_STATE::DEATH && anim_->IsEnd() && paramChara_.hp <= 0) return;
 
 	Object::Update();
 
 	// 索敵範囲有効
 	SearchField();
+
+	SearchAttackField();
 
 	// 状態更新
 	UpdateState();
@@ -104,44 +125,23 @@ void Enemy::Update(void)
 }
 void Enemy::UpdateState(void)
 {
+	if (paramEnemy_.actionState == ACTION_STATE::SPAWN) { UpdateStateSpawn(); }
 	if (paramEnemy_.actionState == ACTION_STATE::IDLE) { UpdateStateIdle(); }
-	if (paramEnemy_.actionState == ACTION_STATE::SEARCH) { UpdateStateSearch(); }
 	if (paramEnemy_.actionState == ACTION_STATE::MOVE) { UpdateStateMove(); }
+	if (paramEnemy_.actionState == ACTION_STATE::KNOCK) { UpdateStateKnock(); }
 	//if (paramEnemy_.actionState == ACTION_STATE::IDLE) { UpdateStateIdle(); }
-}
-
-void Enemy::UpdateStateIdle(void)
-{
-	if (paramEnemy_.isHearing)
-	{
-		ChangeActionState(ACTION_STATE::SEARCH);
-	}
-
-	if (!AsoUtility::EqualsVZero(paramChara_.velocity))
-	{
-		UpdateModelFrames();
-	}
 }
 
 void Enemy::UpdateStateSpawn(void)
 {
 }
 
-void Enemy::UpdateStateSearch(void)
+void Enemy::UpdateStateIdle(void)
 {
-	if (!paramEnemy_.isHearing)
+	if (paramEnemy_.isHearing)
 	{
-		ChangeActionState(ACTION_STATE::IDLE);
+		ChangeActionState(ACTION_STATE::MOVE);
 	}
-
-	// プレイヤー追従
-	LookPlayerPos();
-}
-
-void Enemy::UpdateStateMove(void)
-{
-	// プレイヤー追従
-	LookPlayerPos();
 
 	if (!AsoUtility::EqualsVZero(paramChara_.velocity))
 	{
@@ -149,8 +149,59 @@ void Enemy::UpdateStateMove(void)
 	}
 }
 
+
+void Enemy::UpdateStateMove(void)
+{
+	if (!paramEnemy_.isHearing) { ChangeActionState(ACTION_STATE::IDLE); }
+
+	//if (paramEnemy_.isAttack) { ChangeActionState(ACTION_STATE::ATTACK_ACTIVE); }
+
+	if (paramChara_.timeInv > 0.0f) return;
+
+
+	// プレイヤー追従
+	LookPlayerPos();
+
+	VECTOR pos = VAdd(paramChara_.pos, paramChara_.posLocal);
+
+	float speedZ = ((pos.z < player_.GetPos().z) ? paramChara_.speed : -paramChara_.speed);
+	float accZ = ((pos.z < player_.GetPos().z) ? paramChara_.speedAcc : -paramChara_.speedAcc);
+	accZ = ((pos.z == player_.GetPos().z) ? 0.0f : accZ);
+
+	float speedX = ((pos.z < player_.GetPos().x) ? paramChara_.speed : -paramChara_.speed);
+	float accX = ((pos.x < player_.GetPos().z) ? paramChara_.speedAcc : -paramChara_.speedAcc);
+	accZ = ((pos.z == player_.GetPos().x) ? 0.0f : accZ);
+
+	VECTOR velo;
+	velo.x = _Move(&paramChara_.velocity.x, accX, speedX);
+	velo.y = 0.0f;
+	velo.z = _Move(&paramChara_.velocity.z, accZ, speedZ);
+
+	paramChara_.velocity = VAdd(paramChara_.velocity, velo);
+
+	VECTOR dir = { paramChara_.dir.x, 0.0f, paramChara_.dir.z };
+
+	paramChara_.pos = VAdd(paramChara_.pos, VAdd(dir, velo));
+
+	if (!AsoUtility::EqualsVZero(velo))
+	{
+		UpdateModelFrames();
+	}
+
+}
+
+void Enemy::UpdateStateKnock(void)
+{
+	UpdateModelFrames();
+	if (AsoUtility::EqualsVZero(paramChara_.knockBack)) 
+	{
+		ChangeActionState(ACTION_STATE::IDLE);
+	}
+}
+
 void Enemy::UpdateStateAtk(void)
 {
+
 }
 
 void Enemy::ChangeActionState(ACTION_STATE state)
@@ -161,14 +212,32 @@ void Enemy::ChangeActionState(ACTION_STATE state)
 
 void Enemy::Draw(void)
 {
-	if (!paramChara_.isActive) return;
-
 	SceneManager& scene = SceneManager::GetInstance();
+
+	if (!paramChara_.isActive ||
+		paramEnemy_.animState == ANIM_STATE::DEATH && anim_->IsEnd() && paramChara_.hp <= 0) return;
 
 	if (scene.GetIsDebugMode())
 	{
 		DrawSearchRange();
+
+		DrawAttackRange();
 	}
+
+	COLOR_F defaultColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+	COLOR_F color = defaultColor;
+
+	if (paramChara_.timeInv > 0.0f && paramEnemy_.animState != ANIM_STATE::DEATH)
+	{
+		color = { 125,0,0,25 };
+		/*
+		int team = static_cast<int>(paramChara_.timeAct * 10.0f);
+		if (team % COLOR_TEAM == 0)
+		{
+			color = paramChara_.damageColor;
+		}*/
+	}
+	MV1SetDifColorScale(paramChara_.handle, color);
 
 	Object::Draw();
 }
@@ -182,15 +251,22 @@ void Enemy::LookPlayerPos(void)
 {
 	VECTOR pPos = player_.GetPos();
 
+	// ワールド座標
+	VECTOR ePos = VAdd(paramChara_.pos, paramChara_.posLocal);
+
 	// プレイヤーと敵の距離
-	VECTOR diff = VSub(paramChara_.pos, pPos);
+	VECTOR diff = VSub(pPos, ePos);
 
-	// プレイヤーの方向を追尾
-	paramChara_.dir = VNorm(diff);
-	float rotY = atan2f(diff.x, diff.z);
-	Quaternion pDir = Quaternion::Euler({ 0.0f, rotY, 0.0f });
+	// 正規化したプレイヤーの方向を追尾
+	paramChara_.dir = VNorm({ diff.x, 0.0f, diff.z });
+	
+	//float rotY = atan2f(diff.x, diff.z);
+	//Quaternion pDir = Quaternion::Euler({ 0.0f, rotY, 0.0f });
 
-	paramChara_.quaRot = Quaternion::Mult(paramChara_.quaRotLocal, pDir);
+	//VECTOR dir = { paramChara_.dir.x, 0.0f, paramChara_.dir.z };
+	VECTOR dir = paramChara_.dir;
+	// 向きに反映
+	paramChara_.quaRot = Quaternion::LookRotation(dir, AsoUtility::AXIS_Y);
 }
 
 void Enemy::UpdateAnim(void)
@@ -208,9 +284,38 @@ void Enemy::SearchField(void)
 
 	float diff = ((vec.x * vec.x) + (vec.z * vec.z));
 
+	float range = (paramEnemy_.searchRange * paramEnemy_.searchRange);
 	// 視野左右内に入っている
-	paramEnemy_.isHearing = (diff <= (paramEnemy_.searchRange * paramEnemy_.searchRange));
+	paramEnemy_.isHearing = (diff <= range);
 }
+
+void Enemy::SearchAttackField(void)
+{
+	VECTOR pPos = player_.GetPos();
+
+	// 敵の向いている方向
+	VECTOR eDir = VNorm(paramChara_.dir);
+
+	// 敵とプレイヤーとの間のベクトル
+	VECTOR diff = VSub(pPos, VAdd(paramChara_.pos, paramChara_.posLocal));
+
+	// 敵から見たプレイヤーの方向
+	VECTOR dirPlayerFromEnemy = VNorm(diff);
+
+
+	// 内積を使ってベクトルの比較を行う
+	// (+1.0)：２つのベクトルは同じ方向
+	// (0.0)：２つのベクトルは直交
+	// (-1.0)：２つのベクトルは逆方向
+	float dot = VDot(eDir, dirPlayerFromEnemy);
+	float angle = acosf(dot);
+
+	const float colRad = AsoUtility::Deg2Rad(paramEnemy_.atkRange);
+
+	// 視野左右内に入っている
+	paramEnemy_.isAttack = (angle <= colRad);
+}
+
 void Enemy::DrawSearchRange(void)
 {
 	/* 索敵範囲描画 */
@@ -244,4 +349,39 @@ void Enemy::DrawSearchRange(void)
 
 		DrawTriangle3D(pos, leftPos, rightPos, color, true);
 	}
+}
+
+void Enemy::DrawAttackRange(void)
+{
+	unsigned int color = ((paramEnemy_.isAttack) ? 0xffaaaa : 0xaa00ff);
+	const float searchAngle = 50.0f;
+
+	MATRIX mat = Quaternion::ToMatrix(paramChara_.quaRot);
+
+	VECTOR pos = VAdd(paramChara_.pos, paramChara_.posLocal);
+
+	// 前方方向
+	VECTOR forward = paramChara_.quaRot.GetForward();
+
+	// 左側方向
+	MATRIX leftMat = MMult(mat, MGetRotY(AsoUtility::Deg2Rad(-searchAngle)));
+	VECTOR left = VTransform(AsoUtility::DIR_F, leftMat);
+
+	// 右側方向
+	MATRIX rightMat = MMult(mat, MGetRotY(AsoUtility::Deg2Rad(searchAngle)));
+	VECTOR right = VTransform(AsoUtility::DIR_F, rightMat);
+
+
+	// 正面の位置
+	VECTOR forwardPos = VAdd(pos, VScale(forward, paramEnemy_.atkRange));
+
+	// 左の位置
+	VECTOR leftPos = VAdd(pos, VScale(left, paramEnemy_.atkRange));
+
+	// 右の位置
+	VECTOR rightPos = VAdd(pos, VScale(right, paramEnemy_.atkRange));
+
+	// 描画処理
+	DrawTriangle3D(pos, leftPos, forwardPos, color, true);
+	DrawTriangle3D(pos, forwardPos, rightPos, color, true);
 }

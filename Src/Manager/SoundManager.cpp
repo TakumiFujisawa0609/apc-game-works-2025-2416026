@@ -11,7 +11,8 @@ const std::string SoundManager::PATH_BGM_TITLE = ResourceManager::PATH_BGM + "BG
 const std::string SoundManager::PATH_BGM_GAME  = ResourceManager::PATH_BGM + "GameBGM.mp3";
 
 const std::string SoundManager::PATH_SE_CLICK  = ResourceManager::PATH_SE + "Click.mp3";
-const std::string SoundManager::PATH_SE_ATTACK = ResourceManager::PATH_SE + "Attack.mp3";
+const std::string SoundManager::PATH_SE_SWORD_JUB = ResourceManager::PATH_SE + "SwordAttackJub.mp3";
+const std::string SoundManager::PATH_SE_SWORD_STRONG = ResourceManager::PATH_SE + "SwordAttackStrong.mp3";
 const std::string SoundManager::PATH_SE_KNOCK  = ResourceManager::PATH_SE + "KnockDown.mp3";
 
 void SoundManager::CreateInstance(void)
@@ -45,7 +46,8 @@ void SoundManager::SetSounds(void)
 	// SE
 
 	SetSound(SRC::SE_CLICK, PATH_SE_CLICK, Sound::TYPE::SOUND_2D, VOLUME_CLICK);
-	SetSound(SRC::SE_ATTACK, PATH_SE_ATTACK, Sound::TYPE::SOUND_2D, VOLUME_ATTACK);
+	SetSound(SRC::SE_SWORD_JUB, PATH_SE_SWORD_JUB, Sound::TYPE::SOUND_2D, VOLUME_ATTACK);
+	SetSound(SRC::SE_SWORD_STRONG, PATH_SE_SWORD_STRONG, Sound::TYPE::SOUND_2D, VOLUME_ATTACK);
 	SetSound(SRC::SE_KNOCK, PATH_SE_KNOCK, Sound::TYPE::SOUND_2D, VOLUME_KNOCK);
 
 
@@ -55,13 +57,13 @@ void SoundManager::SetSounds(void)
 	SetSound(SRC::BGM_GAME, PATH_BGM_GAME, Sound::TYPE::SOUND_2D, VOLUME_GAME);
 
 }
-void SoundManager::SetSound(SoundManager::SRC src, const std::string& path, Sound::TYPE type, float maxVolume)
+void SoundManager::SetSound(SoundManager::SRC _src, const std::string& path, Sound::TYPE type, float maxVolume)
 {
 	Sound res;
 
 	res = Sound(type, path);
 	res.SetMaxVolume(maxVolume);
-	sounds_.emplace(src, res);
+	sounds_.emplace(_src, res);
 }
 
 
@@ -91,9 +93,9 @@ void SoundManager::Destroy(void)
 	delete instance_;
 }
 
-bool SoundManager::Play(SRC src, Sound::TIMES times, bool isForce)
+bool SoundManager::Play(SRC _src, bool _isLoop, bool _isForce)
 {
-	const auto& lPair = sounds_.find(src);
+	const auto& lPair = sounds_.find(_src);
 
 	if (lPair == sounds_.end())
 	{
@@ -111,11 +113,12 @@ bool SoundManager::Play(SRC src, Sound::TIMES times, bool isForce)
 	}
 
 	// 2Dサウンド再生処理
-	return lPair->second.Play(times, isForce);
+	Sound::TIMES times = ((_isLoop) ? Sound::TIMES::LOOP : Sound::TIMES::ONCE);
+	return lPair->second.Play(times, _isForce);
 }
-bool SoundManager::Play(SRC src, Sound::TIMES times, VECTOR pos, float radius)
+bool SoundManager::Play(SRC _src, bool _isLoop, VECTOR _pos, float _radius)
 {
-	const auto& lPair = sounds_.find(src);
+	const auto& lPair = sounds_.find(_src);
 
 	if (lPair == sounds_.end())
 	{
@@ -133,12 +136,13 @@ bool SoundManager::Play(SRC src, Sound::TIMES times, VECTOR pos, float radius)
 	}
 
 	// 3Dサウンド再生処理
-	return lPair->second.Play(times, pos, radius);
+	Sound::TIMES times = ((_isLoop) ? Sound::TIMES::LOOP : Sound::TIMES::ONCE);
+	return lPair->second.Play(times, _pos, _radius);
 }
 
-void SoundManager::Stop(SRC src)
+void SoundManager::Stop(SRC _src)
 {
-	const auto& listPair = sounds_.find(src);
+	const auto& listPair = sounds_.find(_src);
 
 	// 判定対象
 	if (listPair == sounds_.end())
@@ -171,9 +175,9 @@ void SoundManager::StopAll(void)
 	}
 }
 
-void SoundManager::SetVolume(SRC src, float per)
+void SoundManager::SetVolume(SRC _src, float per)
 {
-	const auto& lPair = sounds_.find(src);
+	const auto& lPair = sounds_.find(_src);
 
 	if (lPair != sounds_.end())
 	{
@@ -187,9 +191,9 @@ void SoundManager::SetVolume(SRC src, float per)
 #endif
 }
 
-bool SoundManager::IsSoundStart(SRC src)
+bool SoundManager::IsSoundStart(SRC _src)
 {
-	const auto& soundlist = sounds_.find(src);
+	const auto& soundlist = sounds_.find(_src);
 
 	if (soundlist == sounds_.end())
 	{
@@ -203,9 +207,9 @@ bool SoundManager::IsSoundStart(SRC src)
 	return soundlist->second.IsStart();
 }
 
-bool SoundManager::IsSoundPlay(SRC src)
+bool SoundManager::IsSoundPlay(SRC _src)
 {
-	const auto& soundlist = sounds_.find(src);
+	const auto& soundlist = sounds_.find(_src);
 
 	if (soundlist == sounds_.end())
 	{
@@ -219,9 +223,9 @@ bool SoundManager::IsSoundPlay(SRC src)
 	return soundlist->second.IsPlay();
 }
 
-bool SoundManager::IsSoundEnd(SRC src)
+bool SoundManager::IsSoundEnd(SRC _src)
 {
-	const auto& soundlist = sounds_.find(src);
+	const auto& soundlist = sounds_.find(_src);
 
 	if (soundlist == sounds_.end())
 	{

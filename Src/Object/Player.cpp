@@ -8,7 +8,7 @@
 #include "./Object.h"
 #include "../Application.h"
 #include "../Manager/ResourceManager.h"
-#include "../Manager/Resource.h"
+#include "../Manager/SoundManager.h"
 #include "../Manager/InputManager.h"
 #include "../Manager/SceneManager.h"
 #include "./Status/StatusData.h"
@@ -171,9 +171,6 @@ void Player::Update(void)
 
 	// ”½“]‰ñ“]ƒtƒ‰ƒO
 	bool isRevert = false;
-
-	// Œ»İˆÊ’uŠ„‚è“–‚Ä
-	paramChara_.prePos = paramChara_.pos;
 
 	// ó‘ÔXVˆ—
 	UpdateActionState();
@@ -617,6 +614,9 @@ void Player::Move(void)
 			paramChara_.velocity.x *= scale;
 			paramChara_.velocity.z *= scale;
 		}
+
+		// ˆÚ“®•ûŒü‚ğæ“¾
+		paramChara_.dir = VNorm({ paramChara_.velocity.x, 0.0f, paramChara_.velocity.z });
 	}
 
 	// ˆÊ’u‚É”½‰f‚·‚é
@@ -740,7 +740,7 @@ void Player::UpdateMortion(MORTION_TYPE _type)
 		int state = static_cast<int>(paramChara_.attackState);
 
 		// Ÿ‚ÌUŒ‚ó‘Ô‚É‘JˆÚ
-		ChangeAttackStateNext(time[state]);
+		ChangeAttackStateNext(time[state], SoundManager::SRC::SE_SWORD_JUB);
 
 		// ‘Ò‹@ó‘Ô‚É–ß‚·
 		if (paramChara_.attackState == ATTACK_STATE::NONE)

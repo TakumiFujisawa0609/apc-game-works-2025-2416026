@@ -56,7 +56,7 @@ void GameScene::Init(void)
 
 	// BGMçƒê∂
 	SoundManager::GetInstance().Play(SoundManager::SRC::BGM_GAME,
-		Sound::TIMES::LOOP, true);
+		true, true);
 }
 void GameScene::ReInit(void)
 {
