@@ -145,11 +145,11 @@ void GameScene::Draw(void)
 	// ƒQ[ƒ€•`‰æ
 	DrawUI();
 
+	EnemyController::GetInstance().DrawDebug();
+	 
 #ifdef _DEBUG
 
 	CollisionManager::GetInstance().DrawDebug();
-
-	EnemyController::GetInstance().DrawDebug();
 
 	player_->DrawDebug();
 

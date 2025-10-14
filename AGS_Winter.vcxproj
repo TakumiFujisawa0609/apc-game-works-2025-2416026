@@ -166,6 +166,7 @@
     <ClInclude Include="Src\Object\Status\StatusEnemy.h" />
     <ClInclude Include="Src\Object\Status\StatusPlayer.h" />
     <ClInclude Include="Src\Object\Status\StatusWeapon.h" />
+    <ClInclude Include="Src\resource.h" />
     <ClInclude Include="Src\Scene\GameClearScene.h" />
     <ClInclude Include="Src\Scene\GameOverScene.h" />
     <ClInclude Include="Src\Scene\GameScene.h" />
@@ -212,6 +213,9 @@
     <ClCompile Include="Src\Utility\AsoUtility.cpp" />
     <ClCompile Include="Src\Utility\UtilityCollision.cpp" />
     <ClCompile Include="Src\Utility\UtilityCommon.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Src\AGS_Winter.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

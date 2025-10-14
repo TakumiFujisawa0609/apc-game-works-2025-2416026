@@ -1,6 +1,3 @@
-/* --------------
-　ゲーム終了処理
- ---------------- */
 #include "GameExit.h"
 #include "./Font.h"
 #include "../Application.h"
@@ -43,9 +40,9 @@ void GameExit::Init(void)
 	isActiveMenu_ = false;
 }
 
-/*　更新処理　*/
 void GameExit::Update(void)
 {
+	/*　更新処理　*/
 	SoundManager& sound = SoundManager::GetInstance();
 	SceneManager& scene = SceneManager::GetInstance();
 

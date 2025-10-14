@@ -2,6 +2,7 @@
 #include <DxLib.h>
 #include <vector>
 #include <cassert>
+#include <algorithm>
 #include "../Object.h"
 #include "./Enemy.h"
 #include "./EnemyWarrior.h"
@@ -44,13 +45,17 @@ void EnemyController::Init(void)
 {
 	enemys_.clear();
 
-	const int rangeXZ = 250;
+	const int rangeXZ = 250.0f;
+	float x, z = 0.0f;
 	
 	for (int i = 0; i < 30; i++)
 	{
-		float x = static_cast<float>(GetRand(rangeXZ + rangeXZ) - rangeXZ);
-		float z = static_cast<float>(GetRand(rangeXZ));
+		int randX = GetRand(rangeXZ + rangeXZ) - rangeXZ;
+		x = static_cast<float>(randX);
+		z = static_cast<float>(GetRand(rangeXZ));
 		
+		x = std::clamp(x, static_cast<float>(-rangeXZ), static_cast<float>(rangeXZ));
+		z = std::clamp(z, 0.0f, static_cast<float>(rangeXZ));
 		EnemySpawn(ENEMY_TYPE::SKELETON_WARRIOR, { x, 0.0f, z });
 	}
 }
