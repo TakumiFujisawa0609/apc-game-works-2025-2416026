@@ -18,32 +18,32 @@ AnimationController::AnimationController(int modelId)
 }
 
 
-void AnimationController::AddInFbx(int type, float speed, int animIndex)
+void AnimationController::AddInFbx(int _type, float _speed, int _animIndex)
 {
 	Animation animation;
-	animation.animIndex = animIndex;
+	animation.animIndex = _animIndex;
 
-	animation.speed = speed;
+	animation.speed = _speed;
 
 	// アニメーション割り当て処理
-	Add(type, speed, animation);
+	Add(_type, _speed, animation);
 }
-void AnimationController::Add(int type, float speed, const std::string path)
+void AnimationController::Add(int _type, float _speed, const std::string _path)
 {
 	Animation animation;
-	animation.model = MV1LoadModel(path.c_str());
+	animation.model = MV1LoadModel(_path.c_str());
 	animation.animIndex = -1;
 
-	animation.speed = speed;
+	animation.speed = _speed;
 
 	// アニメーション割り当て処理
-	Add(type, speed, animation);
+	Add(_type, _speed, animation);
 }
 
-void AnimationController::Play(int type, bool isLoop)
+void AnimationController::Play(int _type, bool isLoop)
 {
 	// 同じアニメーションだったら再生を継続する
-	if (playType_ == type) return;
+	if (playType_ == _type) return;
 	
 	if (playType_ != -1)
 	{
@@ -55,8 +55,8 @@ void AnimationController::Play(int type, bool isLoop)
 	isStop_ = false;
 
 	// アニメーション種別を変更
-	playType_ = type;
-	playAnim_ = animations_[type];
+	playType_ = _type;
+	playAnim_ = animations_[_type];
 
 	// 初期化
 	playAnim_.step = 0.0f;	
@@ -218,23 +218,22 @@ float AnimationController::GetPlayTimeTotal(void)
 	return time;
 }
 
-void AnimationController::Add(int type, float speed, Animation& animation)
+void AnimationController::Add(int _type, float _speed, Animation& _animation)
 {
-	animation.speed = speed;
+	_animation.speed = _speed;
 
-	
-	if (animations_.count(type) == 0)
+	if (animations_.count(_type) == 0)
 	{
 		// 動的配列に追加
-		animations_.emplace(type, animation);
+		animations_.emplace(_type, _animation);
 	}
 }
 
-bool AnimationController::IsFindAnimation(int type)
+bool AnimationController::IsFindAnimation(int _type)
 {
 	bool isFind = false;
 
-	auto it = animations_.find(type);
+	auto it = animations_.find(_type);
 	if (it != animations_.end())
 	{
 		// 発見

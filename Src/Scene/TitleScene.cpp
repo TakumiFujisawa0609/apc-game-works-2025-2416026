@@ -81,41 +81,41 @@ void TitleScene::Update(void)
 	{
 		switch (state_)
 		{
-		case TITLE_STATE::START_GAME:
-		{
-			sound.Play(SoundManager::SRC::SE_CLICK, false);
+			case TITLE_STATE::START_GAME:
+			{
+				sound.Play(SoundManager::SRC::SE_CLICK, false);
 
-			Application::GetInstance().SetIsExitMenu(true);
+				Application::GetInstance().SetIsExitMenu(true);
+			
+				scene.ChangeScene(SceneManager::SCENE_ID::GAME);
+			}
+			break;
 
-			scene.ChangeScene(SceneManager::SCENE_ID::GAME);
-		}
-		break;
+			case TITLE_STATE::INFO:
+			{
+				// 遊び方描画フラグ変更処理
+				isViewInfo_ = true;
 
-		case TITLE_STATE::INFO:
-		{
-			// 遊び方描画フラグ変更処理
-			isViewInfo_ = true;
+				Application::GetInstance().SetIsExitMenu(false);
 
-			Application::GetInstance().SetIsExitMenu(false);
+				info_ = INFO_TYPE::PLAY_PAD;
 
-			info_ = INFO_TYPE::PLAY_PAD;
+				// 演出時間割り当て
+				arrowPerformTime_ = ARROW_PERFORM_TIME;
 
-			// 演出時間割り当て
-			arrowPerformTime_ = ARROW_PERFORM_TIME;
+				// 矢印の大きさ割り当て
+				arrowScale_ = ARROW_SCALE;
+			}
+			break;
 
-			// 矢印の大きさ割り当て
-			arrowScale_ = ARROW_SCALE;
-		}
-		break;
+			case TITLE_STATE::GAME_END:
+			{
+				sound.Play(SoundManager::SRC::SE_CLICK, false);
 
-		case TITLE_STATE::GAME_END:
-		{
-			sound.Play(SoundManager::SRC::SE_CLICK, false);
-
-			// ゲーム終了処理
-			Application::GetInstance().SetIsGameEnd();
-		}
-		break;
+				// ゲーム終了処理
+				Application::GetInstance().SetIsGameEnd();
+			}
+			break;
 		}
 	}
 

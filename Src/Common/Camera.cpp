@@ -95,7 +95,7 @@ void Camera::SetBeforeDraw(void)
 	}
 
 	// 追尾位置
-	DrawSphere3D(pos_.target, 10.0f, 10, GetColor(255, 0, 0), GetColor(255, 0, 0), true);
+	//DrawSphere3D(pos_.target, 10.0f, 10, GetColor(255, 0, 0), GetColor(255, 0, 0), true);
 
 	// DXライブラリのカメラとEffekseerのカメラを同期する
 	Effekseer_Sync3DSetting();

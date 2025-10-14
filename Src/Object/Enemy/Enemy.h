@@ -66,6 +66,7 @@ public:
 	/// @brief s“®ó‘Ôæ“¾
 	ACTION_STATE GetActionState(void)const { return paramEnemy_.actionState; };
 	
+	ANIM_STATE GetAnimState(void)const { return paramEnemy_.animState; };
 
 protected:
 

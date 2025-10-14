@@ -218,21 +218,16 @@ void Enemy::Draw(void)
 		DrawSearchRange();
 
 		DrawAttackRange();
-	}
 
-	COLOR_F color = { 1.0f, 1.0f, 1.0f, 1.0f };
+		COLOR_F color = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-	if (paramChara_.timeInv > 0.0f && paramEnemy_.animState != ANIM_STATE::DEATH)
-	{
-		color = { 125,0,0,25 };
-		/*
-		int team = static_cast<int>(paramChara_.timeAct * 10.0f);
-		if (team % COLOR_TEAM == 0)
+		if (paramChara_.timeInv > 0.0f && paramEnemy_.animState != ANIM_STATE::DEATH)
 		{
-			color = paramChara_.damageColor;
-		}*/
+			color = { 75, 0, 0, 25 };
+		}
+		// ê‘Ç…ï`âÊ
+		MV1SetDifColorScale(paramChara_.handle, color);
 	}
-	MV1SetDifColorScale(paramChara_.handle, color);
 
 	Object::Draw();
 }

@@ -44,29 +44,41 @@ void EnemyController::Init(void)
 {
 	enemys_.clear();
 
-	const float rangeXZ = 250.0f;
+	const int rangeXZ = 250;
 	
 	for (int i = 0; i < 30; i++)
 	{
-		//break;
 		float x = static_cast<float>(GetRand(rangeXZ + rangeXZ) - rangeXZ);
 		float z = static_cast<float>(GetRand(rangeXZ));
 		
 		EnemySpawn(ENEMY_TYPE::SKELETON_WARRIOR, { x, 0.0f, z });
 	}
-
-	//EnemySpawn(ENEMY_TYPE::SKELETON_WARRIOR, { static_cast<float>(GetRand(rangeXZ)), 0.0f, static_cast<float>(GetRand(rangeXZ)) });
 }
 
 void EnemyController::Update(void)
 {
 	if (enemys_.empty()) return;
 
+	int cnt = enemys_.size();
 	for (auto& enemy : enemys_)
 	{
-		if (!enemy->GetIsActive()) continue;
+		if (enemy->GetCurHp() <= 0 && enemy->GetIsAnimEnd())
+		{
+			if (enemy->GetAnimState() == Enemy::ANIM_STATE::DEATH ||
+				enemy->GetAnimState() == Enemy::ANIM_STATE::HIT_2)
+			{
+				cnt--;
+			}
+		}
+
+		if (!enemy->GetIsActive())continue;
 
 		enemy->Update();
+	}
+
+	if (cnt <= 0)
+	{
+		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::CLEAR);
 	}
 }
 
@@ -74,13 +86,20 @@ void EnemyController::Draw(void)
 {
 	if (enemys_.empty()) return;
 
-	int cnt = 0;
+	int cnt = enemys_.size();
 	for (auto& enemy : enemys_)
 	{
-		if (!enemy->GetIsActive()) continue;
+		if (enemy->GetCurHp() <= 0 && enemy->GetIsAnimEnd())
+		{
+			if (enemy->GetAnimState() == Enemy::ANIM_STATE::DEATH ||
+				enemy->GetAnimState() == Enemy::ANIM_STATE::HIT_2)
+			{
+				cnt--;
+			}
+		}
 
+		if (!enemy->GetIsActive()) continue;
 		enemy->Draw();
-		cnt++;
 	}
 
 	DrawFormatString(Application::SCREEN_HALF_X, 0, 0xffffff, "“G‚Ì”FŽc‚è%d‘Ì", cnt);
@@ -89,11 +108,14 @@ void EnemyController::Draw(void)
 void EnemyController::DrawDebug(void)
 {
 	if (!SceneManager::GetInstance().GetIsDebugMode())return;
+	int y = 136;
 	for (auto& enemy : enemys_)
 	{
-		if (!enemy->GetIsActive()) continue;
+		//if (!enemy->GetIsActive()) continue;
+		if (enemy->GetAnimState() == Enemy::ANIM_STATE::DEATH) continue;
+
 		enemy->DrawDebug();
-		DrawFormatString(0, 132, 0xff0000, "enemy: pos(%.2f,%.2f,%.2f), velo(%.2f,%.2f,%.2f), knock(%.1f, %.1f, %.1f), hp(%d), inv(%.2f)\n",
+		DrawFormatString(0, y, 0xff0000, "enemy: pos(%.2f,%.2f,%.2f), velo(%.2f,%.2f,%.2f), knock(%.1f, %.1f, %.1f), hp(%d), inv(%.2f)\n",
 			enemy->GetPos().x,enemy->GetPos().y,enemy->GetPos().z,
 			AsoUtility::Rad2Deg(enemy->GetVelocity().x),
 			AsoUtility::Rad2Deg(enemy->GetVelocity().y),
@@ -102,7 +124,7 @@ void EnemyController::DrawDebug(void)
 			AsoUtility::Rad2Deg(enemy->GetKnockVelo().y),
 			AsoUtility::Rad2Deg(enemy->GetKnockVelo().z),
 			enemy->GetCurHp(), enemy->GetTimeInv());
-
+		y += 16;
 	}
 }
 

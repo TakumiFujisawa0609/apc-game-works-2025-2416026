@@ -71,10 +71,14 @@ void GameClearScene::Draw(void)
 	// 背景描画
 	DrawGraph(0, 0, backImage_, true);
 
-	/*
+	
 	//フォントの描画
-	DrawFont();
+	DrawFontText({ Application::SCREEN_HALF_X - 110, Application::SCREEN_HALF_Y }, 60, 0xffffff, "ゲームクリア", false);
 
+	DrawFontText({ Application::SCREEN_HALF_X - 50, Application::SCREEN_HALF_Y +  86}, 30, 0xffffff, "決定でタイトルに戻る", false);
+
+
+	/*
 	if (isViewInfo_)
 	{
 		DrawInfo();

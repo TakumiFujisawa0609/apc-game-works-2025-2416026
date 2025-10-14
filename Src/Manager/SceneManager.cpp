@@ -6,6 +6,8 @@
 #include "../Scene/SceneBase.h"
 #include "../Scene/TitleScene.h"
 #include "../Scene/GameScene.h"
+#include "../Scene/GameClearScene.h"
+#include "../Scene/GameOverScene.h"
 #include "./InputManager.h"
 #include "./ResourceManager.h"
 #pragma endregion
@@ -151,6 +153,12 @@ void SceneManager::Draw(void)
 		DrawBox(((lineGlid.x * 2) - 1), 0, ((lineGlid.x * 2) + 1), (midPos.y * 2),
 			0x0, true);
 
+		DrawBox(0, (Application::SCREEN_HALF_Y - 1), Application::SCREEN_SIZE_X, (Application::SCREEN_HALF_Y + 1),
+			0xff0000, true);
+
+		DrawBox((Application::SCREEN_HALF_X - 1), 0, (Application::SCREEN_HALF_X + 1), Application::SCREEN_SIZE_Y,
+			0x00ff00, true);
+		
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND,0);
 	}
 //#endif
@@ -254,6 +262,9 @@ void SceneManager::DoChangeState(SCENE_ID nextScene)
 
 	case SCENE_ID::GAME:
 		curScene_ = new GameScene();
+		break;
+	case SCENE_ID::CLEAR:
+		curScene_ = new GameClearScene();
 		break;
 	}
 

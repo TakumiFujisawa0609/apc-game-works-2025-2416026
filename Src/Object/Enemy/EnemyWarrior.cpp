@@ -90,6 +90,7 @@ void EnemyWarrior::AnimState(void)
 	{
 		if (anim_->IsEnd())
 		{
+			paramChara_.hp = 0;
 			paramChara_.isActive = false;
 		}
 	}

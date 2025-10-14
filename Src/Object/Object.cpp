@@ -290,8 +290,9 @@ void Object::SetDamage(int _damage)
 {
 	/*　被ダメージ処理　*/
 	
+	const float invTime = 0.75f;
 	// ダメージが０の時は処理終了
-	if (_damage == 0 || paramChara_.timeInv > 0.0f) { return; }
+	if (_damage <= 0 || paramChara_.timeInv > 0.0f) { return; }
 
 	// ダメージがマイナス時、正の数に変換する
 	int damageValue = ((_damage < 0) ? -_damage : _damage);
@@ -299,7 +300,7 @@ void Object::SetDamage(int _damage)
 	// HP減少
 	paramChara_.hp -= damageValue;
 
-	paramChara_.timeInv = 0.75f;
+	paramChara_.timeInv = invTime;
 
 	if (paramChara_.hp < 0) { paramChara_.hp = 0; }
 }

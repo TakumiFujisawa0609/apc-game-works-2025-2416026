@@ -603,20 +603,6 @@ void Player::UpdateMortion(MORTION_TYPE _type)
 	// UŒ‚‚µ‚Ä‚¢‚é‚Æ‚«‚ÉUŒ‚ŠÔŒ¸­
 	paramChara_.timeAct -= delta;
 
-	// UŒ‚I—¹‚ÉÄUŒ‚ˆ—
-	if (paramChara_.attackState == ATTACK_STATE::END)
-	{
-		// ãUŒ‚
-		if (IsInputAtkJub())
-		{
-			//ChangeActionState(ACTION_STATE::ATTACK_JUB_1);
-		}
-
-		// ‹­UŒ‚
-		//else if (IsInputAtkStrong()) { ChangeActionState(ACTION_STATE::ATTACK_SPECIAL); }
-	}
-
-
 	if (paramChara_.timeAct <= 0.0f)
 	{
 		// s“®‚Ì—LŒø‚ÈŠÔŠ„‚è“–‚Ä
@@ -630,6 +616,21 @@ void Player::UpdateMortion(MORTION_TYPE _type)
 		{
 			ChangeActionState(ACTION_STATE::IDLE);
 		}
+	}
+
+	// UŒ‚I—¹‚ÉÄUŒ‚ˆ—
+	if (paramChara_.attackState == ATTACK_STATE::END)
+	{
+		// ãUŒ‚
+		if (IsInputAtkJub())
+		{
+			//anim_->SetAnimStep(0.0f);
+			//ChangeAttackState(ATTACK_STATE::ACTIVE);
+			//ChangeActionState(ACTION_STATE::ATTACK_JUB_1);
+		}
+
+		// ‹­UŒ‚
+		//else if (IsInputAtkStrong()) { ChangeActionState(ACTION_STATE::ATTACK_SPECIAL); }
 	}
 }
 

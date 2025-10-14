@@ -18,20 +18,14 @@ public:
 	};
 
 
-	/// <summary>
-	/// デフォルトコンストラクタ
-	/// </summary>
+	/// @brief デフォルトコンストラクタ
 	AnimationController(void);
 
-	/// <summary>
-	/// コンストラクタ
-	/// </summary>
-	/// <param name="modelId">キャラモデルID</param>
+	/// @brief コンストラクタ
+	/// @param modelId キャラモデルID
 	AnimationController(int modelId);
 
-	/// <summary>
-	/// デフォルトデストラクタ
-	/// </summary>
+	/// @brief デフォルトデストラクタ
 	~AnimationController(void) = default;
 
 	/// <summary>
@@ -51,59 +45,40 @@ public:
 	void Add(int type, float speed, const std::string path);
 
 
-	/// <summary>
-	/// アニメーション再生
-	/// </summary>
-	/// <param name="type">アニメーションの種類</param>
-	/// <param name="isLoop">ループするか否か(default=true)</param>
-	void Play(int type, bool isLoop = true);
+	/// @brief アニメーション再生
+	/// @param _type アニメーションの種類
+	/// @param _isLoop ループするか否か[default=true]
+	void Play(int _type, bool _isLoop = true);
 
-	/// <summary>
-	/// 更新処理
-	/// </summary>
+	/// @brief 更新処理
 	void Update(void);
 
-	/// <summary>
-	/// デバッグ描画処理
-	/// </summary>
+	/// @brief デバッグ描画処理
 	void DrawDebug(void);
 
-	/// <summary>
-	/// メモリ解放処理
-	/// </summary>
+	/// @brief メモリ解放処理
 	void Release(void);
 
 
-	/// <summary>
-	/// アニメーションが終了したか判定
-	/// </summary>
+	/// @brief アニメーションが終了したか判定
 	bool IsEnd(void) const;
 
-	/// <summary>
-	/// 再生中のアニメーション番号取得
-	/// </summary>
+	/// @brief 再生中のアニメーション番号取得
 	int GetPlayType(void) { return playType_; };
 
-	/// <summary>
-	/// アニメーション停止処理
-	/// </summary>
-	/// <param name="isStop"></param>
+	/// @brief アニメーション停止処理
 	void Stop(bool isStop = true) { isStop_ = isStop; };
 
 	/// <summary>
 	/// 再生位置変更処理
 	/// </summary>
 	/// <param name="step">再生する位置</param>
-	void SetAnimStep(float step = 0.0f);
+	void SetAnimStep(float _step = 0.0f);
 
-	/// <summary>
-	/// 再生中のアニメーションの現在時間を取得
-	/// </summary>
+	/// @brief 再生中のアニメーションの現在時間を取得
 	float GetPlayTime(void);
 
-	/// <summary>
-	/// 再生中のアニメーションの総再生時間を取得
-	/// </summary>
+	/// @brief 再生中のアニメーションの総再生時間を取得
 	float GetPlayTimeTotal(void);
 
 
@@ -134,11 +109,16 @@ private:
 	/// <param name="type"></param>
 	/// <param name="speed">再生速度</param>
 	/// <param name="animIndex"></param>
-	void Add(int type, float speed, Animation& animIndex);
+	
+	/// @brief アニメーション追加処理
+	/// @param _type アニメーションの種類
+	/// @param _speed 再生速度
+	/// @param _animIndex 格納するアニメーションリスト
+	void Add(int _type, float _speed, Animation& _animIndex);
 
 	/// <summary>
 	/// アニメーションが格納されているか判定
 	/// </summary>
 	/// <param name="type">アニメーションの種類</param>
-	bool IsFindAnimation(int type);
+	bool IsFindAnimation(int _type);
 };

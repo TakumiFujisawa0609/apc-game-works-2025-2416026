@@ -94,6 +94,10 @@ void GameScene::Update(void)
 	// 当たり判定更新
 	CollisionManager::GetInstance().Update();
 
+	Camera& camera = Camera::GetInstance();
+	// カメラ位置更新
+	camera.UpdatePlayerTransform(&player_->GetPos(), &player_->GetRotation());
+	camera.SetTrackingTarget(&player_->GetPos());
 
 	if (gameState_ == GAME_STATE::IDLE)
 	{
@@ -111,11 +115,6 @@ void GameScene::Update(void)
 			SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::TITLE);
 		}
 	}
-
-	Camera& camera = Camera::GetInstance();
-	// カメラ位置更新
-	camera.UpdatePlayerTransform(&player_->GetPos(), &player_->GetRotation());
-	camera.SetTrackingTarget(&player_->GetPos());
 }
 
 void GameScene::Draw(void)

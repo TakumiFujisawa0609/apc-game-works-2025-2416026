@@ -2,6 +2,7 @@
 
 #include "../Common/Quaternion.h"
 #include "../Manager/SoundManager.h"
+#include "./AnimationController.h"
 #include <DxLib.h>
 #include <memory>
 #include <map>
@@ -197,9 +198,6 @@ protected:
 		
 		// –³“GŠÔ
 		float timeInv;
-
-		// ƒ_ƒ[ƒW‚ÌF
-		COLOR_F damageColor;
 
 		// UŒ‚ó‘Ô
 		ATTACK_STATE attackState;
@@ -464,6 +462,7 @@ public:
 
 	const VECTOR& GetKnockVelo(void) { return paramChara_.knockBack; };
 
+	bool GetIsAnimEnd(void)const { return anim_->IsEnd(); };
 
 	/// @brief UŒ‚—LŒø‚·‚é—P—\ŠÔæ“¾ 
 	float GetActionTime(void) const { return paramChara_.timeAct; };
