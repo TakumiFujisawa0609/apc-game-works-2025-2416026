@@ -13,6 +13,8 @@ public:
 		NONE = -1,
 		BGM_TITLE,
 		BGM_GAME,
+		BGM_CLEAR,
+		BGM_GAMEOVER,
 
 		SE_CLICK,  // ÉNÉäÉbÉN
 		SE_SWORD_JUB, // é„çUåÇ

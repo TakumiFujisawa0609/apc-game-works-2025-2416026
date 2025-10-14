@@ -2,30 +2,25 @@
 class SceneBase;
 //class Fader;
 
-#include <chrono> // 時間
+#include <chrono>
 #include <DxLib.h>
 #include "../Common/Vector2.h"
 
-/// <summary>
-/// シーン管理マネージャ
-/// </summary>
 class SceneManager
 {
 public:
 
-	/// <summary>
-	/// シーン種類
-	/// </summary>
+	/// @brief シーン種類
 	enum class SCENE_ID
 	{
 		NONE = 0,
-		TITLE,		// タイトル
-		GAME,		// ゲーム
+		TITLE,    // タイトル
+		GAME,     // ゲーム
+		CLEAR,    // クリアシーン
+		GAMEOVER, // ゲームオーバー
 	};
 
-	/// <summary>
-	/// 演出状態
-	/// </summary>
+	/// @brief 演出状態
 	enum class PERFORM_TYPE
 	{
 		NONE = 0, // 無効

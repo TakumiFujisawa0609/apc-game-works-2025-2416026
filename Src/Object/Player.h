@@ -14,7 +14,7 @@ class Player : public Object
 {
 	using PAD_BTN = InputManager::PAD_BTN;
 	using PAD_ALGKEY = InputManager::JOYPAD_ALGKEY;
-	using PAD_NO = InputManager::JOYPAD_NO;
+	using PAD_NO = InputManager::PAD_NO;
 
 	using MORTION_TYPE = StatusPlayer::MORTION_TYPE;
 
@@ -26,11 +26,13 @@ public:
 		NONE = -1,
 		IDLE, // ‘Ò‹@
 
+		ATTACK_JUB,   // ãUŒ‚
 		ATTACK_JUB_1, // ãUŒ‚‚P‰ñ–Ú(‰‰ñ)
 		ATTACK_JUB_2, // ãUŒ‚‚Q‰ñ–Ú
 		ATTACK_JUB_3, // ãUŒ‚‚R‰ñ–Ú
 
 		ATTACK_SPECIAL, // ‹­UŒ‚’P‘Ì(•KE‹Z)
+		ATTACK_STRONG,   // ‹­UŒ‚
 		ATTACK_STRONG_1, // ã‚P‰ñ ‹­UŒ‚
 		ATTACK_STRONG_2, // ã‚Q‰ñ ‹­UŒ‚
 		ATTACK_STRONG_3, // ã‚R‰ñ ‹­UŒ‚
@@ -217,6 +219,9 @@ protected:
 		ACTION_STATE actionState;
 
 		MORTION_TYPE mortionType;
+
+		// ãUŒ‚‰ñ”
+		int jubCnt;
 
 		// ƒpƒŠƒBŠÔ
 		float parryTime;

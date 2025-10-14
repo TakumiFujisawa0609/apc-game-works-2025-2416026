@@ -290,7 +290,7 @@ void CollisionManager::CollisionEnemys(void)
 
 	for (auto& enemy : enemys)
 	{
-		if (!enemy->GetIsActive())continue;
+		if (!enemy->GetIsActive() || enemy->GetCurHp() <= 0)continue;
 
 		pPos = player_->GetFramePos(COLLISION_TYPE::BODY);
 		pRad = player_->GetRadius(COLLISION_TYPE::BODY);

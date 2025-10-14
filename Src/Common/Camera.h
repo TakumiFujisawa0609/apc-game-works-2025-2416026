@@ -51,7 +51,7 @@ public:
 	// ’‹“_‚Ö‚Ì‹“_ˆÚ“®‘¬“x(0`1.0)
 	static constexpr float CAMERA_LOOK_SPEED = 0.0f;
 
-	static constexpr VECTOR CAMERA_DISTANCE = { 0.0, 250.0f, -750.0f };
+	static constexpr VECTOR CAMERA_DISTANCE = { 0.0, 300.0f, -850.0f };
 
 
 	/// <summary>

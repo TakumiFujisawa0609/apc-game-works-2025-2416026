@@ -24,7 +24,7 @@ public:
 	/// <summary>
 	/// コントローラー認識番号
 	/// </summary>
-	enum class JOYPAD_NO
+	enum class PAD_NO
 	{
 		PAD1 = 1,         // パッド１入力
 		PAD2,             // パッド２入力
@@ -201,7 +201,7 @@ public:
 	/// </summary>
 	/// <param name="_padNum">コントローラの対象</param>
 	/// <param name="button">コントローラ番号</param>
-	bool PadIsBtnNew(JOYPAD_NO _padNum, PAD_BTN button) const;
+	bool PadIsBtnNew(PAD_NO _padNum, PAD_BTN button) const;
 	/// <summary>
 	/// コントローラの入力判定
 	/// </summary>
@@ -214,7 +214,7 @@ public:
 	/// </summary>
 	/// <param name="_padNum">コントローラの対象</param>
 	/// <param name="button">コントローラ番号</param>
-	bool PadIsBtnTrgDown(JOYPAD_NO _padNum, PAD_BTN button) const;
+	bool PadIsBtnTrgDown(PAD_NO _padNum, PAD_BTN button) const;
 	/// <summary>
 	/// コントローラのキーを押したか判定
 	/// </summary>
@@ -227,7 +227,7 @@ public:
 	/// </summary>
 	/// <param name="_padNum">コントローラの対象</param>
 	/// <param name="button">コントローラ番号</param>
-	bool PadIsBtnTrgUp(JOYPAD_NO _padNum, PAD_BTN button) const;
+	bool PadIsBtnTrgUp(PAD_NO _padNum, PAD_BTN button) const;
 	/// <summary>
 	/// コントローラのキーを離したか判定
 	/// </summary>
@@ -240,7 +240,7 @@ public:
 	/// </sammary>
 	/// <param name="_padNum">コントローラの対象</param>
 	/// <param name="_algKey">スティック番号</param>
-	bool PadIsAlgKeyNew(JOYPAD_NO _padNum, JOYPAD_ALGKEY _algKey)const;
+	bool PadIsAlgKeyNew(PAD_NO _padNum, JOYPAD_ALGKEY _algKey)const;
 	/// <sammary>
 	/// コントローラのスティックの入力判定
 	/// </sammary>
@@ -253,7 +253,7 @@ public:
 	/// </sammary>
 	/// <param name="_padNum">コントローラの対象</param>
 	/// <param name="_algKey">スティック番号</param>
-	bool PadIsAlgKeyTrgDown(JOYPAD_NO _padNum, JOYPAD_ALGKEY _algKey)const;
+	bool PadIsAlgKeyTrgDown(PAD_NO _padNum, JOYPAD_ALGKEY _algKey)const;
 	/// <sammary>
 	/// コントローラのスティックを入力時の判定
 	/// </sammary>
@@ -266,7 +266,7 @@ public:
 	/// </sammary>
 	/// <param name="_padNum">コントローラの対象</param>
 	/// <param name="_algKey">スティック番号</param>
-	bool PadIsAlgKeyTrgUp(JOYPAD_NO _padNum, JOYPAD_ALGKEY _algKey)const;
+	bool PadIsAlgKeyTrgUp(PAD_NO _padNum, JOYPAD_ALGKEY _algKey)const;
 	/// <sammary>
 	/// コントローラのスティックを離した時の判定
 	/// </sammary>
@@ -279,7 +279,7 @@ public:
 	/// </summary>
 	/// <param name="_padNum">コントローラの対象</param>
 	/// <param name="_algKey">スティック番号</param>
-	int PadAlgKeyX(JOYPAD_NO _padNum, JOYPAD_ALGKEY _algKey)const;
+	int PadAlgKeyX(PAD_NO _padNum, JOYPAD_ALGKEY _algKey)const;
 	/// <summary>
 	/// コントローラのスティック横移動量を取得
 	/// </summary>
@@ -292,7 +292,7 @@ public:
 	/// </summary>
 	/// <param name="_padNum">コントローラの対象</param>
 	/// <param name="_algKey">スティック番号</param>
-	int PadAlgKeyY(JOYPAD_NO _padNum, JOYPAD_ALGKEY _algKey)const;
+	int PadAlgKeyY(PAD_NO _padNum, JOYPAD_ALGKEY _algKey)const;
 	/// <summary>
 	/// コントローラのスティック縦移動量を取得
 	/// </summary>
@@ -305,7 +305,7 @@ public:
 	/// </summary>
 	/// <param name="_padNum">コントローラの対象</param>
 	/// <param name="_algKey">スティック番号</param>
-	const VECTOR& GetAlgKeyDirXZ(JOYPAD_NO _padNum, JOYPAD_ALGKEY _algKey)const;
+	const VECTOR& GetAlgKeyDirXZ(PAD_NO _padNum, JOYPAD_ALGKEY _algKey)const;
 
 	/// <summary>
 	/// いずれかのコントローラの入力判定
@@ -433,7 +433,7 @@ private:
 	/*　コントローラのメンバ変数　*/
 
 	// パッド情報
-	JOYPAD_IN_STATE padInfos_[static_cast<int>(JOYPAD_NO::PAD4)];
+	JOYPAD_IN_STATE padInfos_[static_cast<int>(PAD_NO::PAD4)];
 
 	// DirectInputの入力状態
 	DINPUT_JOYSTATE joyDInState_;
@@ -493,41 +493,41 @@ private:
 	/// コントローラの入力情報
 	/// </summary>
 	/// <param name="_padNum">コントローラの対象</param>
-	JOYPAD_IN_STATE& GetPadInputState(JOYPAD_NO _padNum);
+	JOYPAD_IN_STATE& GetPadInputState(PAD_NO _padNum);
 
 	/// <summary>
 	/// 接続されたコントローラを識別して取得
 	/// </summary>
 	/// <param name="_padNum">判定するコントローラ番号</param>
 	/// <returns>コントローラ識別情報</returns>
-	JOYPAD_TYPE GetPadType(JOYPAD_NO _padNum);
+	JOYPAD_TYPE GetPadType(PAD_NO _padNum);
 
 	/// <summary>
 	/// DirectInputの入力取得
 	/// </summary>
 	/// <param name="_padNum">判定するコントローラ番号</param>
 	/// <returns>DirectInput入力情報</returns>
-	DINPUT_JOYSTATE GetPadDInputState(JOYPAD_NO _padNum);
+	DINPUT_JOYSTATE GetPadDInputState(PAD_NO _padNum);
 
 	/// <summary>
 	/// コントローラボタンの入力取得
 	/// </summary>
 	/// <param name="_padNum">判定するコントローラ番号</param>
 	/// <returns>コントローラボタン入力情報</returns>
-	XINPUT_STATE GetPadXInputState(JOYPAD_NO _padNum);
+	XINPUT_STATE GetPadXInputState(PAD_NO _padNum);
 
 	/// <summary>
 	/// コントローラを識別して取得
 	/// </summary>
 	/// <param name="jpadNum">判定するコントローラ番号</param>
 	/// <returns>コントローラ識別情報</returns>
-	void SetPadInState(JOYPAD_NO jpadNum);
+	void SetPadInState(PAD_NO jpadNum);
 
 	/// <summary>
 	/// 接続されたコントローラの識別を取得
 	/// </summary>
 	/// <param name="jPadNo"></param>
-	JOYPAD_TYPE GetJPadType(JOYPAD_NO jPadNo);
+	JOYPAD_TYPE GetJPadType(PAD_NO jPadNo);
 
 #pragma endregion
 };

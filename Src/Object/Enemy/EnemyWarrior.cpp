@@ -52,10 +52,9 @@ void EnemyWarrior::InitAnim(void)
 	animSpeed_.emplace(WARRIER_ANIM::ATTACK, status_.GetAnimSpeed(StatusEnemy::ANIM_TYPE::ATTACK));
 	animSpeed_.emplace(WARRIER_ANIM::WALK, status_.GetAnimSpeed(StatusEnemy::ANIM_TYPE::WALK));
 	animSpeed_.emplace(WARRIER_ANIM::SPAWN, status_.GetAnimSpeed(StatusEnemy::ANIM_TYPE::SPAWN));
-	animSpeed_.emplace(WARRIER_ANIM::SPAWN, status_.GetAnimSpeed(StatusEnemy::ANIM_TYPE::SPAWN));
 	animSpeed_.emplace(WARRIER_ANIM::HIT_1, status_.GetAnimSpeed(StatusEnemy::ANIM_TYPE::HIT_1));
 	animSpeed_.emplace(WARRIER_ANIM::HIT_2, status_.GetAnimSpeed(StatusEnemy::ANIM_TYPE::HIT_2));
-	animSpeed_.emplace(WARRIER_ANIM::DEATH, 30);
+	animSpeed_.emplace(WARRIER_ANIM::DEATH, status_.GetAnimSpeed(StatusEnemy::ANIM_TYPE::DEATH));
 	
 
 	for (auto& anim : animSpeed_)
@@ -76,7 +75,7 @@ void EnemyWarrior::DamagePerform(void)
 {
 	if (paramChara_.hp > 0)
 	{
-		ChangeAnimState(ANIM_STATE::HIT_1, false);
+		ChangeAnimState(ANIM_STATE::HIT_2, false);
 	}
 	else
 	{
@@ -86,23 +85,34 @@ void EnemyWarrior::DamagePerform(void)
 
 void EnemyWarrior::AnimState(void)
 {
-	if (paramEnemy_.animState == ANIM_STATE::HIT_1 ||
-		paramEnemy_.animState == ANIM_STATE::HIT_2)
+	// 撃破アニメーション時、無効化
+	if (paramEnemy_.animState == ANIM_STATE::DEATH)
 	{
 		if (anim_->IsEnd())
 		{
-			ChangeAnimState(ANIM_STATE::IDLE);
+			paramChara_.isActive = false;
 		}
-		return;
-	}
-
-	if (paramEnemy_.actionState == ACTION_STATE::MOVE && paramChara_.timeInv <= 0.0f)
-	{
-		ChangeAnimState(ANIM_STATE::WALK);
 	}
 	else
 	{
-		ChangeAnimState(ANIM_STATE::IDLE);
+		if (paramEnemy_.animState == ANIM_STATE::HIT_1 ||
+			paramEnemy_.animState == ANIM_STATE::HIT_2)
+		{
+			if (anim_->IsEnd())
+			{
+				ChangeAnimState(ANIM_STATE::IDLE);
+			}
+			return;
+		}
+
+		if (paramEnemy_.actionState == ACTION_STATE::MOVE && paramChara_.timeInv <= 0.0f)
+		{
+			ChangeAnimState(ANIM_STATE::WALK);
+		}
+		else
+		{
+			ChangeAnimState(ANIM_STATE::IDLE);
+		} 
 	}
 }
 

@@ -11,7 +11,7 @@
 
 using PAD_ALGKEY = InputManager::JOYPAD_ALGKEY;
 using PAD_BTN = InputManager::PAD_BTN;
-using PAD_NO = InputManager::JOYPAD_NO;
+using PAD_NO = InputManager::PAD_NO;
 
 
 GameExit::GameExit(void)
@@ -72,7 +72,7 @@ void GameExit::Update(void)
 					case SceneManager::SCENE_ID::TITLE:
 					{
 						// ÉQÅ[ÉÄèIóπ
-						Application::GetInstance().SetIsGame(false);
+						Application::GetInstance().SetIsGameEnd();
 					}
 					break;
 

@@ -201,7 +201,7 @@ void Camera::_UpdateCameraRot(void)
 	}
 	else
 	{
-		VECTOR dir = input.GetAlgKeyDirXZ(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_ALGKEY::RIGHT);
+		VECTOR dir = input.GetAlgKeyDirXZ(InputManager::PAD_NO::PAD1, InputManager::JOYPAD_ALGKEY::RIGHT);
 		rotInput.y += (dir.x * rotPow);
 	}
 

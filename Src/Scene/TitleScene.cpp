@@ -15,12 +15,10 @@
 
 using PAD_ALGKEY = InputManager::JOYPAD_ALGKEY;
 using PAD_BTN = InputManager::PAD_BTN;
-using PAD_NO = InputManager::JOYPAD_NO;
+using PAD_NO = InputManager::PAD_NO;
 
 TitleScene::TitleScene(void)
 {
-	titleImage_ = 0;		//タイトル画像
-
 	state_ = TITLE_STATE::START_GAME;
 
 	info_ = INFO_TYPE::PLAY_PAD;
@@ -93,7 +91,7 @@ void TitleScene::Update(void)
 		}
 		break;
 
-		case (TITLE_STATE::INFO):
+		case TITLE_STATE::INFO:
 		{
 			// 遊び方描画フラグ変更処理
 			isViewInfo_ = true;
@@ -110,10 +108,12 @@ void TitleScene::Update(void)
 		}
 		break;
 
-		case (TITLE_STATE::GAME_END):
+		case TITLE_STATE::GAME_END:
 		{
+			sound.Play(SoundManager::SRC::SE_CLICK, false);
+
 			// ゲーム終了処理
-			Application::GetInstance().SetIsGame(false);
+			Application::GetInstance().SetIsGameEnd();
 		}
 		break;
 		}
@@ -124,25 +124,7 @@ void TitleScene::Update(void)
 
 	if (!isViewInfo_ && !isPvActive_)
 	{
-		if (IsSelectUp())
-		{
-			state--;
-
-			if (state < 0)
-			{
-				state = static_cast<int>(TITLE_STATE::GAME_END);
-			}
-		}
-
-		if (IsSelectDown())
-		{
-			state++;
-
-			if (state == static_cast<int>(TITLE_STATE::MAX))
-			{
-				state = 0;
-			}
-		}
+		ChangeState(state, static_cast<int>(TITLE_STATE::GAME_END), static_cast<int>(TITLE_STATE::MAX));
 	}
 	else
 	{
@@ -184,7 +166,7 @@ void TitleScene::Draw(void)
 	Font& font = Font::GetInstance();
 
 	// タイトルロゴ描画
-	DrawGraph(0, 0, titleImage_, true);
+	DrawGraph(0, 0, backImage_, true);
 
 	//フォントの描画
 	DrawFont();
@@ -245,18 +227,16 @@ void TitleScene::FontSettings(void)
 void TitleScene::DrawFont(void)
 {
 	int yOffset = 0;
-
+	unsigned int color;
 
 	// ゲーム開始テキスト
-	DrawTitieText(yOffset, "ゲームスタート", TITLE_STATE::START_GAME);
-	yOffset += TEXT_POS_Y_OFFSET;
-
+	DrawTitleText(yOffset, "ゲームスタート", TITLE_STATE::START_GAME);
+	
 	// 操作説明テキスト
-	DrawTitieText(yOffset, "操作説明", TITLE_STATE::INFO);
-	yOffset += TEXT_POS_Y_OFFSET;
+	DrawTitleText(yOffset, "操作説明", TITLE_STATE::INFO);
 
 	// ゲーム終了テキスト
-	DrawTitieText(yOffset, "ゲーム終了", TITLE_STATE::GAME_END);
+	DrawTitleText(yOffset, "ゲーム終了", TITLE_STATE::GAME_END);
 
 	// 描画ブレンドモードをノーブレンドにする
 	SetDrawBlendMode(DX_BLENDMODE_INVSRC, 200);
@@ -282,59 +262,31 @@ void TitleScene::DrawExplanation(void)
 {
 }
 
-void TitleScene::DrawTitieText(int posY, const char* text, TitleScene::TITLE_STATE state)
+void TitleScene::DrawTitleText(int& _posY, const char* _text, TitleScene::TITLE_STATE _state)
 {
-	Font& font = Font::GetInstance();
-
+	Vector2 pos = { Application::SCREEN_HALF_X, Application::SCREEN_HALF_Y };
 	int size = TEXT_SIZE_DEFAULT;
 	unsigned int color = TEXT_COLOR_DEFAULT;
 
-	// テキストの長さ
-	int strWidth = font.GetDefaultTextWidth(text);
-
-	int x = (Application::SCREEN_HALF_X - strWidth);
-	int y = (Application::SCREEN_HALF_Y + TEXT_POS.y + posY);
-
-	// 状態が選択している時、
-	if (state_ == state)
+	if (state_ == _state)
 	{
-		// テキストサイズ変更
 		size = TEXT_SIZE_SELECT;
-
-		// テキスト色変更
 		color = TEXT_COLOR_SELECT;
-
-		x -= TEXT_SIZE_SELECT / 2;
 	}
+	pos.y += (TEXT_POS.y + _posY);
+	_posY += TEXT_POS_Y_OFFSET;
 
-	// テキスト描画
-	font.DrawTextA("GameFont", x, y, text, color, size, Font::FONT_TYPE_ANTIALIASING_EDGE);
+	// フォントのテキスト描画
+	DrawFontText(pos, size, color, _text, (state_ == _state));
 }
 
 void TitleScene::UpdateInfo(void)
 {
 	float delta = SceneManager::GetInstance().GetDeltaTime();
-	int info = static_cast<int>(info_);
 
 	// 選択処理
-	if (IsSelectUp())
-	{
-		info--;
-
-		if (info < 0)
-		{
-			info = static_cast<int>(INFO_TYPE::MAX) - 1;
-		}
-	}
-	if (IsSelectDown())
-	{
-		info++;
-
-		if (info == static_cast<int>(INFO_TYPE::MAX))
-		{
-			info = 0;
-		}
-	}
+	int info = static_cast<int>(info_);
+	ChangeState(info, (static_cast<int>(INFO_TYPE::MAX) - 1), static_cast<int>(INFO_TYPE::MAX));
 	// 状態割り当て
 	info_ = static_cast<INFO_TYPE>(info);
 
@@ -406,84 +358,4 @@ void TitleScene::DrawInfo(void)
 	// テキスト描画
 	font.DrawTextA(Font::FONT_GAME, x, y, "※ ※ ※ ※　 このゲームはコントローラ操作を推奨しています。　※ ※ ※ ※",
 		0xFF0000, -1, Font::FONT_TYPE_ANTIALIASING);
-}
-
-
-bool TitleScene::IsSelectUp(void)
-{
-	bool ret = false;
-	InputManager& input = InputManager::GetInstance();
-
-	if (input.PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::LEFT) &&
-		input.PadAlgKeyX(PAD_NO::PAD1, PAD_ALGKEY::LEFT) < 0 ||
-		input.PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::LEFT) &&
-		input.PadAlgKeyY(PAD_NO::PAD1, PAD_ALGKEY::LEFT) < 0 ||
-		input.PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) &&
-		input.PadAlgKeyX(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) < 0 ||
-		input.PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) &&
-		input.PadAlgKeyY(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) < 0 ||
-
-		input.KeyIsTrgDown(KEY_INPUT_W) ||
-		input.KeyIsTrgDown(KEY_INPUT_A) ||
-		input.KeyIsTrgDown(KEY_INPUT_LEFT) ||
-		input.KeyIsTrgDown(KEY_INPUT_UP))
-	{
-		ret = true;
-	}
-
-	return ret;
-}
-bool TitleScene::IsSelectDown(void)
-{
-	bool ret = false;
-	InputManager& input = InputManager::GetInstance();
-
-	if (input.PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::LEFT) &&
-		input.PadAlgKeyX(PAD_NO::PAD1, PAD_ALGKEY::LEFT) > 0 ||
-		input.PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::LEFT) &&
-		input.PadAlgKeyY(PAD_NO::PAD1, PAD_ALGKEY::LEFT) > 0 ||
-		input.PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) &&
-		input.PadAlgKeyX(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) > 0 ||
-		input.PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) &&
-		input.PadAlgKeyY(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) > 0 ||
-
-		input.KeyIsTrgDown(KEY_INPUT_S) ||
-		input.KeyIsTrgDown(KEY_INPUT_D) ||
-		input.KeyIsTrgDown(KEY_INPUT_RIGHT) ||
-		input.KeyIsTrgDown(KEY_INPUT_DOWN))
-	{
-		ret = true;
-	}
-	return ret;
-}
-bool TitleScene::IsCheck(void)
-{
-	bool ret = false;
-	InputManager& input = InputManager::GetInstance();
-
-	if (input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::START) ||
-		input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::RIGHT) ||
-		input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::DOWN) ||
-
-		input.KeyIsTrgDown(KEY_INPUT_SPACE) ||
-		input.KeyIsTrgDown(KEY_INPUT_RETURN))
-	{
-		ret = true;
-	}
-	return ret;
-}
-bool TitleScene::IsCansel(void)
-{
-	bool ret = false;
-	InputManager& input = InputManager::GetInstance();
-
-	if (input.KeyIsTrgDown(KEY_INPUT_ESCAPE) ||
-		input.KeyIsTrgDown(KEY_INPUT_X) ||
-		input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::BACK) ||
-		input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::RIGHT))
-	{
-		ret = true;
-	}
-
-	return ret;
 }

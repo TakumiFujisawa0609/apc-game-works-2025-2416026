@@ -90,6 +90,13 @@ void Object::Update(void)
 	// 現在位置割り当て
 	paramChara_.prePos = paramChara_.pos;
 
+	// Y座標がマイナス時、0にする
+	if (paramChara_.pos.y < 0.0f)
+	{
+		paramChara_.pos.y = paramChara_.prePos.y = 0.0f;
+	}
+	
+
 	if(paramChara_.timeInv > 0.0f)
 	{
 		paramChara_.timeInv -= delta;
@@ -294,12 +301,7 @@ void Object::SetDamage(int _damage)
 
 	paramChara_.timeInv = 0.75f;
 
-	if (paramChara_.hp < 0)
-	{
-		paramChara_.hp = 0;
-
-		paramChara_.isActive = false;
-	}
+	if (paramChara_.hp < 0) { paramChara_.hp = 0; }
 }
 
 void Object::GravityKnock(void)
@@ -307,7 +309,7 @@ void Object::GravityKnock(void)
 	// 重力加速
 	paramChara_.knockBack.y -= Application::GRAVITY_ACC;
 
-	if (paramChara_.knockBack.y < Application::GRAVITY_MAX)
+	if (paramChara_.knockBack.y > Application::GRAVITY_MAX)
 	{
 		paramChara_.knockBack.y = Application::GRAVITY_MAX;
 	}

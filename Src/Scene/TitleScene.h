@@ -1,11 +1,8 @@
 #pragma once
-#include "../Scene/SceneBase.h"
+#include "./SceneBase.h"
 #include "../Common/Vector2.h"
 #include <DxLib.h>
 
-/// <summary>
-/// タイトルシーン
-/// </summary>
 class TitleScene : public SceneBase
 {
 public:
@@ -35,7 +32,7 @@ public:
 	/// <summary>
 	/// 通常のデストラクタ
 	/// </summary>
-	~TitleScene(void) = default; // defaultさん やっておしまいなさい
+	~TitleScene(void) = default;
 
 	/// <summary>
 	/// 初期読み込み
@@ -90,10 +87,10 @@ private:
 	static constexpr int TEXT_POS_Y_OFFSET = 75;
 
 	// デフォルトのテキスト色
-	static constexpr unsigned int TEXT_COLOR_DEFAULT = 0xFFFA00;
+	static constexpr unsigned int TEXT_COLOR_DEFAULT = 0xfefefe;
 
 	// 選択時のテキスト色
-	static constexpr unsigned int TEXT_COLOR_SELECT = 0xFF5500;
+	static constexpr unsigned int TEXT_COLOR_SELECT = 0x555555;
 
 	static constexpr Vector2 INFO_TEXT_POS = { 500, 250 };
 
@@ -125,8 +122,6 @@ private:
 	float pvTime_;
 	float isPvActive_;
 
-	// タイトル
-	int titleImage_;
 
 	// コントローラ画像
 	int padImage_;
@@ -149,30 +144,10 @@ private:
 	/// <summary>
 	/// テキスト割り当て
 	/// </summary>
-	/// <param name="posY">テキスト縦位置</param>
-	/// <param name="text">テキストの内容</param>
-	/// <param name="state">選択状態</param>
-	void DrawTitieText(int posY, const char* text, TITLE_STATE state);
-
-	/// <summary>
-	/// 選択の上の判定処理
-	/// </summary>
-	bool IsSelectUp(void);
-
-	/// <summary>
-	/// 選択の下の判定処理
-	/// </summary>
-	bool IsSelectDown(void);
-
-	/// <summary>
-	/// 決定の判定処理
-	/// </summary>
-	bool IsCheck(void);
-
-	/// <summary>
-	/// 決定の判定処理
-	/// </summary>
-	bool IsCansel(void);
+	/// <param name="_posY">テキスト縦位置</param>
+	/// <param name="_text">テキストの内容</param>
+	/// <param name="_state">選択状態</param>
+	void DrawTitleText(int& _posY, const char* _text, TITLE_STATE _state);
 
 	/// <summary>
 	/// 遊び方更新

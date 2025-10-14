@@ -33,41 +33,27 @@ public:
 	static constexpr float GRAVITY_DEC = 0.125f;
 
 
-	/// <summary>
-	/// 明示的にインスタンス生成処理
-	/// </summary>
+	/// @brief 明示的にインスタンス生成処理
 	static void CreateInstance(void);
 
-	/// <summary>
-	/// 静的インスタンス取得処理
-	/// </summary>
-	/// <returns>アプリケーションマネージャ</returns>
+	/// @brief 静的インスタンス取得処理
+	/// @return アプリケーションマネージャ
 	static Application& GetInstance(void) { return *instance_; };
 
-	/// <summary>
-	/// 実行処理
-	/// </summary>
-	void Dash(void);
+	/// @brief 実行処理
+	void Run(void);
 
-	/// <summary>
-	/// インスタンス削除処理
-	/// </summary>
+	/// @brief インスタンス削除処理
 	void Destroy(void);
 
 
-	/// <summary>
-	/// ゲーム継続判定フラグ割り当て
-	/// </summary>
-	void SetIsGame(bool flag) { isGame_ = flag; };
+	/// @brief ゲーム終了処理
+	void SetIsGameEnd(void) { isGame_ = false; };
 
-	/// <summary>
-	/// ゲーム継続判定フラグ取得
-	/// </summary>
+	/// @brief ゲーム継続判定フラグ取得
 	bool GetIsGame(void) const { return isGame_; };
 
-	/// <summary>
-	/// 終了メニューの処理を行うか否か
-	/// </summary>
+	/// @brief 終了メニューの処理を行うか否か
 	void SetIsExitMenu(bool flag) { isActiveExitMenu_ = flag; };
 
 
@@ -86,33 +72,25 @@ private:
 	bool isActiveExitMenu_;
 
 
-	// デフォルトコンストラクタ
+	/// @brief デフォルトコンストラクタ
 	Application(void);
 
-	// デフォルトデストラクタ
+	/// @brief デフォルトデストラクタ
 	~Application(void) = default;
 
-	// デフォルトコピーコンストラクタ
+	/// @brief デフォルトコピーコンストラクタ
 	Application(const Application&) = default;
 
 
-	/// <summary>
-	/// 初期化処理
-	/// </summary>
+	/// @brief 初期化処理
 	void Init(void);
 
-	/// <summary>
-	/// エフェクシアの初期化処理
-	/// </summary>
+	/// @brief エフェクシアの初期化処理
 	void InitEffecseer(void);
 
-	/// <summary>
-	/// マネージャーを生成
-	/// </summary>
+	/// @brief 各マネージャー生成処理
 	void CreateManagers(void);
 
-	/// <summary>
-	/// 描画処理
-	/// </summary>
+	/// @brief 描画処理
 	void Draw(void);
 };

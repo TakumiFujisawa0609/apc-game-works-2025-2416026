@@ -115,10 +115,10 @@ void InputManager::Update(void)
 	}
 
 	// ゲームパッド入力判定更新
-	SetPadInState(JOYPAD_NO::PAD1);
-	SetPadInState(JOYPAD_NO::PAD2);
-	SetPadInState(JOYPAD_NO::PAD3);
-	SetPadInState(JOYPAD_NO::PAD4);
+	SetPadInState(PAD_NO::PAD1);
+	SetPadInState(PAD_NO::PAD2);
+	SetPadInState(PAD_NO::PAD3);
+	SetPadInState(PAD_NO::PAD4);
 }
 
 void InputManager::Destroy(void)
@@ -224,7 +224,7 @@ const InputManager::Mouse& InputManager::FindMouse(unsigned int mouseType) const
 
 #pragma region コントローラ処理
 
-void InputManager::SetPadInState(JOYPAD_NO jPadNum)
+void InputManager::SetPadInState(PAD_NO jPadNum)
 {
 	/* コントローラを識別して取得 */
 
@@ -259,7 +259,7 @@ void InputManager::SetPadInState(JOYPAD_NO jPadNum)
 	}
 }
 
-InputManager::JOYPAD_IN_STATE& InputManager::GetPadInputState(JOYPAD_NO _padNum)
+InputManager::JOYPAD_IN_STATE& InputManager::GetPadInputState(PAD_NO _padNum)
 {
 	/* コントローラ入力取得処理 */
 
@@ -418,7 +418,7 @@ InputManager::JOYPAD_IN_STATE& InputManager::GetPadInputState(JOYPAD_NO _padNum)
 	return ret;
 }
 
-InputManager::JOYPAD_TYPE InputManager::GetJPadType(JOYPAD_NO jPadNo)
+InputManager::JOYPAD_TYPE InputManager::GetJPadType(PAD_NO jPadNo)
 {
 	int num = GetJoypadType(static_cast<int>(jPadNo));
 	InputManager::JOYPAD_TYPE type = static_cast<InputManager::JOYPAD_TYPE>(num);
@@ -426,14 +426,14 @@ InputManager::JOYPAD_TYPE InputManager::GetJPadType(JOYPAD_NO jPadNo)
 }
 
 
-DINPUT_JOYSTATE InputManager::GetPadDInputState(InputManager::JOYPAD_NO _padNum)
+DINPUT_JOYSTATE InputManager::GetPadDInputState(InputManager::PAD_NO _padNum)
 {
 	// DirectInput情報取得
 	GetJoypadDirectInputState(static_cast<int>(_padNum), &joyDInState_);
 	return joyDInState_;
 }
 
-XINPUT_STATE InputManager::GetPadXInputState(InputManager::JOYPAD_NO _padNum)
+XINPUT_STATE InputManager::GetPadXInputState(InputManager::PAD_NO _padNum)
 {
 	// ボタン入力情報取得
 	GetJoypadXInputState(static_cast<int>(_padNum), &joyXInState_);
@@ -441,12 +441,12 @@ XINPUT_STATE InputManager::GetPadXInputState(InputManager::JOYPAD_NO _padNum)
 }
 
 
-InputManager::JOYPAD_TYPE InputManager::GetPadType(JOYPAD_NO padNo)
+InputManager::JOYPAD_TYPE InputManager::GetPadType(PAD_NO padNo)
 {
 	return static_cast<InputManager::JOYPAD_TYPE>(GetJoypadType(static_cast<int>(padNo)));
 }
 
-bool InputManager::PadIsBtnNew(JOYPAD_NO _padNum, PAD_BTN button) const
+bool InputManager::PadIsBtnNew(PAD_NO _padNum, PAD_BTN button) const
 {
 	int num = static_cast<int>(_padNum);
 
@@ -466,7 +466,7 @@ bool InputManager::PadIsBtnNew(int _padNum, int button) const
 	return ret;
 }
 
-bool InputManager::PadIsBtnTrgDown(JOYPAD_NO _padNum, PAD_BTN button) const
+bool InputManager::PadIsBtnTrgDown(PAD_NO _padNum, PAD_BTN button) const
 {
 	int num = static_cast<int>(_padNum);
 
@@ -486,7 +486,7 @@ bool InputManager::PadIsBtnTrgDown(int _padNum, int button) const
 	return ret;
 }
 
-bool InputManager::PadIsBtnTrgUp(JOYPAD_NO _padNum, PAD_BTN button) const
+bool InputManager::PadIsBtnTrgUp(PAD_NO _padNum, PAD_BTN button) const
 {
 	int num = static_cast<int>(_padNum);
 
@@ -506,7 +506,7 @@ bool InputManager::PadIsBtnTrgUp(int _padNum, int button) const
 	return ret;
 }
 
-bool InputManager::PadIsAlgKeyNew(JOYPAD_NO _padNum, JOYPAD_ALGKEY _algKey)const
+bool InputManager::PadIsAlgKeyNew(PAD_NO _padNum, JOYPAD_ALGKEY _algKey)const
 {
 	int num = static_cast<int>(_padNum);
 
@@ -526,7 +526,7 @@ bool InputManager::PadIsAlgKeyNew(int _padNum, int _algKey)const
 	return ret;
 }
 
-bool InputManager::PadIsAlgKeyTrgDown(JOYPAD_NO _padNum, JOYPAD_ALGKEY _algKey)const
+bool InputManager::PadIsAlgKeyTrgDown(PAD_NO _padNum, JOYPAD_ALGKEY _algKey)const
 {
 	int num = static_cast<int>(_padNum);
 	// パッドが未割当時、false
@@ -545,7 +545,7 @@ bool InputManager::PadIsAlgKeyTrgDown(int _padNum, int _algKey)const
 	return ret;
 }
 
-bool InputManager::PadIsAlgKeyTrgUp(JOYPAD_NO _padNum, JOYPAD_ALGKEY _algKey)const
+bool InputManager::PadIsAlgKeyTrgUp(PAD_NO _padNum, JOYPAD_ALGKEY _algKey)const
 {
 	int num = static_cast<int>(_padNum);
 	// パッドが未割当時、false
@@ -564,7 +564,7 @@ bool InputManager::PadIsAlgKeyTrgUp(int _padNum, int _algKey)const
 	return ret;
 }
 
-int InputManager::PadAlgKeyX(JOYPAD_NO _padNum, JOYPAD_ALGKEY _algKey)const
+int InputManager::PadAlgKeyX(PAD_NO _padNum, JOYPAD_ALGKEY _algKey)const
 {
 	int num = static_cast<int>(_padNum);
 
@@ -582,7 +582,7 @@ int InputManager::PadAlgKeyX(int _padNum, int _algKey)const
 	return padInfos_[_padNum].algKeyX[_algKey];
 }
 
-int InputManager::PadAlgKeyY(JOYPAD_NO _padNum, JOYPAD_ALGKEY _algKey)const
+int InputManager::PadAlgKeyY(PAD_NO _padNum, JOYPAD_ALGKEY _algKey)const
 {
 	int num = static_cast<int>(_padNum);
 
@@ -600,7 +600,7 @@ int InputManager::PadAlgKeyY(int _padNum, int _algKey)const
 	return padInfos_[_padNum].algKeyY[_algKey];
 }
 
-const VECTOR& InputManager::GetAlgKeyDirXZ(JOYPAD_NO _padNum, JOYPAD_ALGKEY _algKey) const
+const VECTOR& InputManager::GetAlgKeyDirXZ(PAD_NO _padNum, JOYPAD_ALGKEY _algKey) const
 {
 	VECTOR ret = {};
 

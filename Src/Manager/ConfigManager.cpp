@@ -58,8 +58,8 @@ void ConfigManager::ChangeConfigType(void)
 
 	if (input.KeyIsTrgDown(KEY_INPUT_S) ||
 		input.KeyIsTrgDown(KEY_INPUT_DOWN) ||
-		input.PadIsAlgKeyTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_ALGKEY::LEFT) ||
-		input.PadIsAlgKeyTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_ALGKEY::RIGHT))
+		input.PadIsAlgKeyTrgDown(InputManager::PAD_NO::PAD1, InputManager::JOYPAD_ALGKEY::LEFT) ||
+		input.PadIsAlgKeyTrgDown(InputManager::PAD_NO::PAD1, InputManager::JOYPAD_ALGKEY::RIGHT))
 	{
 		type--;
 
@@ -68,8 +68,8 @@ void ConfigManager::ChangeConfigType(void)
 
 	if (input.KeyIsTrgDown(KEY_INPUT_W) ||
 		input.KeyIsTrgDown(KEY_INPUT_UP) ||
-		input.PadIsAlgKeyTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_ALGKEY::LEFT) ||
-		input.PadIsAlgKeyTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_ALGKEY::RIGHT))
+		input.PadIsAlgKeyTrgDown(InputManager::PAD_NO::PAD1, InputManager::JOYPAD_ALGKEY::LEFT) ||
+		input.PadIsAlgKeyTrgDown(InputManager::PAD_NO::PAD1, InputManager::JOYPAD_ALGKEY::RIGHT))
 	{
 		type--;
 

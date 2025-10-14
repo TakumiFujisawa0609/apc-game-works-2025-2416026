@@ -56,12 +56,6 @@ void Player::Init(const VECTOR& pos, float angleY)
 	inputKey_.emplace(INPUT_TYPE::ATTACK_JUB, MOUSE_INPUT_LEFT);
 	inputKey_.emplace(INPUT_TYPE::ATTACK_STRONG, MOUSE_INPUT_RIGHT);
 
-	// 攻撃状態初期化
-	paramChara_.attackState = ATTACK_STATE::NONE;
-
-	//paramChara_.posChatch = AsoUtility::VECTOR_ZERO;
-	//paramChara_.posChatch.y += CATCH_OFFSET;
-
 	//jumpPower_ = START_JUMP_POWER;
 
 	// 当たり判定割り当て
@@ -76,6 +70,9 @@ void Player::SetParam(void)
 	// 行動状態
 	paramPlayer_.actionState = ACTION_STATE::IDLE;
 	paramPlayer_.mortionType = MORTION_TYPE::NONE;
+
+	// 攻撃状態初期化
+	paramChara_.attackState = ATTACK_STATE::NONE;
 
 	paramChara_.posLocal = {};
 
@@ -102,6 +99,7 @@ void Player::SetParam(void)
 	paramChara_.speed = status_.GetSpeed();
 	paramChara_.speedAcc = status_.GetSpeedAcc();
 	paramPlayer_.dashMult = status_.GetDashMult();
+	paramPlayer_.jubCnt = 0;
 
 	paramPlayer_.weaponId = status_.GetWeaponId();
 	paramPlayer_.luck = status_.GetLuck();
@@ -207,12 +205,12 @@ void Player::DrawDebug(void)
 
 	VECTOR pos = VAdd(paramChara_.pos, paramChara_.posLocal);
 	// パラメータ描画
-	DrawFormatString(0, 120, 0xFFFFFF,"player：p(%.1f, %.1f, %.1f), rot(%.1f°, %.1f° ,%.1f°), ac(%.1f°,%.1f°,%.1f°),attack(%d, %.1f秒), type(%d), anim(%d)"
+	DrawFormatString(0, 120, 0xFFFFFF,"player：p(%.1f, %.1f, %.1f), rot(%.1f°, %.1f° ,%.1f°), ac(%.1f°,%.1f°,%.1f°),attack(%d, %.1f秒), type(%d), anim(%d), cnt(%d)"
 					 ,pos.x, pos.y, pos.z
 					 ,paramChara_.rot.x, paramChara_.rot.y, paramChara_.rot.z
 					 ,paramChara_.velocity.x, paramChara_.velocity.y, paramChara_.velocity.z
 					 ,paramChara_.attackState, paramChara_.timeAct
-		             ,paramPlayer_.actionState ,anim_->GetPlayType());
+		             ,paramPlayer_.actionState ,anim_->GetPlayType() ,paramPlayer_.jubCnt);
 #endif
 }
 
@@ -315,121 +313,6 @@ void Player::UpdateStateOver(void)
 
 	// Y軸加算
 	paramChara_.pos.y += paramChara_.velocity.y;
-}
-
-
-bool Player::IsInputMove(void)
-{
-	InputManager& input = InputManager::GetInstance();
-
-	bool ret = false;
-
-	// コントローラ入力時
-	if (GetJoypadNum() > 0)
-	{
-		// 左スティックが入力されている時
-		if (input.PadIsAlgKeyNew(PAD_NO::PAD1, PAD_ALGKEY::LEFT))
-		{
-			ret = true;
-		}
-	}
-
-	// キーボード入力時
-	else if (input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_FRONT]) ||
-		input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_BACK]) ||
-		input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_LEFT]) ||
-		input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_RIGHT]))
-	{
-		// 移動入力時、true
-		ret = true;
-	}
-
-	return ret;
-}
-
-bool Player::IsInputAtkStrong(void)
-{
-	InputManager& input = InputManager::GetInstance();
-
-	bool ret = false;
-
-	// コントローラ入力時
-	if (GetJoypadNum() > 0)
-	{
-		if (input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::UP))
-		{
-			ret = true;
-		}
-	}
-
-	// キーボード入力時
-	else if (input.MouseIsTrgDown(inputKey_[INPUT_TYPE::ATTACK_STRONG]))
-	{
-		// 移動入力時、true
-		ret = true;
-	}
-
-	return ret;
-}
-
-bool Player::IsInputAtkJub(void)
-{
-	InputManager& input = InputManager::GetInstance();
-
-	bool ret = false;
-
-	// コントローラ入力時
-	if (GetJoypadNum() > 0)
-	{
-		if (input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::LEFT))
-		{
-			ret = true;
-		}
-	}
-
-	// キーボード入力時
-	else if (input.MouseIsTrgDown(inputKey_[INPUT_TYPE::ATTACK_JUB]))
-	{
-		// 移動入力時、true
-		ret = true;
-	}
-
-	return ret;
-}
-
-bool Player::IsInputDash(void)
-{
-	InputManager& input = InputManager::GetInstance();
-
-	// コントローラ入力時
-	if (GetJoypadNum() > 0)
-	{
-		if (input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::L_STICK))
-		{
-			paramPlayer_.isDash = true;
-		}
-		else if (input.PadIsBtnTrgUp(PAD_NO::PAD1, PAD_BTN::L_STICK))
-		{
-			paramPlayer_.isDash = false;
-		}
-	}
-
-	// キーボード入力時
-	else
-	{
-		if (input.KeyIsTrgDown(inputKey_[INPUT_TYPE::DASH]))
-		{
-			// ダッシュ移動入力時、true
-			paramPlayer_.isDash = true;
-		}
-		else if (input.KeyIsTrgUp(inputKey_[INPUT_TYPE::DASH]))
-		{
-			// ダッシュ移動入力時、true
-			paramPlayer_.isDash = false;
-		}
-	}
-
-	return paramPlayer_.isDash;
 }
 
 
@@ -772,4 +655,119 @@ void Player::SetPosForward(void)
 	VECTOR pos = VAdd(paramChara_.colList[COLLISION_TYPE::BODY]->pos, forward);
 
 	paramChara_.posForward = pos;
+}
+
+
+bool Player::IsInputMove(void)
+{
+	InputManager& input = InputManager::GetInstance();
+
+	bool ret = false;
+
+	// コントローラ入力時
+	if (GetJoypadNum() > 0)
+	{
+		// 左スティックが入力されている時
+		if (input.PadIsAlgKeyNew(PAD_NO::PAD1, PAD_ALGKEY::LEFT))
+		{
+			ret = true;
+		}
+	}
+
+	// キーボード入力時
+	else if (input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_FRONT]) ||
+		input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_BACK]) ||
+		input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_LEFT]) ||
+		input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_RIGHT]))
+	{
+		// 移動入力時、true
+		ret = true;
+	}
+
+	return ret;
+}
+
+bool Player::IsInputAtkStrong(void)
+{
+	InputManager& input = InputManager::GetInstance();
+
+	bool ret = false;
+
+	// コントローラ入力時
+	if (GetJoypadNum() > 0)
+	{
+		if (input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::UP))
+		{
+			ret = true;
+		}
+	}
+
+	// キーボード入力時
+	else if (input.MouseIsTrgDown(inputKey_[INPUT_TYPE::ATTACK_STRONG]))
+	{
+		// 移動入力時、true
+		ret = true;
+	}
+
+	return ret;
+}
+
+bool Player::IsInputAtkJub(void)
+{
+	InputManager& input = InputManager::GetInstance();
+
+	bool ret = false;
+
+	// コントローラ入力時
+	if (GetJoypadNum() > 0)
+	{
+		if (input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::LEFT))
+		{
+			ret = true;
+		}
+	}
+
+	// キーボード入力時
+	else if (input.MouseIsTrgDown(inputKey_[INPUT_TYPE::ATTACK_JUB]))
+	{
+		// 移動入力時、true
+		ret = true;
+	}
+
+	return ret;
+}
+
+bool Player::IsInputDash(void)
+{
+	InputManager& input = InputManager::GetInstance();
+
+	// コントローラ入力時
+	if (GetJoypadNum() > 0)
+	{
+		if (input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::L_STICK))
+		{
+			paramPlayer_.isDash = true;
+		}
+		else if (input.PadIsBtnTrgUp(PAD_NO::PAD1, PAD_BTN::L_STICK))
+		{
+			paramPlayer_.isDash = false;
+		}
+	}
+
+	// キーボード入力時
+	else
+	{
+		if (input.KeyIsTrgDown(inputKey_[INPUT_TYPE::DASH]))
+		{
+			// ダッシュ移動入力時、true
+			paramPlayer_.isDash = true;
+		}
+		else if (input.KeyIsTrgUp(inputKey_[INPUT_TYPE::DASH]))
+		{
+			// ダッシュ移動入力時、true
+			paramPlayer_.isDash = false;
+		}
+	}
+
+	return paramPlayer_.isDash;
 }

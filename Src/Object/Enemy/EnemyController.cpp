@@ -7,6 +7,8 @@
 #include "./EnemyWarrior.h"
 #include "../Player.h"
 #include "../,./../../Utility/AsoUtility.h"
+#include "../,./../../Application.h"
+#include "../,./../../Manager/SceneManager.h"
 
 EnemyController* EnemyController::instance_ = nullptr;
 
@@ -42,20 +44,18 @@ void EnemyController::Init(void)
 {
 	enemys_.clear();
 
-	const float rangeXZ = 750.0f;
+	const float rangeXZ = 250.0f;
 	
 	for (int i = 0; i < 30; i++)
 	{
 		//break;
-		float x = static_cast<int>(GetRand(rangeXZ + rangeXZ) - rangeXZ);
-		float z = static_cast<int>(GetRand(rangeXZ + rangeXZ) - rangeXZ);
+		float x = static_cast<float>(GetRand(rangeXZ + rangeXZ) - rangeXZ);
+		float z = static_cast<float>(GetRand(rangeXZ));
 		
-		//EnemySpawn(ENEMY_TYPE::SKELETON_WARRIOR, { x, 0.0f, z });
+		EnemySpawn(ENEMY_TYPE::SKELETON_WARRIOR, { x, 0.0f, z });
 	}
 
-	EnemySpawn(ENEMY_TYPE::SKELETON_WARRIOR, { static_cast<float>(GetRand(rangeXZ)),
-											   0.0f,
-										       static_cast<float>(GetRand(rangeXZ)) });
+	//EnemySpawn(ENEMY_TYPE::SKELETON_WARRIOR, { static_cast<float>(GetRand(rangeXZ)), 0.0f, static_cast<float>(GetRand(rangeXZ)) });
 }
 
 void EnemyController::Update(void)
@@ -74,31 +74,36 @@ void EnemyController::Draw(void)
 {
 	if (enemys_.empty()) return;
 
+	int cnt = 0;
 	for (auto& enemy : enemys_)
 	{
 		if (!enemy->GetIsActive()) continue;
 
 		enemy->Draw();
+		cnt++;
 	}
+
+	DrawFormatString(Application::SCREEN_HALF_X, 0, 0xffffff, "“G‚Ì”FŽc‚è%d‘Ì", cnt);
 }
 
 void EnemyController::DrawDebug(void)
 {
+	if (!SceneManager::GetInstance().GetIsDebugMode())return;
 	for (auto& enemy : enemys_)
 	{
 		if (!enemy->GetIsActive()) continue;
 		enemy->DrawDebug();
-		DrawFormatString(0, 132, 0xff0000, "enemy: pos(%.2f,%.2f,%.2f), dir(%.2f,%.2f,%.2f), knock(%.1f, %.1f, %.1f), hp(%d), inv(%.2f)",
+		DrawFormatString(0, 132, 0xff0000, "enemy: pos(%.2f,%.2f,%.2f), velo(%.2f,%.2f,%.2f), knock(%.1f, %.1f, %.1f), hp(%d), inv(%.2f)\n",
 			enemy->GetPos().x,enemy->GetPos().y,enemy->GetPos().z,
-			AsoUtility::Rad2Deg(enemy->GetDir().x),
-			AsoUtility::Rad2Deg(enemy->GetDir().y), 
-			AsoUtility::Rad2Deg(enemy->GetDir().z),
+			AsoUtility::Rad2Deg(enemy->GetVelocity().x),
+			AsoUtility::Rad2Deg(enemy->GetVelocity().y),
+			AsoUtility::Rad2Deg(enemy->GetVelocity().z),
 			AsoUtility::Rad2Deg(enemy->GetKnockVelo().x),
 			AsoUtility::Rad2Deg(enemy->GetKnockVelo().y),
 			AsoUtility::Rad2Deg(enemy->GetKnockVelo().z),
 			enemy->GetCurHp(), enemy->GetTimeInv());
-	}
 
+	}
 }
 
 void EnemyController::Release(void)

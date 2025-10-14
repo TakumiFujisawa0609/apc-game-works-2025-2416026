@@ -84,7 +84,7 @@ void Enemy::SetDamage(int _damage)
 	Object::SetDamage(_damage);
 
 	const float knockXZ = 1.0f;
-	const float knockY = 4.5f;
+	const float knockY = 3.5f;
 
 	//　吹っ飛ばし処理
 	VECTOR dir = paramChara_.dir;
@@ -156,7 +156,7 @@ void Enemy::UpdateStateMove(void)
 
 	//if (paramEnemy_.isAttack) { ChangeActionState(ACTION_STATE::ATTACK_ACTIVE); }
 
-	if (paramChara_.timeInv > 0.0f) return;
+	if (paramChara_.timeInv > 0.0f || paramChara_.hp <= 0) return;
 
 
 	// プレイヤー追従
@@ -183,11 +183,7 @@ void Enemy::UpdateStateMove(void)
 
 	paramChara_.pos = VAdd(paramChara_.pos, VAdd(dir, velo));
 
-	if (!AsoUtility::EqualsVZero(velo))
-	{
-		UpdateModelFrames();
-	}
-
+	UpdateModelFrames();
 }
 
 void Enemy::UpdateStateKnock(void)
@@ -224,8 +220,7 @@ void Enemy::Draw(void)
 		DrawAttackRange();
 	}
 
-	COLOR_F defaultColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-	COLOR_F color = defaultColor;
+	COLOR_F color = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 	if (paramChara_.timeInv > 0.0f && paramEnemy_.animState != ANIM_STATE::DEATH)
 	{

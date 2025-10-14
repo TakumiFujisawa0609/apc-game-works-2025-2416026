@@ -189,9 +189,9 @@ bool GameScene::IsCheck(void)
 	bool ret = false;
 	InputManager& input = InputManager::GetInstance();
 
-	if (input.PadIsBtnTrgDown(InputManager::JOYPAD_NO::PAD1, PAD_BTN::START) ||
-		input.PadIsBtnTrgDown(InputManager::JOYPAD_NO::PAD1, PAD_BTN::RIGHT) ||
-		input.PadIsBtnTrgDown(InputManager::JOYPAD_NO::PAD1, PAD_BTN::DOWN) ||
+	if (input.PadIsBtnTrgDown(InputManager::PAD_NO::PAD1, PAD_BTN::START) ||
+		input.PadIsBtnTrgDown(InputManager::PAD_NO::PAD1, PAD_BTN::RIGHT) ||
+		input.PadIsBtnTrgDown(InputManager::PAD_NO::PAD1, PAD_BTN::DOWN) ||
 
 		input.KeyIsTrgDown(KEY_INPUT_SPACE) ||
 		input.KeyIsTrgDown(KEY_INPUT_RETURN))

@@ -122,7 +122,7 @@ void Application::CreateManagers(void)
 }
 
 
-void Application::Dash(void)
+void Application::Run(void)
 {
 	/*　実行処理　*/
 	
@@ -193,13 +193,11 @@ void Application::Draw(void)
 	// 終了メニュー
 	exit_->Draw();
 
-//#ifdef _DEBUG
 
 	// フレームレート描画
 	if (scene.GetIsDebugMode()){ FrameRate::GetInstance().Draw(); }
 
 	scene.DrawDebug();
-//#endif
 
 	ScreenFlip(); // 裏画面を表にコピー
 }

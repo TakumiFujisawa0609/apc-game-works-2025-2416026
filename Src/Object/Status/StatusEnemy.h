@@ -41,6 +41,7 @@ public:
 		ANIM_SPEED_SPAWN, // 生成時のアニメーション速度
 		ANIM_SPEED_HIT_1, // 弱被ダメージアニメーション速度
 		ANIM_SPEED_HIT_2, // 強被ダメージアニメーション速度
+		ANIM_SPEED_DEATH,
 
 		MAX,
 	};
@@ -53,6 +54,8 @@ public:
 		SPAWN,
 		HIT_1,
 		HIT_2,
+		DEATH,
+
 		MAX,
 	};
 
@@ -82,8 +85,9 @@ public:
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_ATTACK)], animSpeed_[static_cast<int>(ANIM_TYPE::ATTACK)], 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_WALK)], animSpeed_[static_cast<int>(ANIM_TYPE::WALK)], 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_SPAWN)], animSpeed_[static_cast<int>(ANIM_TYPE::SPAWN)], 0.0f);
-		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_SPAWN)], animSpeed_[static_cast<int>(ANIM_TYPE::HIT_1)], 0.0f);
-		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_SPAWN)], animSpeed_[static_cast<int>(ANIM_TYPE::HIT_2)], 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_HIT_1)], animSpeed_[static_cast<int>(ANIM_TYPE::HIT_1)], 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_HIT_2)], animSpeed_[static_cast<int>(ANIM_TYPE::HIT_2)], 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_DEATH)], animSpeed_[static_cast<int>(ANIM_TYPE::DEATH)], 0.0f);
 	}
 
 
