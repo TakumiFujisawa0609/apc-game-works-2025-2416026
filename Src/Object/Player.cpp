@@ -219,10 +219,6 @@ void Player::Release(void)
 	/*　解放処理　*/
 	Object::Release();
 
-	// アニメーション解放
-	anim_->Release();
-	delete anim_;
-
 	// 当たり判定解放	
 	//collision_->Release();
 	//delete collision_;
@@ -296,9 +292,22 @@ void Player::UpdateStateAtk(void)
 		anim_->Play(static_cast<int>(ANIM_STATE::SWORD_SLASH),false);
 	}
 
+	// 攻撃モーション更新
 	UpdateMortion(type);
 
+	// フレーム位置更新
 	UpdateModelFrames();
+
+	if (paramPlayer_.actionState == ACTION_STATE::ATTACK_JUB_END ||
+		paramPlayer_.actionState == ACTION_STATE::ATTACK_STRONG_1 ||
+		paramPlayer_.actionState == ACTION_STATE::ATTACK_STRONG_2 ||
+		paramPlayer_.actionState == ACTION_STATE::ATTACK_STRONG_3)
+	{
+		if (anim_->IsEnd() && paramChara_.attackState == ATTACK_STATE::NONE)
+		{
+			ChangeActionState(ACTION_STATE::IDLE);
+		}
+	}
 }
 
 
@@ -340,20 +349,25 @@ void Player::ChangeActionState(ACTION_STATE state)
 
 		paramChara_.timeAct = 0.0f;
 	}
-	else if (state == ACTION_STATE::ATTACK_JUB_1)
+	else if (state == ACTION_STATE::ATTACK_JUB)
 	{
 		paramPlayer_.mortionType = MORTION_TYPE::JUB_1;
+		paramPlayer_.actionState = ACTION_STATE::ATTACK_JUB_1;
 
 		anim_->Play(static_cast<int>(ANIM_STATE::SWORD_SLASH), false);
-
-		paramPlayer_.isDash = false;
+		paramChara_.timeAct = status_.GetMortionStart(paramPlayer_.mortionType);
 		paramChara_.attackState = ATTACK_STATE::START;
-		paramChara_.timeAct = status_.GetMortionStart(MORTION_TYPE::JUB_1);
 
 		// 加速度初期化
 		paramChara_.velocity = AsoUtility::VECTOR_ZERO;
-	}
 
+		paramPlayer_.isDash = false;
+	}
+	else if (state == ACTION_STATE::ATTACK_STRONG)
+	{
+		int strong = static_cast<int>(ACTION_STATE::ATTACK_STRONG) + 1;
+		paramPlayer_.actionState = static_cast<ACTION_STATE>(strong);
+	}
 }
 
 bool Player::GetIsAttack(void) const
@@ -619,20 +633,51 @@ void Player::UpdateMortion(MORTION_TYPE _type)
 	}
 
 	// 攻撃終了時に再攻撃処理
-	if (paramChara_.attackState == ATTACK_STATE::END)
+	if (paramPlayer_.actionState != ACTION_STATE::ATTACK_JUB_END &&
+		paramPlayer_.actionState != ACTION_STATE::ATTACK_STRONG_1 &&
+		paramPlayer_.actionState != ACTION_STATE::ATTACK_STRONG_2 &&
+		paramPlayer_.actionState != ACTION_STATE::ATTACK_STRONG_3 &&
+		paramChara_.attackState == ATTACK_STATE::END)
 	{
 		// 弱攻撃
 		if (IsInputAtkJub())
 		{
-			//anim_->SetAnimStep(0.0f);
-			//ChangeAttackState(ATTACK_STATE::ACTIVE);
-			//ChangeActionState(ACTION_STATE::ATTACK_JUB_1);
+			// 弱攻撃増加
+			paramPlayer_.jubCnt++;
+
+			// 再生位置初期化
+			anim_->SetAnimStep();
+
+			// 弱攻撃の状態遷移
+			int jubState = static_cast<int>(ACTION_STATE::ATTACK_JUB) + paramPlayer_.jubCnt;
+			paramPlayer_.actionState = static_cast<ACTION_STATE>(jubState);
+
+			// 再攻撃状態遷移
+			ChangeAttackState(ATTACK_STATE::START,
+							  time[static_cast<int>(paramChara_.attackState)],
+				              SoundManager::SRC::SE_SWORD_JUB);
 		}
 
 		// 強攻撃
-		//else if (IsInputAtkStrong()) { ChangeActionState(ACTION_STATE::ATTACK_SPECIAL); }
+		else if (IsInputAtkStrong())
+		{
+			int strong = static_cast<int>(ACTION_STATE::ATTACK_STRONG);
+			strong = (paramPlayer_.jubCnt + 1);
+			paramPlayer_.actionState = static_cast<ACTION_STATE>(strong);
+			paramPlayer_.jubCnt = 0;
+		}
 	}
 }
+
+void Player::SetPosForward(void)
+{
+	float frameRad = status_.GetMortionRadius(paramPlayer_.mortionType);
+	VECTOR forward = VScale(paramChara_.quaRot.GetForward(), frameRad);
+	VECTOR pos = VAdd(paramChara_.colList[COLLISION_TYPE::BODY]->pos, forward);
+
+	paramChara_.posForward = pos;
+}
+
 
 bool Player::IsActiveAction(void)const
 {
@@ -649,15 +694,26 @@ bool Player::IsActiveAction(void)const
 	return ret;
 }
 
-void Player::SetPosForward(void)
+bool Player::IsActionAttack(void)
 {
-	float frameRad = status_.GetMortionRadius(paramPlayer_.mortionType);
-	VECTOR forward = VScale(paramChara_.quaRot.GetForward(), frameRad);
-	VECTOR pos = VAdd(paramChara_.colList[COLLISION_TYPE::BODY]->pos, forward);
+	bool result = false;
+	ACTION_STATE state = paramPlayer_.actionState;
+	if (state == ACTION_STATE::ATTACK_JUB ||
+		state == ACTION_STATE::ATTACK_JUB_1 ||
+		state == ACTION_STATE::ATTACK_JUB_2 ||
+		state == ACTION_STATE::ATTACK_JUB_END ||
 
-	paramChara_.posForward = pos;
+		state == ACTION_STATE::ATTACK_SPECIAL ||
+
+		state == ACTION_STATE::ATTACK_STRONG ||
+		state == ACTION_STATE::ATTACK_STRONG_1 ||
+		state == ACTION_STATE::ATTACK_STRONG_2 ||
+		state == ACTION_STATE::ATTACK_STRONG_3)
+	{
+		result = true;
+	}
+	return result;
 }
-
 
 bool Player::IsInputMove(void)
 {
@@ -688,31 +744,6 @@ bool Player::IsInputMove(void)
 	return ret;
 }
 
-bool Player::IsInputAtkStrong(void)
-{
-	InputManager& input = InputManager::GetInstance();
-
-	bool ret = false;
-
-	// コントローラ入力時
-	if (GetJoypadNum() > 0)
-	{
-		if (input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::UP))
-		{
-			ret = true;
-		}
-	}
-
-	// キーボード入力時
-	else if (input.MouseIsTrgDown(inputKey_[INPUT_TYPE::ATTACK_STRONG]))
-	{
-		// 移動入力時、true
-		ret = true;
-	}
-
-	return ret;
-}
-
 bool Player::IsInputAtkJub(void)
 {
 	InputManager& input = InputManager::GetInstance();
@@ -730,6 +761,31 @@ bool Player::IsInputAtkJub(void)
 
 	// キーボード入力時
 	else if (input.MouseIsTrgDown(inputKey_[INPUT_TYPE::ATTACK_JUB]))
+	{
+		// 移動入力時、true
+		ret = true;
+	}
+
+	return ret;
+}
+
+bool Player::IsInputAtkStrong(void)
+{
+	InputManager& input = InputManager::GetInstance();
+
+	bool ret = false;
+
+	// コントローラ入力時
+	if (GetJoypadNum() > 0)
+	{
+		if (input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::UP))
+		{
+			ret = true;
+		}
+	}
+
+	// キーボード入力時
+	else if (input.MouseIsTrgDown(inputKey_[INPUT_TYPE::ATTACK_STRONG]))
 	{
 		// 移動入力時、true
 		ret = true;

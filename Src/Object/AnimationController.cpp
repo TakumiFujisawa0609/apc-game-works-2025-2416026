@@ -40,11 +40,11 @@ void AnimationController::Add(int _type, float _speed, const std::string _path)
 	Add(_type, _speed, animation);
 }
 
-void AnimationController::Play(int _type, bool isLoop)
+void AnimationController::Play(int _type, bool _isLoop)
 {
-	// 同じアニメーションだったら再生を継続する
+	// 同じアニメーションだったら再生を行わない
 	if (playType_ == _type) return;
-	
+
 	if (playType_ != -1)
 	{
 		// モデルからアニメーションを外す
@@ -79,7 +79,7 @@ void AnimationController::Play(int _type, bool isLoop)
 	playAnim_.totalTime = MV1GetAttachAnimTotalTime(modelId_, playAnim_.attachNo);
 
 	// アニメーションループ
-	isLoop_ = isLoop;
+	isLoop_ = _isLoop;
 }
 
 
@@ -126,12 +126,15 @@ void AnimationController::DrawDebug(void)
 
 void AnimationController::Release(void)
 {
+	if (animations_.empty()) return;
+
 	// ロードしたアニメーションを解放
-	for (auto& pair : animations_)
+	for (auto& anim : animations_)
 	{
-		if (pair.second.model != -1)
+		if (anim.second.model != -1)
 		{
-			MV1DeleteModel(pair.second.model);
+			//MV1DetachAnim(modelId_, anim.second.attachNo);
+			MV1DeleteModel(anim.second.model);
 		}
 	}
 
@@ -231,17 +234,20 @@ void AnimationController::Add(int _type, float _speed, Animation& _animation)
 
 bool AnimationController::IsFindAnimation(int _type)
 {
-	bool isFind = false;
+	bool ret = false;
 
 	auto it = animations_.find(_type);
 	if (it != animations_.end())
 	{
 		// 発見
-		isFind = true;
+		ret = true;
 	}
-
 #ifdef _DEBUG
-	OutputDebugString("\nアニメーションの情報がありません。\n");
+	else
+	{
+		OutputDebugString("\nアニメーションの情報がありません。\n");
+	}
 #endif
-	return isFind;
+
+	return ret;
 }

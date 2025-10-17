@@ -119,6 +119,8 @@ private:
 	// 読み込み済みリソース
 	std::map<SRC, Resource*> loadedMap_;
 
+	std::map<int, std::string> path_;
+
 
 	/// <summary>
 	/// デフォルトコンストラクタ(private化で外部生成不可化)

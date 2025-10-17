@@ -169,7 +169,8 @@ void Application::Run(void)
 
 			// データ再ロード
 			if (scene.GetIsDebugMode() &&
-				input.KeyIsTrgDown(KEY_INPUT_DELETE))
+				input.KeyIsTrgDown(KEY_INPUT_DELETE) &&
+				scene.GetSceneId() == SceneManager::SCENE_ID::TITLE)
 			{
 				StatusData::GetInstance().Load();
 				OutputDebugString("\nリソースデータを再ロードしました。\n");
@@ -198,6 +199,13 @@ void Application::Draw(void)
 	if (scene.GetIsDebugMode()){ FrameRate::GetInstance().Draw(); }
 
 	scene.DrawDebug();
+
+	if (scene.GetIsDebugMode() &&
+		scene.GetSceneId() == SceneManager::SCENE_ID::TITLE &&
+		InputManager::GetInstance().KeyIsNew(KEY_INPUT_DELETE))
+	{
+		DrawString(SCREEN_SIZE_X - 225, 16, "リソースデータ リロード", 0x0000ff);
+	}
 
 	ScreenFlip(); // 裏画面を表にコピー
 }

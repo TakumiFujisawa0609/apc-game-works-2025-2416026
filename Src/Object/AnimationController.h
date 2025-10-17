@@ -31,18 +31,18 @@ public:
 	/// <summary>
 	/// 同じFBX内のアニメーションを準備
 	/// </summary>
-	/// <param name="type"></param>
-	/// <param name="speed">再生速度</param>
-	/// <param name="animIndex"></param>
-	void AddInFbx(int type, float speed, int animIndex);
+	/// <param name="_type"></param>
+	/// <param name="_speed">再生速度</param>
+	/// <param name="_animIndex"></param>
+	void AddInFbx(int _type, float _speed, int _animIndex);
 
 	/// <summary>
 	/// 別のFBXからアニメーションを準備
 	/// </summary>
-	/// <param name="type"></param>
-	/// <param name="speed">再生速度</param>
+	/// <param name="_type"></param>
+	/// <param name="_speed">再生速度</param>
 	/// <param name="path"></param>
-	void Add(int type, float speed, const std::string path);
+	void Add(int _type, float _speed, const std::string path);
 
 
 	/// @brief アニメーション再生
@@ -106,9 +106,9 @@ private:
 	/// <summary>
 	/// アニメーション追加の共通処理
 	/// </summary>
-	/// <param name="type"></param>
-	/// <param name="speed">再生速度</param>
-	/// <param name="animIndex"></param>
+	/// <param name="_type"></param>
+	/// <param name="_speed">再生速度</param>
+	/// <param name="_animIndex"></param>
 	
 	/// @brief アニメーション追加処理
 	/// @param _type アニメーションの種類
@@ -119,6 +119,6 @@ private:
 	/// <summary>
 	/// アニメーションが格納されているか判定
 	/// </summary>
-	/// <param name="type">アニメーションの種類</param>
+	/// <param name="_type">アニメーションの種類</param>
 	bool IsFindAnimation(int _type);
 };

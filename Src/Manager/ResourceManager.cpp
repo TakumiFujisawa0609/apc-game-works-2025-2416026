@@ -3,6 +3,9 @@
 #include "ResourceManager.h"
 #include <DxLib.h>
 #include <string>
+#include <vector>
+#include <iostream>
+#include <filesystem>
 #include "../Application.h"
 #include "../Object/Status/StatusData.h"
 #include "../Object/Status/StatusEnemy.h"
@@ -158,6 +161,7 @@ Resource* ResourceManager::_Load(SRC src)
 
 	return ret;
 }
+
 
 int ResourceManager::LoadModelDuplicate(SRC src)
 {

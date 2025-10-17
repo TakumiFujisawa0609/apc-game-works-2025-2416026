@@ -29,7 +29,7 @@ public:
 		ATTACK_JUB,   // 弱攻撃
 		ATTACK_JUB_1, // 弱攻撃１回目(初回)
 		ATTACK_JUB_2, // 弱攻撃２回目
-		ATTACK_JUB_3, // 弱攻撃３回目
+		ATTACK_JUB_END, // 弱攻撃３回目
 
 		ATTACK_SPECIAL, // 強攻撃単体(必殺技)
 		ATTACK_STRONG,   // 強攻撃
@@ -37,6 +37,7 @@ public:
 		ATTACK_STRONG_2, // 弱２回 強攻撃
 		ATTACK_STRONG_3, // 弱３回 強攻撃
 
+		DODGE, // 回避
 		GAME_OVER, // ゲームオーバー状態
 
 	};
@@ -157,9 +158,6 @@ public:
 
 	/// @brief 被ダメージ処理
 	void SetDamage(int _damage = 1)override;
-
-	/// @brief 移動入力をしているか否か
-	bool IsInputMove(void);
 
 
 	/// <summary>
@@ -302,24 +300,28 @@ protected:
 	/// @brief待機状態のアニメーション遷移処理
 	void AnimStateIdle(void);
 
-	/// @brief 攻撃入力をしているか否か
-	bool IsInputAtkStrong(void);
-
-	/// @brief弱攻撃入力をしているか否か
-	bool IsInputAtkJub(void);
-
-	/// @brief ダッシュ入力をしているか否か
-	bool IsInputDash(void);
-
-
 	/// <summary>
 	/// モーション処理
 	/// </summary>
 	/// <param name="_type">モーションの種類</param>
 	void UpdateMortion(MORTION_TYPE _type);
 
+	void SetPosForward(void)override;
+
+	bool IsActionAttack(void);
+
 	/// @brief行動可能か否か判定
 	bool IsActiveAction(void)const;
 
-	void SetPosForward(void)override;
+	/// @brief 移動入力をしているか否か
+	bool IsInputMove(void);
+
+	/// @brief弱攻撃入力をしているか否か
+	bool IsInputAtkJub(void);
+
+	/// @brief 攻撃入力をしているか否か
+	bool IsInputAtkStrong(void);
+
+	/// @brief ダッシュ入力をしているか否か
+	bool IsInputDash(void);
 };

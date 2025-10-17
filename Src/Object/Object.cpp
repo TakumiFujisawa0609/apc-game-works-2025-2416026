@@ -158,7 +158,8 @@ void Object::DrawDebug(void)
 
 void Object::Release(void)
 {
-	//animSpeed_.clear();
+	anim_->Release();
+	delete anim_;
 }
 
 void Object::SetMatrixModel(void)

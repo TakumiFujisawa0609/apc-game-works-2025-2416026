@@ -40,7 +40,7 @@ public:
 		NONE = -1,
 		JUB_1,
 		JUB_2,
-		JUB_3,
+		JUB_END,
 
 		SPECIAL,
 		STRONG_1,
