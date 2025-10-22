@@ -81,21 +81,15 @@ public:
 	/// </summary>
 	void Update(void);
 
-	/// <summary>
-	/// 描画処理
-	/// </summary>
+	/// @brief 描画処理
 	void Draw(void);
 
-	/// <summary>
-	/// 解放処理
-	/// </summary>
+	/// @brief 解放処理
 	void Release(void);
 
 	
-	/// <summary>
-	/// 終了メニューが有効か判定
-	/// </summary>
-	bool GetIsActiveMenu(void)const;
+	/// @brief 終了メニューが有効か判定
+	bool GetIsActiveMenu(void)const { return isActiveMenu_; };
 
 
 private:

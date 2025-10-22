@@ -9,11 +9,11 @@ public:
 
 	enum class TITLE_STATE
 	{
-		START_GAME,     // ゲームシーン遷移状態
-		INFO,           // 遊び方
-		GAME_END,       //ゲーム終了
+		START_GAME, // ゲームシーン遷移状態
+		INFO,       // 遊び方
+		GAME_END,   //ゲーム終了
 
-		MAX, //要素最大数
+		MAX, //要素数
 	};
 
 	enum class INFO_TYPE
@@ -24,51 +24,37 @@ public:
 	};
 
 
-	/// <summary>
-	/// デフォルトコンストラクタ
-	/// </summary>
+	/// @brief デフォルトコンストラクタ
 	TitleScene(void);
 
-	/// <summary>
-	/// 通常のデストラクタ
-	/// </summary>
+	/// @brief デフォルトデストラクタ
 	~TitleScene(void) = default;
 
-	/// <summary>
-	/// 初期読み込み
-	/// </summary>
+	/// @brief 初期読み込み
 	void Load(void) override;
 
-	/// <summary>
-	/// 初期化処理
-	/// </summary>
+	/// @brief 初期化処理
 	void Init(void) override;
 
-	/// <summary>
-	/// 更新処理
-	/// </summary>
+	/// @brief 更新処理
 	void Update(void) override;
 
-	/// <summary>
-	/// 描画処理
-	/// </summary>
+	/// @brief 描画処理
 	void Draw(void) override;
 
-	/// <summary>
-	/// 解放処理
-	/// </summary>
+	/// @brief 解放処理
 	void Release(void) override;
 
-	//フォント設定
+	/// @brief フォント設定
 	void FontSettings(void);
 
-	//フォント描画
+	/// @brief フォント描画
 	void DrawFont(void);
 
-	//操作説明
+	/// @brief 操作説明
 	void DrawOperation(void);
 
-	//遊び方
+	/// @brief 遊び方
 	void DrawExplanation(void);
 
 
@@ -141,21 +127,15 @@ private:
 	float selectScale_;
 
 
-	/// <summary>
-	/// テキスト割り当て
-	/// </summary>
-	/// <param name="_posY">テキスト縦位置</param>
-	/// <param name="_text">テキストの内容</param>
-	/// <param name="_state">選択状態</param>
+	/// @brief テキスト割り当て
+	/// @param _posY テキスト縦位置
+	/// @param _text テキストの内容
+	/// @param _state 選択状態
 	void DrawTitleText(int& _posY, const char* _text, TITLE_STATE _state);
 
-	/// <summary>
-	/// 遊び方更新
-	/// </summary>
+	/// @brief 遊び方更新
 	void UpdateInfo(void);
 
-	/// <summary>
-	/// 遊び方描画処理
-	/// </summary>
+	/// @brief 遊び方描画処理
 	void DrawInfo(void);
 };

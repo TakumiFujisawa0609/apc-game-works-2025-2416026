@@ -10,6 +10,12 @@ public:
 	// アナログキーの入力受付しきい値(0.0～1.0)
 	static constexpr float ALGKEY_THRESHOLD = 0.5f;
 
+	// 十字キーの入力受付しきい値(0.0～1.0)
+	static constexpr float DPAD_THRESHOLD = (1.0f * 4500.0f);
+	
+	// マウスホイール移動最大
+	static constexpr int MOUSE_WHEEL_MAX = 2;
+
 	/// <summary>
 	/// 入力状態
 	/// </summary>
@@ -190,7 +196,7 @@ public:
 	/// <summary>
 	/// マウスの回転量を取得(正の値：上(奥)方向)
 	/// </summary>
-	int GetMouseWheelRot(void) { return GetMouseWheelRotVol(); };
+	int GetMouseWheelRot(void);
 
 #pragma endregion
 
@@ -235,43 +241,31 @@ public:
 	/// <param name="button">コントローラ番号</param>
 	bool PadIsBtnTrgUp(int _padNum, int button) const;
 
-	/// <sammary>
-	/// コントローラのスティックの入力判定
-	/// </sammary>
-	/// <param name="_padNum">コントローラの対象</param>
-	/// <param name="_algKey">スティック番号</param>
+	/// @brief コントローラのスティックの入力判定
+	/// @param _padNum コントローラの対象
+	/// @param _algKey スティックの種類
 	bool PadIsAlgKeyNew(PAD_NO _padNum, JOYPAD_ALGKEY _algKey)const;
-	/// <sammary>
-	/// コントローラのスティックの入力判定
-	/// </sammary>
-	///<param name="_padNum">コントローラの対象</param>
-	/// <param name="_algKey">スティック番号</param>
+	/// @brief コントローラのスティックの入力判定
+	/// @param _padNum コントローラの対象
+	/// @param _algKey スティック番号
 	bool PadIsAlgKeyNew(int _padNum, int _algKey)const;
 
-	/// <sammary>
-	/// コントローラのスティックを入力時の判定
-	/// </sammary>
-	/// <param name="_padNum">コントローラの対象</param>
-	/// <param name="_algKey">スティック番号</param>
+	/// @brief コントローラのスティックを入力した時の判定
+	/// @param _padNum コントローラの対象
+	/// @param _algKey スティックの種類
 	bool PadIsAlgKeyTrgDown(PAD_NO _padNum, JOYPAD_ALGKEY _algKey)const;
-	/// <sammary>
-	/// コントローラのスティックを入力時の判定
-	/// </sammary>
-	/// <param name="_padNum">コントローラの対象</param>
-	/// <param name="_algKey">スティック番号</param>
+	/// @brief コントローラのスティックを入力した時の判定
+	/// @param _padNum コントローラの対象
+	/// @param _algKey スティックの種類
 	bool PadIsAlgKeyTrgDown(int _padNum, int _algKey)const;
 
-	/// <sammary>
-	/// コントローラのスティックを離した時の判定
-	/// </sammary>
-	/// <param name="_padNum">コントローラの対象</param>
-	/// <param name="_algKey">スティック番号</param>
+	/// @brief コントローラのスティックを離した時の判定
+	/// @param _padNum コントローラの対象
+	/// @param _algKey スティックの種類
 	bool PadIsAlgKeyTrgUp(PAD_NO _padNum, JOYPAD_ALGKEY _algKey)const;
-	/// <sammary>
-	/// コントローラのスティックを離した時の判定
-	/// </sammary>
-	/// <param name="_padNum">コントローラの対象</param>
-	/// <param name="_algKey">スティック番号</param>
+	/// @brief コントローラのスティックを離した時の判定
+	/// @param _padNum コントローラの対象
+	/// @param _algKey スティックの種類
 	bool PadIsAlgKeyTrgUp(int _padNum, int _algKey)const;
 
 	/// <summary>
@@ -386,6 +380,8 @@ private:
 		// スティックの縦入力の傾き具合
 		int algKeyY[static_cast<int>(JOYPAD_ALGKEY::MAX)];
 
+		unsigned int dPad;
+
 		// スティックの前フレームの入力判定
 		bool isOldAlgKey[static_cast<int>(JOYPAD_ALGKEY::MAX)];
 
@@ -424,7 +420,7 @@ private:
 	InputManager::Mouse mouseInfoEmpty_;
 
 	Vector2 mousePos_; // マウスカーソル位置
-	int mouseInput_;   // マウスボタン入力状態
+	int mouseInput_;   // マウスボタン入力状態	
 
 	// マウスホイール回転量
 	float mouseWheelRot_;

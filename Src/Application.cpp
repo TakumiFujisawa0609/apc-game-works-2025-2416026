@@ -90,11 +90,9 @@ void Application::Init(void)
 }
 void Application::CreateManagers(void)
 {
+
 	// 入力マネージャ
 	InputManager::CreateInstance();
-
-	// カメラ
-	Camera::CreateInstance();
 
 	// ステータスデータ
 	StatusData::CreateInstance();
@@ -102,14 +100,17 @@ void Application::CreateManagers(void)
 	// リソースマネージャ生成
 	ResourceManager::CreateInstance();
 
-	// フレームレートマネージャ生成
-	FrameRate::CreateInstance();
-
 	// 音声マネージャー生成
 	SoundManager::CreateInstance();
 
 	// エフェクトマネージャー生成
 	EffectManager::CreateInstance();
+
+	// フレームレートマネージャ生成
+	FrameRate::CreateInstance();
+
+	// カメラ
+	Camera::CreateInstance();
 
 	// シーンマネージャ生成
 	SceneManager::CreateInstance();
@@ -214,6 +215,8 @@ void Application::Destroy(void)
 {
 	/*　インスタンス削除処理　*/
 
+	exit_->Release();
+
 	// フォントファイルの解放
 	Font::GetInstance().Destroy();
 
@@ -223,18 +226,14 @@ void Application::Destroy(void)
 	// シーンマネージャ
 	SceneManager::GetInstance().Destroy();
 
-	// エフェクトマネージャー
-	EffectManager::GetInstance().Destroy();
+	// カメラ
+	Camera::GetInstance().Destroy();
 
 	// フレームレートマネージャ
 	FrameRate::GetInstance().Destroy();
 
-	// カメラ
-	Camera::GetInstance().Destroy();
-
-	// 入力マネージャ
-	InputManager::GetInstance().Destroy();
-
+	// エフェクトマネージャー
+	EffectManager::GetInstance().Destroy();
 
 	// 音声マネージャ
 	SoundManager::GetInstance().Destroy();
@@ -245,6 +244,8 @@ void Application::Destroy(void)
 	// ステータスデータ
 	StatusData::GetInstance().Destroy();
 
+	// 入力マネージャ
+	InputManager::GetInstance().Destroy();
 
 	Effkseer_End();
 

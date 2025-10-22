@@ -1,6 +1,9 @@
 #include "InputManager.h" 
 #include <DxLib.h>
 #include <cassert>
+#ifdef _DEBUG
+#include <string>
+#endif
 
 
 InputManager* InputManager::instance_;
@@ -168,9 +171,9 @@ bool InputManager::KeyIsNewAll(void) const
 	return isInput;
 }
 
-const InputManager::Key& InputManager::FindKey(unsigned int keyType)const
+const InputManager::Key& InputManager::FindKey(unsigned int _keyType)const
 {
-	auto it = keys_.find(keyType);
+	auto it = keys_.find(_keyType);
 	if (it != keys_.end())
 	{
 		// キーの情報を返す
@@ -178,7 +181,10 @@ const InputManager::Key& InputManager::FindKey(unsigned int keyType)const
 	}
 
 #ifdef _DEBUG
-	OutputDebugString("\nキーの情報がありません。\nInputManager.SetInputKey()にて割り当ててください。\n");
+	std::string text = "\nキーの情報がありません。[キーの値：";
+	text += std::to_string(_keyType).c_str();
+	text += "]";
+	OutputDebugString(text.c_str());
 
 #endif
 
@@ -203,16 +209,20 @@ void InputManager::AddMouse(unsigned int type)
 	mouses_.emplace(mouse.type, mouse);
 }
 
-const InputManager::Mouse& InputManager::FindMouse(unsigned int mouseType) const
+const InputManager::Mouse& InputManager::FindMouse(unsigned int _mouseType) const
 {
-	auto it = mouses_.find(mouseType);
+	auto it = mouses_.find(_mouseType);
 	if (it != mouses_.end())
 	{
 		// マウスの情報を返す
 		return it->second;
 	}
 #ifdef _DEBUG
-	OutputDebugString("\nマウスの情報がありません。\nInputManagerで割り当て処理を行ってください\n");
+
+	std::string text = "\nマウスの情報がありません。[マウスの値：";
+	text += std::to_string(_mouseType).c_str();
+	text += "]";
+	OutputDebugString(text.c_str());
 #endif
 
 	// 空のキー情報を返す
@@ -513,8 +523,8 @@ bool InputManager::PadIsAlgKeyNew(PAD_NO _padNum, JOYPAD_ALGKEY _algKey)const
 	// パッドが未割当時、false
 	if (GetJoypadNum() < static_cast<int>(num)) return false;
 
-	int keyType = static_cast<int>(_algKey);
-	bool ret = (padInfos_[num].isNewAlgKey[keyType]);
+	int _keyType = static_cast<int>(_algKey);
+	bool ret = (padInfos_[num].isNewAlgKey[_keyType]);
 	return ret;
 }
 bool InputManager::PadIsAlgKeyNew(int _padNum, int _algKey)const
@@ -532,8 +542,8 @@ bool InputManager::PadIsAlgKeyTrgDown(PAD_NO _padNum, JOYPAD_ALGKEY _algKey)cons
 	// パッドが未割当時、false
 	if (GetJoypadNum() < num) return false;
 
-	int keyType = static_cast<int>(_algKey);
-	bool ret = (padInfos_[num].isTrgDownAlgKey[keyType]);
+	int _keyType = static_cast<int>(_algKey);
+	bool ret = (padInfos_[num].isTrgDownAlgKey[_keyType]);
 	return ret;
 }
 bool InputManager::PadIsAlgKeyTrgDown(int _padNum, int _algKey)const
@@ -551,8 +561,8 @@ bool InputManager::PadIsAlgKeyTrgUp(PAD_NO _padNum, JOYPAD_ALGKEY _algKey)const
 	// パッドが未割当時、false
 	if (GetJoypadNum() < num) return false;
 
-	int keyType = static_cast<int>(_algKey);
-	bool ret = (padInfos_[num].isTrgUpAlgKey[keyType]);
+	int _keyType = static_cast<int>(_algKey);
+	bool ret = (padInfos_[num].isTrgUpAlgKey[_keyType]);
 	return ret;
 }
 bool InputManager::PadIsAlgKeyTrgUp(int _padNum, int _algKey)const

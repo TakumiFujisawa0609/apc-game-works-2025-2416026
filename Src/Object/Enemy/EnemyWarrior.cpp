@@ -64,7 +64,7 @@ void EnemyWarrior::InitAnim(void)
 		speed = animSpeed_[anim.first];
 
 		// アニメーション割り当て
-		anim_->AddInFbx(type, speed, type);
+		anim_->AddInternal(type, speed, type);
 	}
 
 	// 待機アニメーション再生

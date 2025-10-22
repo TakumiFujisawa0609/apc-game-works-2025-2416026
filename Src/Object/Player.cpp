@@ -131,7 +131,7 @@ void Player::InitAnim(void)
 		speed = paramPlayer_.animSpeed[anim.first];
 
 		// アニメーション割り当て
-		anim_->AddInFbx(type, speed, type);
+		anim_->AddInternal(type, speed, type);
 	}
 
 	// 待機アニメーション再生
@@ -801,11 +801,13 @@ bool Player::IsInputDash(void)
 	// コントローラ入力時
 	if (GetJoypadNum() > 0)
 	{
-		if (input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::L_STICK))
+		if (input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::L_STICK) ||
+			input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::DOWN))
 		{
 			paramPlayer_.isDash = true;
 		}
-		else if (input.PadIsBtnTrgUp(PAD_NO::PAD1, PAD_BTN::L_STICK))
+		else if (input.PadIsBtnTrgUp(PAD_NO::PAD1, PAD_BTN::L_STICK) ||
+				 input.PadIsBtnTrgUp(PAD_NO::PAD1, PAD_BTN::DOWN))
 		{
 			paramPlayer_.isDash = false;
 		}

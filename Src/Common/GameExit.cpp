@@ -204,13 +204,6 @@ void GameExit::Release(void)
 }
 
 
-bool GameExit::GetIsActiveMenu(void)const
-{
-	// 終了確認画面有効判定 取得
-
-	return isActiveMenu_;
-}
-
 
 bool GameExit::IsActive(void)
 {

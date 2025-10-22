@@ -6,9 +6,17 @@ class AnimationController
 {
 public:
 
+	enum class ANIM_TYPE
+	{
+		NONE,
+		INTERNAL, // 内部アニメーション
+		EXTERNAL, // 外部アニメーション
+	};
+
 	// アニメーションデータ
 	struct Animation
 	{
+		ANIM_TYPE type = ANIM_TYPE::NONE;
 		int model		= -1;
 		int attachNo	= -1;
 		int animIndex	= 0;
@@ -18,37 +26,31 @@ public:
 	};
 
 
-	/// @brief デフォルトコンストラクタ
-	AnimationController(void);
-
 	/// @brief コンストラクタ
-	/// @param modelId キャラモデルID
-	AnimationController(int modelId);
+	/// @param _modelId アニメーション対象
+	AnimationController(int _modelId);
 
-	/// @brief デフォルトデストラクタ
-	~AnimationController(void) = default;
+	/// @brief デストラクタ
+	~AnimationController(void);
 
-	/// <summary>
-	/// 同じFBX内のアニメーションを準備
-	/// </summary>
-	/// <param name="_type"></param>
-	/// <param name="_speed">再生速度</param>
-	/// <param name="_animIndex"></param>
-	void AddInFbx(int _type, float _speed, int _animIndex);
+	/// @brief 同じモデル内のアニメーションを準備
+	/// @param type アニメーション種類
+	/// @param speed アニメーション速度 
+	/// @param animIndex 
+	void AddInternal(int _type, float _speed, int _animIndex);
 
-	/// <summary>
-	/// 別のFBXからアニメーションを準備
-	/// </summary>
-	/// <param name="_type"></param>
-	/// <param name="_speed">再生速度</param>
-	/// <param name="path"></param>
-	void Add(int _type, float _speed, const std::string path);
+	/// @brief 別のアニメーションモデルから準備
+	/// @param _type アニメーション種類
+	/// @param _speed アニメーション速度 
+	/// @param _path アニメーションのパス
+	void AddExternal(int _type, float _speed, const std::string _path);
 
 
 	/// @brief アニメーション再生
 	/// @param _type アニメーションの種類
-	/// @param _isLoop ループするか否か[default=true]
-	void Play(int _type, bool _isLoop = true);
+	/// @param _isLoop ループするか否か @hint default = true
+	/// @param _blendTime アニメーション遷移時間
+	void Play(int _type, bool _isLoop = true, float _blendTime = 0.175f);
 
 	/// @brief 更新処理
 	void Update(void);
@@ -60,7 +62,7 @@ public:
 	void Release(void);
 
 
-	/// @brief アニメーションが終了したか判定
+	/// @brief アニメーションが終了しているか否か
 	bool IsEnd(void) const;
 
 	/// @brief 再生中のアニメーション番号取得
@@ -69,10 +71,8 @@ public:
 	/// @brief アニメーション停止処理
 	void Stop(bool isStop = true) { isStop_ = isStop; };
 
-	/// <summary>
-	/// 再生位置変更処理
-	/// </summary>
-	/// <param name="step">再生する位置</param>
+	/// @brief 再生位置変更処理
+	/// @param _step 再生する位置
 	void SetAnimStep(float _step = 0.0f);
 
 	/// @brief 再生中のアニメーションの現在時間を取得
@@ -90,11 +90,17 @@ private:
 	// 種類別のアニメーションデータ
 	std::unordered_map<int, Animation> animations_;
 
-	// 再生中のアニメーション
+	// 再生中のアニメーション状態
 	int playType_;
 
-	// 再生中のアニメーションデータ
-	Animation playAnim_;
+	// 前回のアニメーション状態
+	int prePlayType_;
+
+	// ブレンド時間
+	float blendTime_;
+
+	// ブレンドのカウンタタイマー
+	float curBlendTime_;
 
 	// ループするか否かの判定
 	bool isLoop_;
@@ -103,18 +109,10 @@ private:
 	bool isStop_;
 	
 
-	/// <summary>
-	/// アニメーション追加の共通処理
-	/// </summary>
-	/// <param name="_type"></param>
-	/// <param name="_speed">再生速度</param>
-	/// <param name="_animIndex"></param>
-	
 	/// @brief アニメーション追加処理
 	/// @param _type アニメーションの種類
-	/// @param _speed 再生速度
 	/// @param _animIndex 格納するアニメーションリスト
-	void Add(int _type, float _speed, Animation& _animIndex);
+	void Add(int _type, Animation& _animIndex);
 
 	/// <summary>
 	/// アニメーションが格納されているか判定
