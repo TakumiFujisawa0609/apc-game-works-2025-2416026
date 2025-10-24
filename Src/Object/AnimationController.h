@@ -50,7 +50,8 @@ public:
 	/// @param _type アニメーションの種類
 	/// @param _isLoop ループするか否か @hint default = true
 	/// @param _blendTime アニメーション遷移時間
-	void Play(int _type, bool _isLoop = true, float _blendTime = 0.175f);
+	/// @param _isOnce 同一のアニメーションを再生するか否か
+	void Play(int _type, bool _isLoop = true, float _blendTime = 0.175f, bool _isOnce = true);
 
 	/// @brief 更新処理
 	void Update(void);

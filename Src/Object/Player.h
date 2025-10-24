@@ -26,13 +26,11 @@ public:
 		NONE = -1,
 		IDLE, // ‘Ò‹@
 
-		ATTACK_JUB,   // ãUŒ‚
 		ATTACK_JUB_1, // ãUŒ‚‚P‰ñ–Ú(‰‰ñ)
 		ATTACK_JUB_2, // ãUŒ‚‚Q‰ñ–Ú
 		ATTACK_JUB_END, // ãUŒ‚‚R‰ñ–Ú
 
 		ATTACK_SPECIAL, // ‹­UŒ‚’P‘Ì(•KE‹Z)
-		ATTACK_STRONG,   // ‹­UŒ‚
 		ATTACK_STRONG_1, // ã‚P‰ñ ‹­UŒ‚
 		ATTACK_STRONG_2, // ã‚Q‰ñ ‹­UŒ‚
 		ATTACK_STRONG_3, // ã‚R‰ñ ‹­UŒ‚
@@ -206,7 +204,7 @@ public:
 	bool GetIsAttack(void)const;
 
 	float GetRadiusForward(void)const override
-		{ return status_.GetMortionRadius(paramPlayer_.mortionType); };
+		{ return status_.GetMortionRadius(static_cast<int>(paramPlayer_.actionState) + 1); };
 
 
 protected:
@@ -215,8 +213,6 @@ protected:
 	{
 		// s“®ó‘Ô
 		ACTION_STATE actionState;
-
-		MORTION_TYPE mortionType;
 
 		// ãUŒ‚‰ñ”
 		int jubCnt;

@@ -60,10 +60,10 @@ void AnimationController::AddExternal(int _type, float _speed, const std::string
 	Add(_type, anim);
 }
 
-void AnimationController::Play(int _type, bool _isLoop, float _blendTime)
+void AnimationController::Play(int _type, bool _isLoop, float _blendTime, bool _isOnce)
 {
 	// 同じアニメーション時、処理を終了
-	if (playType_ == _type) return;
+	if (playType_ == _type && _isOnce) return;
 
 	if (prePlayType_ != -1)
 	{

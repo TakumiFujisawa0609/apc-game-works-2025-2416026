@@ -69,7 +69,6 @@ void Player::SetParam(void)
 	
 	// 行動状態
 	paramPlayer_.actionState = ACTION_STATE::IDLE;
-	paramPlayer_.mortionType = MORTION_TYPE::NONE;
 
 	// 攻撃状態初期化
 	paramChara_.attackState = ATTACK_STATE::NONE;
@@ -192,8 +191,12 @@ void Player::Draw(void)
 	if (SceneManager::GetInstance().GetIsDebugMode())
 	{
 		// 正面座標
-		DrawSphere3D(paramChara_.posForward, status_.GetMortionRadius(paramPlayer_.mortionType),
-			         16, 0xffaaaa, 0xffffff, false);
+		if (IsActionAttack())
+		{
+			float forwardRad = status_.GetMortionRadius(static_cast<int>(paramPlayer_.actionState) + 1);
+			DrawSphere3D(paramChara_.posForward, forwardRad,
+				16, 0xffaaaa, 0xffffff, false);
+		}
 	}
 }
 
@@ -298,6 +301,7 @@ void Player::UpdateStateAtk(void)
 	// フレーム位置更新
 	UpdateModelFrames();
 
+	// コンボ終了時、通常状態に戻す
 	if (paramPlayer_.actionState == ACTION_STATE::ATTACK_JUB_END ||
 		paramPlayer_.actionState == ACTION_STATE::ATTACK_STRONG_1 ||
 		paramPlayer_.actionState == ACTION_STATE::ATTACK_STRONG_2 ||
@@ -345,17 +349,16 @@ void Player::ChangeActionState(ACTION_STATE state)
 	{
 		anim_->Play(static_cast<int>(ANIM_STATE::IDLE));
 		paramChara_.attackState = ATTACK_STATE::NONE;
-		paramPlayer_.mortionType = MORTION_TYPE::NONE;
 
 		paramChara_.timeAct = 0.0f;
 	}
-	else if (state == ACTION_STATE::ATTACK_JUB)
+	else if (state == ACTION_STATE::ATTACK_JUB_1)
 	{
-		paramPlayer_.mortionType = MORTION_TYPE::JUB_1;
 		paramPlayer_.actionState = ACTION_STATE::ATTACK_JUB_1;
 
 		anim_->Play(static_cast<int>(ANIM_STATE::SWORD_SLASH), false);
-		paramChara_.timeAct = status_.GetMortionStart(paramPlayer_.mortionType);
+		int mortionNum = static_cast<int>(paramPlayer_.actionState) + 1;
+		paramChara_.timeAct = status_.GetMortionStart(mortionNum);
 		paramChara_.attackState = ATTACK_STATE::START;
 
 		// 加速度初期化
@@ -363,9 +366,9 @@ void Player::ChangeActionState(ACTION_STATE state)
 
 		paramPlayer_.isDash = false;
 	}
-	else if (state == ACTION_STATE::ATTACK_STRONG)
+	else if (state == ACTION_STATE::ATTACK_STRONG_1)
 	{
-		int strong = static_cast<int>(ACTION_STATE::ATTACK_STRONG) + 1;
+		int strong = static_cast<int>(ACTION_STATE::ATTACK_STRONG_1) + 1;
 		paramPlayer_.actionState = static_cast<ACTION_STATE>(strong);
 	}
 }
@@ -375,8 +378,7 @@ bool Player::GetIsAttack(void) const
 	bool ret = false;
 
 	// 攻撃状態で攻撃有効時true
-	if (paramChara_.attackState == Object::ATTACK_STATE::ACTIVE &&
-		paramPlayer_.mortionType != MORTION_TYPE::NONE)
+	if (paramChara_.attackState == Object::ATTACK_STATE::ACTIVE)
 	{
 		ret = true;
 	}
@@ -524,6 +526,19 @@ void Player::Move(void)
 
 void Player::DashProc(float& _acc, float& _max)
 {
+	if (AsoUtility::EqualsVZero(paramChara_.velocity))
+	{
+		InputManager& input = InputManager::GetInstance();
+
+		if (!input.PadIsBtnNew(PAD_NO::PAD1, PAD_BTN::L_STICK) &&
+			!input.PadIsBtnNew(PAD_NO::PAD1, PAD_BTN::DOWN) ||
+			!input.KeyIsNew(inputKey_[INPUT_TYPE::DASH]))
+		{
+			// ダッシュ入力が無効+加速度が0の時、ダッシュ無効化
+			paramPlayer_.isDash = false;
+		}
+	}
+
 	if (paramPlayer_.isDash)
 	{
 		// ダッシュ時の加速度割り当て
@@ -649,7 +664,7 @@ void Player::UpdateMortion(MORTION_TYPE _type)
 			anim_->SetAnimStep();
 
 			// 弱攻撃の状態遷移
-			int jubState = static_cast<int>(ACTION_STATE::ATTACK_JUB) + paramPlayer_.jubCnt;
+			int jubState = static_cast<int>(ACTION_STATE::ATTACK_JUB_1) + paramPlayer_.jubCnt;
 			paramPlayer_.actionState = static_cast<ACTION_STATE>(jubState);
 
 			// 再攻撃状態遷移
@@ -661,7 +676,7 @@ void Player::UpdateMortion(MORTION_TYPE _type)
 		// 強攻撃
 		else if (IsInputAtkStrong())
 		{
-			int strong = static_cast<int>(ACTION_STATE::ATTACK_STRONG);
+			int strong = static_cast<int>(ACTION_STATE::ATTACK_STRONG_1);
 			strong = (paramPlayer_.jubCnt + 1);
 			paramPlayer_.actionState = static_cast<ACTION_STATE>(strong);
 			paramPlayer_.jubCnt = 0;
@@ -671,7 +686,9 @@ void Player::UpdateMortion(MORTION_TYPE _type)
 
 void Player::SetPosForward(void)
 {
-	float frameRad = status_.GetMortionRadius(paramPlayer_.mortionType);
+	int forwardNum = static_cast<int>(paramPlayer_.actionState) + 1;
+	float frameRad = status_.GetMortionRadius(forwardNum);
+
 	VECTOR forward = VScale(paramChara_.quaRot.GetForward(), frameRad);
 	VECTOR pos = VAdd(paramChara_.colList[COLLISION_TYPE::BODY]->pos, forward);
 
@@ -698,14 +715,13 @@ bool Player::IsActionAttack(void)
 {
 	bool result = false;
 	ACTION_STATE state = paramPlayer_.actionState;
-	if (state == ACTION_STATE::ATTACK_JUB ||
-		state == ACTION_STATE::ATTACK_JUB_1 ||
+
+	if (state == ACTION_STATE::ATTACK_JUB_1 ||
 		state == ACTION_STATE::ATTACK_JUB_2 ||
 		state == ACTION_STATE::ATTACK_JUB_END ||
 
 		state == ACTION_STATE::ATTACK_SPECIAL ||
 
-		state == ACTION_STATE::ATTACK_STRONG ||
 		state == ACTION_STATE::ATTACK_STRONG_1 ||
 		state == ACTION_STATE::ATTACK_STRONG_2 ||
 		state == ACTION_STATE::ATTACK_STRONG_3)
@@ -806,11 +822,6 @@ bool Player::IsInputDash(void)
 		{
 			paramPlayer_.isDash = true;
 		}
-		else if (input.PadIsBtnTrgUp(PAD_NO::PAD1, PAD_BTN::L_STICK) ||
-				 input.PadIsBtnTrgUp(PAD_NO::PAD1, PAD_BTN::DOWN))
-		{
-			paramPlayer_.isDash = false;
-		}
 	}
 
 	// キーボード入力時
@@ -820,11 +831,6 @@ bool Player::IsInputDash(void)
 		{
 			// ダッシュ移動入力時、true
 			paramPlayer_.isDash = true;
-		}
-		else if (input.KeyIsTrgUp(inputKey_[INPUT_TYPE::DASH]))
-		{
-			// ダッシュ移動入力時、true
-			paramPlayer_.isDash = false;
 		}
 	}
 

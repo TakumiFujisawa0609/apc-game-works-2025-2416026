@@ -144,6 +144,7 @@
     <ClInclude Include="Src\Common\Font.h" />
     <ClInclude Include="Src\Common\FrameRate.h" />
     <ClInclude Include="Src\Common\GameExit.h" />
+    <ClInclude Include="Src\Common\Perform.h" />
     <ClInclude Include="Src\Common\Quaternion.h" />
     <ClInclude Include="Src\Common\Vector2.h" />
     <ClInclude Include="Src\Manager\CollisionManager.h" />
@@ -183,6 +184,7 @@
     <ClCompile Include="Src\Common\Font.cpp" />
     <ClCompile Include="Src\Common\FrameRate.cpp" />
     <ClCompile Include="Src\Common\GameExit.cpp" />
+    <ClCompile Include="Src\Common\Perform.cpp" />
     <ClCompile Include="Src\Common\Quaternion.cpp" />
     <ClCompile Include="Src\Common\Vector2.cpp" />
     <ClCompile Include="Src\Manager\CollisionManager.cpp" />

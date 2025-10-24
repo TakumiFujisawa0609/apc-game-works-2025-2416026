@@ -156,18 +156,24 @@ public:
 
 	// モーション開始時間
 	float GetMortionStart(MORTION_TYPE _type) { return mortion_[_type].timeStart; }
+	float GetMortionStart(int _type) { return mortion_[static_cast<MORTION_TYPE>(_type)].timeStart; }
 
 	// 有効時間
 	float GetMortionActive(MORTION_TYPE _type) { return mortion_[_type].timeActive; }
+	float GetMortionActive(int _type) { return mortion_[static_cast<MORTION_TYPE>(_type)].timeActive; }
 
 	// モーション終了時間
 	float GetMortionEnd(MORTION_TYPE _type) { return mortion_[_type].timeEnd; }
+	float GetMortionEnd(int _type) { return mortion_[static_cast<MORTION_TYPE>(_type)].timeEnd; }
 
 	// モーション終了時間
 	float GetMortionSpeed(MORTION_TYPE _type) { return mortion_[_type].animSpeed; }
+	float GetMortionSpeed(int _type) { return mortion_[static_cast<MORTION_TYPE>(_type)].animSpeed; }
+
 
 	// モーション半径取得
 	float GetMortionRadius(MORTION_TYPE _type) { return mortion_[_type].radius; }
+	float GetMortionRadius(int _type) { return mortion_[static_cast<MORTION_TYPE>(_type)].radius; }
 
 
 private:

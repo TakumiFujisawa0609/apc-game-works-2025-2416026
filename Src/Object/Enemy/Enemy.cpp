@@ -156,14 +156,15 @@ void Enemy::UpdateStateMove(void)
 
 	//if (paramEnemy_.isAttack) { ChangeActionState(ACTION_STATE::ATTACK_ACTIVE); }
 
-	if (paramChara_.timeInv > 0.0f || paramChara_.hp <= 0) return;
-
+	// 無敵中・撃破時・移動アニメーション以外のとき、処理終了
+	if (paramChara_.timeInv > 0.0f || paramChara_.hp <= 0) { return; }
 
 	// プレイヤー追従
 	LookPlayerPos();
 
 	VECTOR pos = VAdd(paramChara_.pos, paramChara_.posLocal);
 
+	// Z軸の移動速度
 	float speedZ = ((pos.z < player_.GetPos().z) ? paramChara_.speed : -paramChara_.speed);
 	float accZ = ((pos.z < player_.GetPos().z) ? paramChara_.speedAcc : -paramChara_.speedAcc);
 	accZ = ((pos.z == player_.GetPos().z) ? 0.0f : accZ);
@@ -210,8 +211,12 @@ void Enemy::Draw(void)
 {
 	SceneManager& scene = SceneManager::GetInstance();
 
+	// 無効状態・HPが0で撃破アニメーション終了の時、処理終了
 	if (!paramChara_.isActive ||
-		paramEnemy_.animState == ANIM_STATE::DEATH && anim_->IsEnd() && paramChara_.hp <= 0) return;
+		paramEnemy_.animState == ANIM_STATE::DEATH && anim_->IsEnd() && paramChara_.hp <= 0) { return; }
+
+
+	COLOR_F color = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 	if (scene.GetIsDebugMode())
 	{
@@ -219,15 +224,14 @@ void Enemy::Draw(void)
 
 		DrawAttackRange();
 
-		COLOR_F color = { 1.0f, 1.0f, 1.0f, 1.0f };
-
 		if (paramChara_.timeInv > 0.0f && paramEnemy_.animState != ANIM_STATE::DEATH)
 		{
+			// 赤に描画
 			color = { 75, 0, 0, 25 };
 		}
-		// 赤に描画
-		MV1SetDifColorScale(paramChara_.handle, color);
 	}
+
+	MV1SetDifColorScale(paramChara_.handle, color);
 
 	Object::Draw();
 }
