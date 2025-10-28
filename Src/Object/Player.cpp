@@ -15,6 +15,7 @@
 #include "./Status/StatusPlayer.h"
 #include "../Utility/AsoUtility.h"
 #include "../Common/Quaternion.h"
+#include "../Common/Camera.h"
 #include "./AnimationController.h"
 
 
@@ -35,6 +36,8 @@ Player::Player(void):
 void Player::Load(void)
 {
 	paramChara_.handle = ResourceManager::GetInstance().LoadHandleId(ResourceManager::SRC::MODEL_PLAYER);
+
+	Object::Load();
 }
 
 void Player::Init(const VECTOR& pos, float angleY)
@@ -114,9 +117,6 @@ void Player::InitAnim(void)
 	int type;
 	int max = static_cast<int>(ANIM_STATE::MAX);
 	float speed = 0.0f;
-
-	// アニメーション初期化
-	anim_ = new AnimationController(paramChara_.handle);
 
 	paramPlayer_.animSpeed.emplace(ANIM_STATE::IDLE, status_.GetAnimSpeedIdle());
 	paramPlayer_.animSpeed.emplace(ANIM_STATE::WALK, status_.GetAnimSpeedWalk());
@@ -392,136 +392,108 @@ void Player::Move(void)
 	/*　移動処理　*/
 
 	InputManager& input = InputManager::GetInstance();
-
+	VECTOR inputDir = {};
+	
+	// ダッシュ処理
 	float speedAcc = paramChara_.speedAcc;
 	float speedMax = paramChara_.speed;
-
-	// ダッシュ処理
 	DashProc(speedAcc, speedMax);
-	
 
-	if (GetJoypadNum() > 0)
+	if (GetJoypadNum() > 0 && IsActiveAction())
 	{
-		if (input.PadAlgKeyY(PAD_NO::PAD1, PAD_ALGKEY::LEFT) && IsActiveAction())
-		{
-			if (input.PadAlgKeyY(PAD_NO::PAD1, PAD_ALGKEY::LEFT) < 0)
-			{
-				// 奥移動処理
-				paramChara_.velocity.z += _Move(&paramChara_.velocity.z, speedAcc, speedMax);
-			}
-			else
-			{
-				// 前移動処理
-				paramChara_.velocity.z += _Move(&paramChara_.velocity.z, -speedAcc , -speedMax);
-			}
-		}
-		else
-		{
-			// 加速度減少
-			paramChara_.velocity.z = DecVelocityXZ(&paramChara_.velocity.z);
-		}
-
-		if (input.PadAlgKeyX(PAD_NO::PAD1, PAD_ALGKEY::LEFT) != 0 && IsActiveAction())
-		{
-			if (input.PadAlgKeyX(PAD_NO::PAD1, PAD_ALGKEY::LEFT) > 0)
-			{
-				// 右移動処理
-				paramChara_.velocity.x += _Move(&paramChara_.velocity.x, speedAcc, speedMax);
-			}
-			else
-			{
-				// 左移動処理
-				paramChara_.velocity.x += _Move(&paramChara_.velocity.x, -speedAcc , -speedMax);
-			}
-		}
-		else
-		{
-			paramChara_.velocity.x = DecVelocityXZ(&paramChara_.velocity.x);
-		}
+		inputDir = input.GetAlgKeyDirXZ(InputManager::PAD_NO::PAD1, InputManager::JOYPAD_ALGKEY::LEFT);
 	}
+	
 
 	// キーボード操作
 	else
 	{
 		bool inputY = (input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_BACK]) &&
-			!input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_FRONT]) ||
-			!input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_BACK]) &&
-			input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_FRONT]));
+					  !input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_FRONT]) ||
+					  !input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_BACK]) &&
+					   input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_FRONT]));
 
 		bool inputX = (input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_LEFT]) &&
-			!input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_RIGHT]) ||
-			!input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_LEFT]) &&
-			input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_RIGHT]));
+					  !input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_RIGHT]) ||
+					  !input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_LEFT]) &&
+					   input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_RIGHT]));
 
-		if (inputY && IsActiveAction())
+		if (IsActiveAction())
 		{
-			if (input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_BACK]))
+			if (inputY)
 			{
-				// 奥移動処理
-				paramChara_.velocity.z += _Move(&paramChara_.velocity.z, speedAcc, speedMax);
+				if (input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_BACK]))
+				{
+					// 奥移動処理
+					inputDir.z = 1.0f;
+				}
+
+				if (input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_FRONT]))
+				{
+					// 前移動処理
+					inputDir.z = -1.0f;
+				}
 			}
 
-			if (input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_FRONT]))
+			if (inputX)
 			{
-				// 前移動処理
-				paramChara_.velocity.z += _Move(&paramChara_.velocity.z, -speedAcc, -speedMax);
-			}
-		}
-		else
-		{
-			paramChara_.velocity.z = DecVelocityXZ(&paramChara_.velocity.z);
-		}
+				if (input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_LEFT]))
+				{
+					// 左移動処理
+					inputDir.x = -1.0f;
+				}
 
-		if (inputX && IsActiveAction())
-		{
-			if (input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_LEFT]))
-			{
-				// 左移動処理
-				paramChara_.velocity.x += _Move(&paramChara_.velocity.x, -speedAcc, -speedMax);
+				if (input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_RIGHT]))
+				{
+					// 右移動処理
+					inputDir.x = 1.0f;
+				}
 			}
-
-			if (input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_RIGHT]))
-			{
-				// 右移動処理
-				paramChara_.velocity.x += _Move(&paramChara_.velocity.x, speedAcc, speedMax);
-			}
-		}
-		else
-		{
-			paramChara_.velocity.x = DecVelocityXZ(&paramChara_.velocity.x);
 		}
 	}
 
 
 
 
-	if (paramChara_.velocity.x != 0.0f && paramChara_.velocity.z != 0.0f)
+	if (!AsoUtility::EqualsVZero(inputDir))
 	{
-		float len = sqrtf((paramChara_.velocity.x * paramChara_.velocity.x) + (paramChara_.velocity.z * paramChara_.velocity.z));
+		Camera& camera = SceneManager::GetInstance().GetCamera();
+		float cameraEulerY = camera.GetCameraRot().ToEuler().y;
+		Quaternion cameraYRot = Quaternion::Euler(0.0f, cameraEulerY, 0.0f);
 
-		// 移動ベクトルを正規化
-		float length = sqrtf(len);
+		// 入力方向をカメラの向きに合わせる
+		VECTOR worldDir = cameraYRot.PosAxis(inputDir);
+		worldDir.y = 0.0f;
+		worldDir = VNorm(worldDir);
 
-		float speed = (speedMax + speedAcc);
-	
-		if (length > speed)
+		// 移動方向を取得
+		paramChara_.dir = worldDir;
+
+
+		// ワールド座標を加速量に反映
+		VECTOR acc = VScale(worldDir, speedAcc);
+		paramChara_.velocity = VAdd(paramChara_.velocity, acc);
+
+		// 加速ベクトルの長さを取得
+		VECTOR veloXZ = { paramChara_.velocity.x, 0.0f, paramChara_.velocity.z };
+		float curVelocity = VSize(veloXZ);
+		if (curVelocity > speedMax)
 		{
-			// 長さが移動速度を超えた時、スカラー倍
-
-			float scale = (speed / length);
-
+			// 加速ベクトルが上限を超えた時、スカラー倍する
+			float scale = (speedMax / curVelocity);
 			paramChara_.velocity.x *= scale;
 			paramChara_.velocity.z *= scale;
 		}
-
-		// 移動方向を取得
-		paramChara_.dir = VNorm({ paramChara_.velocity.x, 0.0f, paramChara_.velocity.z });
+	}
+	else
+	{
+		paramChara_.velocity.x = DecVelocityXZ(&paramChara_.velocity.x);
+		paramChara_.velocity.z = DecVelocityXZ(&paramChara_.velocity.z);
 	}
 
 	// 位置に反映する
 	// 移動処理
 	paramChara_.pos = VAdd(paramChara_.pos, paramChara_.velocity);
-
 }
 
 void Player::DashProc(float& _acc, float& _max)
@@ -812,26 +784,19 @@ bool Player::IsInputAtkStrong(void)
 
 bool Player::IsInputDash(void)
 {
+	/* ダッシュ入力判定 */
 	InputManager& input = InputManager::GetInstance();
 
-	// コントローラ入力時
-	if (GetJoypadNum() > 0)
-	{
-		if (input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::L_STICK) ||
-			input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::DOWN))
-		{
-			paramPlayer_.isDash = true;
-		}
-	}
+	if (GetJoypadNum() > 0 &&
+		input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::L_STICK) ||
+		GetJoypadNum() > 0 &&
+		input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::DOWN) ||
 
-	// キーボード入力時
-	else
+		GetJoypadNum() <= 0 &&
+		input.KeyIsTrgDown(inputKey_[INPUT_TYPE::DASH]))
 	{
-		if (input.KeyIsTrgDown(inputKey_[INPUT_TYPE::DASH]))
-		{
-			// ダッシュ移動入力時、true
-			paramPlayer_.isDash = true;
-		}
+		// ダッシュ切替処理
+		paramPlayer_.isDash = ((!paramPlayer_.isDash) ? true : false);
 	}
 
 	return paramPlayer_.isDash;

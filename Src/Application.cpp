@@ -50,7 +50,12 @@ void Application::Init(void)
 	SetGraphMode(SCREEN_SIZE_X, SCREEN_SIZE_Y, 32);
 
 	// ウィンドウの状態の設定
+#ifdef _DEBUG
 	ChangeWindowMode(true);
+#else
+	// リリース時、フルスクリーン
+	ChangeWindowMode(false);
+#endif
 
 	// DX_LIB_11の使用
 	SetUseDirect3DVersion(DX_DIRECT3D_11);
@@ -109,9 +114,6 @@ void Application::CreateManagers(void)
 	// フレームレートマネージャ生成
 	FrameRate::CreateInstance();
 
-	// カメラ
-	Camera::CreateInstance();
-
 	// シーンマネージャ生成
 	SceneManager::CreateInstance();
 
@@ -136,8 +138,6 @@ void Application::Run(void)
 	// 入力マネージャ
 	InputManager& input = InputManager::GetInstance();
 
-	// カメラ
-	Camera& camera = Camera::GetInstance();
 
 	while (ProcessMessage() == 0 && isGame_)
 	{
@@ -184,10 +184,10 @@ void Application::Draw(void)
 {
 	/* 描画処理 */
 	SceneManager& scene = SceneManager::GetInstance();
-	SetDrawScreen(DX_SCREEN_BACK);
-	ClearDrawScreen(); // 描画した画像を解放
 
-	Camera::GetInstance().SetBeforeDraw(); // カメラセット
+	SetDrawScreen(DX_SCREEN_BACK);
+
+	ClearDrawScreen(); // 描画した画像を解放
 
 	// シーン描画
 	scene.Draw();
@@ -225,9 +225,6 @@ void Application::Destroy(void)
 
 	// シーンマネージャ
 	SceneManager::GetInstance().Destroy();
-
-	// カメラ
-	Camera::GetInstance().Destroy();
 
 	// フレームレートマネージャ
 	FrameRate::GetInstance().Destroy();

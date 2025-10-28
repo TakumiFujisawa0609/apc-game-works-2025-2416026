@@ -17,9 +17,9 @@ public:
 	struct Animation
 	{
 		ANIM_TYPE type = ANIM_TYPE::NONE;
-		int model		= -1;
+		int modelId		= -1; // アニメーションモデル
 		int attachNo	= -1;
-		int animIndex	= 0;
+		int animIndex	= 0;    // モデル内アニメーション番号
 		float speed		= 0.0f; // 再生速度
 		float totalTime = 0.0f; // 最大再生時間
 		float step		= 0.0f; // 現在再生時間
@@ -50,8 +50,7 @@ public:
 	/// @param _type アニメーションの種類
 	/// @param _isLoop ループするか否か @hint default = true
 	/// @param _blendTime アニメーション遷移時間
-	/// @param _isOnce 同一のアニメーションを再生するか否か
-	void Play(int _type, bool _isLoop = true, float _blendTime = 0.175f, bool _isOnce = true);
+	void Play(int _type, bool _isLoop = true, float _blendTime = 0.175f);
 
 	/// @brief 更新処理
 	void Update(void);
@@ -66,6 +65,11 @@ public:
 	/// @brief アニメーションが終了しているか否か
 	bool IsEnd(void) const;
 
+	/// @brief 一定の位置に到達したかの判定
+	/// @param _pointStart 判定開始位置の割合(0.0f～1.0f)
+	/// @param _pointEnd 判定終了位置の割合(0.0f～1.0f)
+	bool IsEndPoint(float _pointStart, float _pointEnd = 1.0f);
+
 	/// @brief 再生中のアニメーション番号取得
 	int GetPlayType(void) { return playType_; };
 
@@ -75,6 +79,10 @@ public:
 	/// @brief 再生位置変更処理
 	/// @param _step 再生する位置
 	void SetAnimStep(float _step = 0.0f);
+
+	/// @brief 再生位置変更
+	/// @param rate 再生位置の割合(0.0f～1.0f)
+	void SetAnimStepRate(float rate);
 
 	/// @brief 再生中のアニメーションの現在時間を取得
 	float GetPlayTime(void);

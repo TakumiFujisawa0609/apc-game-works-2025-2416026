@@ -8,11 +8,12 @@ class CollisionManager;
 class EffectManager;
 class HpBer;
 
-/// <summary>
-/// ƒQ[ƒ€ƒV[ƒ“
-/// </summary>
+
 class GameScene : public SceneBase
 {
+
+	using PAD_BTN = InputManager::PAD_BTN;
+
 public:
 
 	enum class GAME_STATE
@@ -76,19 +77,11 @@ private:
 	GameStageController* gameStage_;
 
 
-	/// <summary>
-	/// Ä‰Šú‰»ˆ—
-	/// </summary>
+	/// @brief Ä‰Šú‰»ˆ—
 	void ReInit(void);
 
-	/// <sammary>
-	/// Œˆ’è”»’è
-	/// </sammary>
-	bool IsCheck(void);
 
-	/// <summary>
-	/// UI•`‰æ
-	/// </summary>
+	/// @brief UI•`‰æ
 	void DrawUI(void);
 
 	void GameIdleProc(void);

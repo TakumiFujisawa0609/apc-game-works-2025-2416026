@@ -27,6 +27,8 @@ void Enemy::LoadResource(void)
 	ResourceManager::SRC src = static_cast<ResourceManager::SRC>(type);
 
 	paramChara_.handle = ResourceManager::GetInstance().LoadModelDuplicate(src);
+
+	Object::Load();
 }
 
 void Enemy::Init(const VECTOR& pos, float angleY, Enemy::ACTION_STATE state)
@@ -333,10 +335,10 @@ void Enemy::DrawSearchRange(void)
 	for (int i = 0; i < split; i++)
 	{
 		leftMat = MMult(mat, MGetRotY(AsoUtility::Deg2Rad(angle * i)));
-		left = VTransform(AsoUtility::DIR_F, leftMat);
+		left = VTransform(AsoUtility::DIR_FORWARD, leftMat);
 
 		rightMat = MMult(mat, MGetRotY(AsoUtility::Deg2Rad(angle * (i + 1))));
-		right = VTransform(AsoUtility::DIR_F, rightMat);
+		right = VTransform(AsoUtility::DIR_FORWARD, rightMat);
 
 		leftPos = VAdd(pos, VScale(left, paramEnemy_.searchRange));
 		rightPos = VAdd(pos, VScale(right, paramEnemy_.searchRange));
@@ -359,11 +361,11 @@ void Enemy::DrawAttackRange(void)
 
 	// ¶‘¤•ûŒü
 	MATRIX leftMat = MMult(mat, MGetRotY(AsoUtility::Deg2Rad(-searchAngle)));
-	VECTOR left = VTransform(AsoUtility::DIR_F, leftMat);
+	VECTOR left = VTransform(AsoUtility::DIR_FORWARD, leftMat);
 
 	// ‰E‘¤•ûŒü
 	MATRIX rightMat = MMult(mat, MGetRotY(AsoUtility::Deg2Rad(searchAngle)));
-	VECTOR right = VTransform(AsoUtility::DIR_F, rightMat);
+	VECTOR right = VTransform(AsoUtility::DIR_FORWARD, rightMat);
 
 
 	// ³–Ê‚ÌˆÊ’u

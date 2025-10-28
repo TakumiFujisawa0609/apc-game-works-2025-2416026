@@ -20,7 +20,6 @@
 #include "../Common/Font.h"
 #pragma endregion
 
-using PAD_BTN = InputManager::PAD_BTN;
 
 GameScene::GameScene(void)
 {
@@ -75,8 +74,8 @@ void GameScene::ReInit(void)
 
 
 	// カメラ移動領域割り当て
-	Camera& camera = Camera::GetInstance();
-	camera.Init(Camera::MODE::FLLOW, player_->GetPos(), player_->GetRotationLocal().y, player_);
+	Camera& camera = SceneManager::GetInstance().GetCamera();
+	camera.Init(Camera::MODE::FOLLOW, player_->GetPos(), player_->GetRotationLocal().y, player_);
 
 	// カメラ追従対象初期化
 	camera.SetTrackingTarget(&player_->GetPos());
@@ -94,7 +93,7 @@ void GameScene::Update(void)
 	// 当たり判定更新
 	CollisionManager::GetInstance().Update();
 
-	Camera& camera = Camera::GetInstance();
+	Camera& camera = SceneManager::GetInstance().GetCamera();
 	// カメラ位置更新
 	camera.UpdatePlayerTransform(&player_->GetPos(), &player_->GetRotation());
 	camera.SetTrackingTarget(&player_->GetPos());
@@ -120,12 +119,15 @@ void GameScene::Update(void)
 void GameScene::Draw(void)
 {
 	/*　描画処理　*/
+	SceneManager& scene = SceneManager::GetInstance();
 	Font& font = Font::GetInstance();
+
 	Vector2 textPos = {};
 	Vector2 midPos = { Application::SCREEN_HALF_X, Application::SCREEN_HALF_Y };
 
+
 	// グリッド線描画
-	SceneManager::GetInstance().DrawGrid();
+	scene.DrawGrid();
 
 	// Effekseerにより再生中のエフェクトを更新する
 	UpdateEffekseer3D();
@@ -153,7 +155,7 @@ void GameScene::Draw(void)
 
 	player_->DrawDebug();
 
-	Camera::GetInstance().DrawDebug();
+	scene.DrawDebug();
 #endif
 }
 
@@ -180,25 +182,6 @@ void GameScene::Release(void)
 
 	// 全音声停止
 	SoundManager::GetInstance().StopAll();
-}
-
-
-bool GameScene::IsCheck(void)
-{
-	bool ret = false;
-	InputManager& input = InputManager::GetInstance();
-
-	if (input.PadIsBtnTrgDown(InputManager::PAD_NO::PAD1, PAD_BTN::START) ||
-		input.PadIsBtnTrgDown(InputManager::PAD_NO::PAD1, PAD_BTN::RIGHT) ||
-		input.PadIsBtnTrgDown(InputManager::PAD_NO::PAD1, PAD_BTN::DOWN) ||
-
-		input.KeyIsTrgDown(KEY_INPUT_SPACE) ||
-		input.KeyIsTrgDown(KEY_INPUT_RETURN))
-	{
-		ret = true;
-	}
-	return ret;
-
 }
 
 void GameScene::DrawUI(void)

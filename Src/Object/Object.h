@@ -255,7 +255,7 @@ protected:
 	float _Move(const float* _curVelo, float _movePow, float _maxVelo);
 
 	/// @brief 回転処理
-	void Rotation(bool isRevert = false);
+	virtual void Rotation(bool isRevert = false);
 
 	/// @brief 重力加算処理
 	void GravityKnock(void);
@@ -268,7 +268,7 @@ protected:
 	float DecVelocityXZ(const float* acc);
 
 	/// @brief アニメーション初期化
-	virtual void InitAnim(void) = 0;
+	virtual void InitAnim(void) {};
 
 	/// @brief フレーム初期化
 	virtual void InitModelFrame(void);
@@ -294,7 +294,7 @@ public:
 	/// @brief デフォルトデストラクタ
 	virtual ~Object(void) = default;
 
-	virtual void Load(void) {};
+	virtual void Load(void);
 
 	void Init(void);
 

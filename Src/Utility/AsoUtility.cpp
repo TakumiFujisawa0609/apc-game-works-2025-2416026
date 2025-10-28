@@ -26,31 +26,6 @@ std::vector<std::string> AsoUtility::Split(std::string& line, char delimiter)
 
 }
 
-double AsoUtility::Rad2Deg(double rad)
-{
-    return rad * (180.0 / DX_PI);
-}
-float AsoUtility::Rad2Deg(float rad)
-{
-    return rad * (180.0f / DX_PI_F);
-}
-int AsoUtility::Rad2Deg(int rad)
-{
-    return rad * Round(180.0f / DX_PI_F);
-}
-
-double AsoUtility::Deg2Rad(double deg)
-{
-    return deg * (DX_PI / 180.0);
-}
-float AsoUtility::Deg2Rad(float deg)
-{
-    return deg * (DX_PI_F / 180.0f);
-}
-int AsoUtility::Deg2Rad(int deg)
-{
-    return deg * Round(DX_PI_F / 180.0f);
-}
 
 double AsoUtility::DegIn360(double deg)
 {
@@ -467,12 +442,14 @@ VECTOR AsoUtility::Normalize(const Vector2& v)
 
 VECTOR AsoUtility::VNormalize(const VECTOR& v)
 {
+    // QuaternionŒvZ‚Åƒ[ƒœZ‚ª”­¶‚µ‚È‚¢‚æ‚¤‚É”»’è
     if (AsoUtility::EqualsVZero(v))
     {
-        // QuaternionŒvZ‚Åƒ[ƒ‚ğ“n‚µ‚ÄA
-        // ƒGƒ‰[(-1, -1, -1)‚ª•Ô‚Á‚Ä‚­‚é‚Æ¢‚é
+        // Œ³‚Ìƒ[ƒƒxƒNƒgƒ‹‚ğ•Ô‚·
         return v;
     }
+
+    // ’Êí³‹K‰»
     return VNorm(v);
 }
 

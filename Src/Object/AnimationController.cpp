@@ -28,7 +28,7 @@ void AnimationController::AddInternal(int _type, float _speed, int _animIndex)
 	/* 内部のアニメーションの追加 */
 	Animation anim;
 
-	anim.model = -1;
+	anim.modelId = -1;
 
 	anim.animIndex = _animIndex;
 
@@ -38,6 +38,8 @@ void AnimationController::AddInternal(int _type, float _speed, int _animIndex)
 	// アニメーション状態割り当て
 	anim.type = ANIM_TYPE::INTERNAL;
 
+	anim.step = 0.0f;
+
 	// アニメーション追加処理
 	Add(_type, anim);
 }
@@ -46,9 +48,7 @@ void AnimationController::AddExternal(int _type, float _speed, const std::string
 	/* 外部のアニメーションの追加 */
 	Animation anim;
 
-	anim.model = MV1LoadModel(_path.c_str());
-
-	anim.animIndex = -1;
+	anim.modelId = MV1LoadModel(_path.c_str());
 
 	// アニメーション速度割り当て
 	anim.speed = _speed;
@@ -56,14 +56,16 @@ void AnimationController::AddExternal(int _type, float _speed, const std::string
 	// アニメーション状態割り当て
 	anim.type = ANIM_TYPE::EXTERNAL;
 
+	anim.step = 0.0f;
+
 	// アニメーション追加処理
 	Add(_type, anim);
 }
 
-void AnimationController::Play(int _type, bool _isLoop, float _blendTime, bool _isOnce)
+void AnimationController::Play(int _type, bool _isLoop, float _blendTime)
 {
 	// 同じアニメーション時、処理を終了
-	if (playType_ == _type && _isOnce) return;
+	if (playType_ == _type) { return; }
 
 	if (prePlayType_ != -1)
 	{
@@ -99,7 +101,7 @@ void AnimationController::Play(int _type, bool _isLoop, float _blendTime, bool _
 	playAnim.step = 0.0f;
 
 	// モデルにアニメーションを付ける
-	if (playAnim.model == -1)
+	if (playAnim.type == ANIM_TYPE::INTERNAL)
 	{
 		// モデルと同じファイルからアニメーションをアタッチする
 		playAnim.attachNo = MV1AttachAnim(modelId_, playAnim.animIndex);
@@ -109,15 +111,15 @@ void AnimationController::Play(int _type, bool _isLoop, float _blendTime, bool _
 		// 別のモデルファイルからアニメーションをアタッチする
 		// DxModelViewerを確認すること(大体0か1)
 		int animIdx = 0;
-		playAnim.attachNo = MV1AttachAnim(modelId_, animIdx, playAnim.model);
+		playAnim.attachNo = MV1AttachAnim(modelId_, animIdx, playAnim.modelId);
 	}
 
 	// アニメーション総時間の取得
 	playAnim.totalTime = MV1GetAttachAnimTotalTime(modelId_, playAnim.attachNo);
 
 
-	// 前回のアニメーションがある時、ブレンド率を100%にする
-	float blendRate = ((prePlayType_ != -1) ? 1.0f : 0.0f);
+	// 前回のアニメーションがある時、ブレンド率を1.0f(100%)にする
+	float blendRate = ((prePlayType_ == -1) ? 1.0f : 0.0f);
 
 	// ブレンドアニメーションの割合を割り当て
 	MV1SetAttachAnimBlendRate(modelId_, playAnim.attachNo, blendRate);
@@ -197,11 +199,11 @@ void AnimationController::Release(void)
 		if (anim.type == ANIM_TYPE::EXTERNAL)
 		{
 			// アニメーション解放
-			MV1DeleteModel(anim.model);
+			MV1DeleteModel(anim.modelId);
 		}
 		
 		// 取付られているアニメーションの場合
-		if (anim.attachNo != -1)
+		if (anim.type == ANIM_TYPE::INTERNAL)
 		{
 			// アニメーションをリセット
 			MV1DetachAnim(modelId_, anim.attachNo);
@@ -240,6 +242,28 @@ bool AnimationController::IsEnd(void) const
 	*/
 }
 
+bool AnimationController::IsEndPoint(float _pointStart, float _pointEnd)
+{
+	auto& anim = animations_.at(playType_);
+
+	float start = _pointStart;
+	float end = _pointEnd;
+
+	// 再生位置の上限制限
+	start = ((start < 0.0f) ? 0.0f : start);
+	start = ((start > 1.0f) ? 1.0f : start);
+
+	// 再生位置の上限制限
+	end = ((end < 0.0f) ? 0.0f : end);
+	end = ((end > 1.0f) ? 1.0f : end);
+
+	// 再生位置の割合
+	float curRate = (anim.step / anim.totalTime);
+
+	// 再生位置が指定の割合になったときtrue
+	return (curRate >= start && curRate < end);
+}
+
 void AnimationController::SetAnimStep(float step)
 {
 	auto& anim = animations_.at(playType_);
@@ -254,14 +278,26 @@ void AnimationController::SetAnimStep(float step)
 		// 再生位置割り当て
 		anim.step = step;
 	}
+}
 
-#ifdef _DEBUG
-	else
+void AnimationController::SetAnimStepRate(float _rate)
+{
+	auto& anim = animations_.at(playType_);
+
+	float step = _rate;
+
+	// 再生位置の上限制限
+	step = ((step < 0.0f) ? 0.0f : step);
+	step = ((step > 1.0f) ? 1.0f : step);
+
+	// 割合の値
+	float rate = (1.0f / anim.totalTime);
+
+	if (playType_ != -1)
 	{
-		OutputDebugString("\nアニメーションが割り当てられていないため、再生位置の割り当てが出来ませんでした；；\n");
-		assert(false); // 例外スロー
+		// 再生位置割り当て
+		anim.step = (rate * step);
 	}
-#endif
 }
 
 float AnimationController::GetPlayTime(void)
@@ -303,6 +339,7 @@ float AnimationController::GetPlayTimeTotal(void)
 
 	return time;
 }
+
 
 void AnimationController::Add(int _type, Animation& _animation)
 {

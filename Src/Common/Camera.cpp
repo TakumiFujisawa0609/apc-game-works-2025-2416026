@@ -6,13 +6,6 @@
 #include <EffekseerForDXLib.h>
 #include <DxLib.h>
 
-Camera* Camera::instance_ = nullptr;
-
-void Camera::CreateInstance(void)
-{
-	if (instance_ == nullptr) instance_ = new Camera();
-	instance_->Load();
-}
 
 Camera::Camera(void)
 {
@@ -46,7 +39,7 @@ void Camera::Init(MODE mode, const VECTOR& pos, float angleY, Player* player)
 
 	follow_ = player;
 
-	zoom_.distance = CAMERA_DISTANCE;
+	zoom_.distance = LOCAL_POS;
 
 	rot_.camera = Quaternion::Euler(0.0f, AsoUtility::Deg2Rad(angleY), 0.0f);
 
@@ -69,7 +62,7 @@ void Camera::SetBeforeDraw(void)
 	}
 	break;
 
-	case Camera::MODE::FLLOW:
+	case Camera::MODE::FOLLOW:
 	{
 		SetBeforeDraw_Follow();
 	}
@@ -88,7 +81,7 @@ void Camera::SetBeforeDraw(void)
 	}
 
 
-	if (mode_ != MODE::FLLOW)
+	if (mode_ != MODE::FOLLOW)
 	{
 		//カメラセット
 		SetCameraPositionAndAngle(pos_.cameraPos, rot_.camera.x, rot_.camera.y, 0.0f);
@@ -150,11 +143,17 @@ void Camera::SetBeforeDraw_FixexPoint(void)
 
 void Camera::SetBeforeDraw_Follow(void)
 {
-	if (follow_ == nullptr) return;
+	/*　追尾カメラ　*/
+
+	_UpdateCameraRot();
 
 	// 回転処理
-	BeforeDrawProc();
+	SmoothRotation();
 
+	TrackPlayer();
+	/*
+	if (follow_ == nullptr) return;
+	
 	float offset = 100.0f;
 	VECTOR pPos = follow_->GetPos();
 	VECTOR forward = rot_.camera.GetForward();
@@ -163,9 +162,40 @@ void Camera::SetBeforeDraw_Follow(void)
 
 	// カメラ地点割り当て
 	SetCameraPositionAndTargetAndUpVec(pos_.cameraPos, target, up);
+	*/
+
+
+
+
+
+	// カメラの移動
+	// カメラの回転行列を作成
+	MATRIX mat = rot_.camera.ToMatrix();
+	//mat = MMult(mat, MGetRotZ(angles_.z));
+
+	VECTOR local = LOCAL_POS;
+	local.z = zoom_.distance.z;
+
+	// 注視点の移動
+	VECTOR followPos = VAdd(follow_->GetPos(), VScale(follow_->GetRotation().GetForward(), 2.0f));
+	VECTOR targetLocalRotPos = VTransform(local, mat);
+
+	// カメラの移動
+	// 相対座標を回転させて、回転後の相対座標を取得する
+	VECTOR cameraLocalRotPos = VTransform(local, mat);
+
+	// 相対座標からワールド座標に直して、カメラ座標とする
+	pos_.cameraPos = VAdd(followPos, cameraLocalRotPos);
+
+	// カメラの設定(位置と注視点による制御)
+	SetCameraPositionAndTargetAndUpVec(
+		pos_.cameraPos,
+		followPos,
+		rot_.camera.GetUp()
+	);
 }
 
-void Camera::BeforeDrawProc(void)
+void Camera::SmoothRotation(void)
 {
 	float smoothPow = 0.15f;
 	VECTOR pPos = follow_->GetPos();
@@ -174,17 +204,18 @@ void Camera::BeforeDrawProc(void)
 	
 
 	// カメラの回転を適用してオフセットを回転
-	VECTOR rotOffset = rot_.camera.PosAxis(CAMERA_DISTANCE);
+	VECTOR rotOffset = rot_.camera.PosAxis(LOCAL_POS);
 
 	// プレイヤー位置に回転したオフセットを加算
 	VECTOR idealPos = VAdd(pPos, zoom_.distance);
 
 	// 現在位置を理想位置に滑らかに移動
-	pos_.cameraPos = VAdd(pos_.cameraPos, VScale(VSub(idealPos, pos_.cameraPos), smoothPow));
-
+	//pos_.cameraPos = VAdd(pos_.cameraPos, VScale(VSub(idealPos, pos_.cameraPos), smoothPow));
+	pos_.cameraPos = VAdd(pos_.cameraPos, VSub(idealPos, pos_.cameraPos));
 
 	// カメラを滑らかに補間
-	rot_.camera = Quaternion::Slerp(rot_.camera, rot_.target, smoothPow);
+	//rot_.camera = Quaternion::Slerp(rot_.camera, rot_.target,smoothPow);
+	rot_.camera = rot_.target;
 }
 
 void Camera::_UpdateCameraRot(void)
@@ -196,6 +227,8 @@ void Camera::_UpdateCameraRot(void)
 
 	if (GetJoypadNum() == 0)
 	{
+		//if (input.KeyIsNew(KEY_INPUT_UP)) { rotInput.x += rotPow; }
+		//if (input.KeyIsNew(KEY_INPUT_DOWN)) { rotInput.x -= rotPow; }
 		if (input.KeyIsNew(KEY_INPUT_LEFT)) { rotInput.y += rotPow; }
 		if (input.KeyIsNew(KEY_INPUT_RIGHT)) { rotInput.y -= rotPow; }
 	}
@@ -203,6 +236,7 @@ void Camera::_UpdateCameraRot(void)
 	{
 		VECTOR dir = input.GetAlgKeyDirXZ(InputManager::PAD_NO::PAD1, InputManager::JOYPAD_ALGKEY::RIGHT);
 		rotInput.y += (dir.x * rotPow);
+		//rotInput.x += (dir.y * rotPow);
 	}
 
 	if (!AsoUtility::EqualsVZero(rotInput))
@@ -210,16 +244,6 @@ void Camera::_UpdateCameraRot(void)
 		// 相対的な回転を適用
 		Quaternion deltaRot = Quaternion::Euler(rotInput);
 		rot_.target = rot_.target.Mult(deltaRot);
-	}
-	else
-	{
-		VECTOR pAngles = follow_->GetRotationEuler();
-		Quaternion pRot = Quaternion::Euler(0.0f, pAngles.y, 0.0f);
-		Quaternion backRot = Quaternion::Euler(0.0f, -DX_PI_F, 0.0f);
-		Quaternion idealRot = pRot.Mult(backRot);
-
-		// 滑らかにプレイヤーを追尾
-		rot_.target = Quaternion::Slerp(rot_.target, idealRot, smoothPow);
 	}
 }
 
@@ -229,13 +253,18 @@ void Camera::SetBeforeDraw_FollowZoom(void)
 	SetCameraTarget();
 
 	//// 注視点から計算した距離分、カメラ座標を離す
-	pos_.cameraPos = VAdd(pos_.target, CAMERA_DISTANCE);
+	pos_.cameraPos = VAdd(pos_.target, LOCAL_POS);
 
 	// 位置制限
 	PosLimit();
 
 	// ズーム倍率割り当て
 	_SetZoomDiff(pos_.target);
+}
+
+void Camera::TrackPlayer(void)
+{
+	rot_.camera = rot_.target;
 }
 
 
@@ -264,13 +293,6 @@ void Camera::Release(void)
 		// 追尾座標リスト解放
 		targetsPos_.clear();
 	}
-}
-
-void Camera::Destroy(void)
-{
-	Release();
-
-	delete instance_;
 }
 
 void Camera::UpdatePlayerTransform(VECTOR* pos, Quaternion* rot)
@@ -342,7 +364,7 @@ void Camera::SetTrackingTarget(VECTOR* target)
 		check++;
 	}
 	// 追尾状態にする
-	mode_ = MODE::FLLOW;
+	mode_ = MODE::FOLLOW;
 }
 
 void Camera::ResetTrackingTarget(void)

@@ -45,9 +45,6 @@ void EnemyWarrior::InitAnim(void)
 	int type;
 	float speed = 0.0f;
 
-	// アニメーション初期化
-	anim_ = new AnimationController(paramChara_.handle);
-
 	animSpeed_.emplace(WARRIER_ANIM::IDLE, status_.GetAnimSpeed(StatusEnemy::ANIM_TYPE::IDLE));
 	animSpeed_.emplace(WARRIER_ANIM::ATTACK, status_.GetAnimSpeed(StatusEnemy::ANIM_TYPE::ATTACK));
 	animSpeed_.emplace(WARRIER_ANIM::WALK, status_.GetAnimSpeed(StatusEnemy::ANIM_TYPE::WALK));

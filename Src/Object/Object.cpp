@@ -43,6 +43,11 @@ Object::Object(void)
 	Load();
 }
 
+void Object::Load(void)
+{
+	anim_ = new AnimationController(paramChara_.handle);
+}
+
 void Object::Init(void)
 {
 	paramChara_.velocity = AsoUtility::VECTOR_ZERO;
@@ -442,11 +447,11 @@ void Object::Rotation(bool isRevert)
 		paramChara_.pos.z == paramChara_.prePos.z) return;
 
 	// 反転フラグ有効時向きを反転
-	velo = ((isRevert) ? VScale(velo, -1) : velo);
+	velo = ((!isRevert) ? VScale(velo, -1) : velo);
 
 	// 進行方向にプレイヤーを向かせる
-	Quaternion rot = Quaternion::LookRotation(velo, AsoUtility::AXIS_Y);
-	paramChara_.quaRot = rot;
+	Quaternion rot = Quaternion::LookRotation(velo);
+	paramChara_.quaRotLocal = rot;
 }
 
 float Object::DecVelocityXZ(const float* acc)
@@ -459,7 +464,7 @@ float Object::DecVelocityXZ(const float* acc)
 
 	float speedDec = MOVE_DEC_POWER;
 
-	if (vel < 0.0f)
+	if (vel > 0.0f)
 	{
 		vel -= MOVE_DEC_POWER; // 減速処理
 

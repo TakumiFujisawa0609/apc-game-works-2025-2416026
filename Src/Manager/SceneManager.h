@@ -1,10 +1,10 @@
 #pragma once
-class SceneBase;
-//class Fader;
-
 #include <chrono>
 #include <DxLib.h>
 #include "../Common/Vector2.h"
+class SceneBase;
+//class Fader;
+class Camera;
 
 class SceneManager
 {
@@ -53,19 +53,13 @@ public:
 	/// <returns></returns>
 	static SceneManager& GetInstance(void) { return *instance_; };
 
-	/// <summary>
-	/// 初期化処理
-	/// </summary>
+	/// @brief 初期化処理 
 	void Load(void);
 
-	/// <summary>
-	/// 更新処理
-	/// </summary>
+	/// @brief 更新処理
 	void Update(void);
 
-	/// <summary>
-	/// 描画処理
-	/// </summary>
+	/// @brief 描画処理
 	void Draw(void);
 
 	/// <summary>
@@ -73,9 +67,7 @@ public:
 	/// </summary>
 	void DrawDebug(void);
 
-	/// <summary>
-	/// 解放処理
-	/// </summary>
+	/// @brief 解放処理
 	void Destroy(void);
 
 	/// <summary>
@@ -84,17 +76,14 @@ public:
 	/// <param name="nextScene">遷移後のシーン</param>
 	void ChangeScene(SCENE_ID nextScene);
 
-	/// <summary>
-	/// シーンID取得
-	/// </summary>
-	/// <returns>現在シーンID</returns>
+	/// @brief 現在シーンID取得
 	SCENE_ID GetSceneId(void) const { return sceneId_; };
 
-	/// <summary>
-	/// 経過時間取得処理
-	/// </summary>
-	/// <returns>経過時間</returns>
+	/// @brief 経過時間取得処理
 	float GetDeltaTime(void) const { return deltaTime_; };
+
+	/// @brief カメラ取得
+	Camera& GetCamera(void) { return *camera_; };
 
 	/// <summary>
 	/// 演出時間
@@ -173,6 +162,9 @@ private:
 	// 現在のシーン状態
 	SceneBase* curScene_;
 
+	// カメラ
+	Camera* camera_;
+
 	//Fader* fader_; // フェーダー
 
 
@@ -188,24 +180,16 @@ private:
 	bool isDebugMode_;
 
 
-	/// <summary>
-	/// デフォルトコンストラクタ(private)
-	/// </summary>
+	/// @brief デフォルトコンストラクタ
 	SceneManager(void);
 
-	/// <summary>
-	/// コピーコンストラクタ
-	/// </summary>
+	/// @brief コピーコンストラクタ対策
 	SceneManager(const SceneManager &other) = default;
 
-	/// <summary>
-	/// デストラクタ(private)
-	/// </summary>
+	/// @brief デフォルトデストラクタ
 	~SceneManager(void) = default;
 
-	/// <summary>
-	/// 3Dの初期化処理
-	/// </summary>
+	/// @brief 3Dの初期化処理
 	void Init3D(void);
 
 	/// <summary>
@@ -220,14 +204,10 @@ private:
 	/// <param name="nextScene"></param>
 	void DoChangeState(SceneManager::SCENE_ID nextScene);
 
-	/// <summary>
-	/// 各フェードの処理
-	/// </summary>
+	/// @brief 各フェードの処理
 	void Fade(void);
 
-	/// <summary>
-	/// 経過時間の処理
-	/// </summary>
+	/// @brief 経過時間の処理
 	void DeltaCount(void);
 
 	/// <summary>

@@ -437,32 +437,32 @@ VECTOR Quaternion::GetDir(VECTOR dir) const
 
 VECTOR Quaternion::GetForward(void) const
 {
-    return GetDir(AsoUtility::DIR_F);
+    return GetDir(AsoUtility::DIR_FORWARD);
 }
 
 VECTOR Quaternion::GetBack(void) const
 {
-    return GetDir(AsoUtility::DIR_B);
+    return GetDir(AsoUtility::DIR_BACK);
 }
 
 VECTOR Quaternion::GetRight(void) const
 {
-    return GetDir(AsoUtility::DIR_R);
+    return GetDir(AsoUtility::DIR_RIGHT);
 }
 
 VECTOR Quaternion::GetLeft(void) const
 {
-    return GetDir(AsoUtility::DIR_L);
+    return GetDir(AsoUtility::DIR_LEFT);
 }
 
 VECTOR Quaternion::GetUp(void) const
 {
-    return GetDir(AsoUtility::DIR_U);
+    return GetDir(AsoUtility::DIR_UP);
 }
 
 VECTOR Quaternion::GetDown(void) const
 {
-    return GetDir(AsoUtility::DIR_D);
+    return GetDir(AsoUtility::DIR_DOWN);
 }
 
 double Quaternion::Dot(const Quaternion& q1, const Quaternion& q2)
@@ -539,14 +539,14 @@ Quaternion Quaternion::FromToRotation(VECTOR fromDir, VECTOR toDir)
     // 180‹ˆÈã‚ÌŽž
     if (angle >= 179.9196)
     {
-        auto r = VCross(fromDir, AsoUtility::DIR_R);
+        auto r = VCross(fromDir, AsoUtility::DIR_RIGHT);
         axis = VCross(r, fromDir);
 
         //if (axis.sqrMagnitude < 0.000001f)
         float len = (axis.x * axis.x) + (axis.y * axis.y) + (axis.z * axis.z);
         if (len < 0.000001f)
         {
-            axis = AsoUtility::DIR_U;
+            axis = AsoUtility::DIR_UP;
         }
     }
 

@@ -3,6 +3,7 @@
 #include <DxLib.h>
 #include <chrono>
 #include "../Application.h"
+#include "../Common/Camera.h"
 #include "../Scene/SceneBase.h"
 #include "../Scene/TitleScene.h"
 #include "../Scene/GameScene.h"
@@ -50,6 +51,8 @@ void SceneManager::Load(void)
 	DoChangeState(sceneId_); // シーン初期化
 
 	isChangeScene_ = false; // 遷移フラグ無効化
+
+	camera_ = new Camera();
 
 	// フェーダ初期化
 	//fader_ = new Fader();
@@ -129,6 +132,8 @@ void SceneManager::Update(void)
 void SceneManager::Draw(void)
 {
 	/*　描画処理　*/
+	
+	camera_->SetBeforeDraw();
 
 	// 現在シーン描画
 	curScene_->Draw();
@@ -168,6 +173,8 @@ void SceneManager::DrawDebug(void)
 {
 	if (isDebugMode_)
 	{
+		camera_->DrawDebug();
+
 		int x = (Application::SCREEN_SIZE_X - 175);
 		DrawString(x, 0, "デバッグモード有効中", 0xff0000);
 	}
@@ -183,6 +190,9 @@ void SceneManager::Destroy(void)
 		curScene_->Release();
 		delete curScene_;
 	}
+
+	camera_->Release();
+	delete camera_;
 
 	//delete fader_;	 // フェーダ削除
 	delete instance_; // マネージャ削除

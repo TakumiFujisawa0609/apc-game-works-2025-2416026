@@ -21,13 +21,17 @@ public:
 	{
 		NONE = -1,
 		FIXEX_POINT, // 定点カメラモード
-		FLLOW,       // 追従モード
+		FOLLOW,       // 追従モード
 		FOLLOW_AUTO_ZOOM,  // 追従モード[自動調整型]
 	};
 
 	// カメラの初期角度
 	static constexpr VECTOR DEFAULT_ANGLES =
-	{ (30.0f * (DX_PI_F / 180.0f)), 0.0f, 0.0f };
+	{ (45.0f * (DX_PI_F / 180.0f)), 0.0f, 0.0f };
+
+	// カメラのローカル座標
+	static constexpr VECTOR LOCAL_POS = { 0.0, 600.0f, -900.0f };
+
 
 	// カメラ最小描画領域
 	static constexpr float CAMERA_NEAR = 20.0f;
@@ -51,18 +55,12 @@ public:
 	// 注視点への視点移動速度(0～1.0)
 	static constexpr float CAMERA_LOOK_SPEED = 0.0f;
 
-	static constexpr VECTOR CAMERA_DISTANCE = { 0.0, 300.0f, -850.0f };
 
+	// デフォルトコンストラクタ
+	Camera(void);
 
-	/// <summary>
-	/// インスタンス生成
-	/// </summary>
-	static void CreateInstance(void);
-
-	/// <summary>
-	/// インスタンス取得
-	/// </summary>
-	static Camera& GetInstance(void) { return *instance_; };
+	// デフォルトデストラクタ
+	~Camera(void) = default;
 
 
 	/// <summary>
@@ -92,11 +90,6 @@ public:
 	/// メモリ解放処理
 	/// </summary>
 	void Release(void);
-
-	/// <summary>
-	/// インスタンス削除
-	/// </summary>
-	void Destroy(void);
 
 
 	void UpdatePlayerTransform(VECTOR* pos, Quaternion* rot);
@@ -158,9 +151,10 @@ public:
 
 	const VECTOR& GetCameraPos(void) const { return pos_.cameraPos; }
 
-private:
+	const VECTOR& GetCameraAngles(void)const { return rot_.camera.ToEuler(); }
+	const Quaternion& GetCameraRot(void)const { return rot_.camera; }
 
-	static Camera* instance_;
+private:
 
 	// カメラ状態
 	MODE mode_;
@@ -204,17 +198,7 @@ private:
 
 	// 追尾しない時間
 	float freeTime_;
-	
 
-
-	// デフォルトコンストラクタ
-	Camera(void);
-
-	// デフォルトデストラクタ
-	~Camera(void) = default;
-
-	// デフォルトコピーコンストラクタ
-	Camera(const Camera& other) = default;
 
 
 	/// <summary>
@@ -237,8 +221,14 @@ private:
 	void SetBeforeDraw_FixexPoint(void);
 
 	void SetBeforeDraw_Follow(void);
-	void BeforeDrawProc(void);
+
+	/// @brief 滑らかに追尾回転する処理
+	void SmoothRotation(void);
 	void _UpdateCameraRot(void);
 
 	void SetBeforeDraw_FollowZoom(void);
+
+	/// @brief プレイヤーの向きにカメラを合わせる
+	void TrackPlayer(void);
+
 };

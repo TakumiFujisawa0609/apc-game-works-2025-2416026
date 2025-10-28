@@ -13,10 +13,6 @@
 #include "../Utility/AsoUtility.h"
 
 
-using PAD_ALGKEY = InputManager::JOYPAD_ALGKEY;
-using PAD_BTN = InputManager::PAD_BTN;
-using PAD_NO = InputManager::PAD_NO;
-
 TitleScene::TitleScene(void)
 {
 	state_ = TITLE_STATE::START_GAME;

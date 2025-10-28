@@ -9,8 +9,10 @@ class AsoUtility
 
 public:
 
-	// ラジアン(rad)・度(deg)変換用
+	// ラジアン(rad) → 度(deg)
 	static constexpr float RAD2DEG = (180.0f / DX_PI_F);
+
+	// 度(deg) → ラジアン(rad)
 	static constexpr float DEG2RAD = (DX_PI_F / 180.0f);
 
 	static constexpr VECTOR VECTOR_ZERO = { 0.0f, 0.0f, 0.0f };
@@ -22,12 +24,12 @@ public:
 	static constexpr VECTOR AXIS_Z = { 0.0f, 0.0f, 1.0f };
 
 	// 方向
-	static constexpr VECTOR DIR_F = { 0.0f, 0.0f, 1.0f };
-	static constexpr VECTOR DIR_B = { 0.0f, 0.0f, -1.0f };
-	static constexpr VECTOR DIR_R = { 1.0f, 0.0f, 0.0f };
-	static constexpr VECTOR DIR_L = { -1.0f, 0.0f, 0.0f };
-	static constexpr VECTOR DIR_U = { 0.0f, 1.0f, 0.0f };
-	static constexpr VECTOR DIR_D = { 0.0f, -1.0f, 0.0f };
+	static constexpr VECTOR DIR_FORWARD = { 0.0f, 0.0f, 1.0f };
+	static constexpr VECTOR DIR_BACK = { 0.0f, 0.0f, -1.0f };
+	static constexpr VECTOR DIR_RIGHT = { 1.0f, 0.0f, 0.0f };
+	static constexpr VECTOR DIR_LEFT = { -1.0f, 0.0f, 0.0f };
+	static constexpr VECTOR DIR_UP = { 0.0f, 1.0f, 0.0f };
+	static constexpr VECTOR DIR_DOWN = { 0.0f, -1.0f, 0.0f };
 
 	static constexpr float kEpsilonNormalSqrt = 1e-15F;
 
@@ -38,15 +40,25 @@ public:
 	static std::vector <std::string> Split(std::string& line, char delimiter);
 
 
-	// ラジアン(rad)から度(deg)
-	static double Rad2Deg(double rad);
-	static float Rad2Deg(float rad);
-	static int Rad2Deg(int rad);
+	///@brief ラジアン(rad)から度(deg)[double]
+	static double Rad2Deg(double rad) { return (rad * RAD2DEG); };
 
-	// 度(deg)からラジアン(rad)
-	static double Deg2Rad(double deg);
-	static float Deg2Rad(float deg);
-	static int Deg2Rad(int deg);
+	///@brief ラジアン(rad)から度(deg)[float]
+	static float Rad2Deg(float rad) { return (rad * RAD2DEG); };
+
+	///@brief ラジアン(rad)から度(deg)[int]
+	static int Rad2Deg(int rad) { return (rad * Round(RAD2DEG)); };
+
+
+	///@brief 度(deg)→ラジアン(rad)[double]
+	static double Deg2Rad(double deg) { return (deg * DEG2RAD); };
+
+	///@brief 度(deg)→ラジアン(rad)[float]
+	static float Deg2Rad(float deg) { return (deg * DEG2RAD); };
+
+	///@brief 度(deg)→ラジアン(rad)[int]
+	static int Deg2Rad(int deg) { return (deg * Round(DEG2RAD)); };
+
 
 	// 0～360度の範囲に収める
 	static double DegIn360(double deg);
@@ -104,8 +116,10 @@ public:
 	static bool Equals(const VECTOR& v1, const VECTOR& v2);
 	static bool EqualsVZero(const VECTOR& v1);
 
-	// 正規化
+	// 2次元ベクトル → 3次元ベクトルに正規化
 	static VECTOR Normalize(const Vector2& v);
+
+	/// @brief ゼロ除算対策済みの正規化処理 
 	static VECTOR VNormalize(const VECTOR& v);
 
 	// 2つのベクトルの間の角度
