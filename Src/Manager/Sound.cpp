@@ -74,7 +74,7 @@ void Sound::Release(void)
 }
 
 
-bool Sound::Play(TIMES times, bool isForce)
+bool Sound::Play(TIMES times, bool _isPitch, float _pitchRange, bool isForce)
 {
 	sound_.isPlayOld = sound_.isPlay;
 
@@ -100,6 +100,16 @@ bool Sound::Play(TIMES times, bool isForce)
 		DX_PLAYTYPE_BACK :
 		DX_PLAYTYPE_LOOP);
 
+
+	// 音声のピッチをランダムで変更しソースを再読み込み
+	if (_isPitch)
+	{
+		int range = _pitchRange;
+		int rand = GetRand(range + range) - range;
+		SetCreateSoundPitchRate(static_cast<float>(rand) * 10.0f);
+		sound_.handle = LoadSoundMem(sound_.path.c_str());
+	}
+
 	// サウンド割り当て判定
 	int id = PlaySoundMem(sound_.handle, type, true);
 
@@ -108,8 +118,8 @@ bool Sound::Play(TIMES times, bool isForce)
 
 	sound_.isPlay = true;
 
-	// 再生を指定したサウンドの割り当て時 true
-	return ((id == 0) ? true : false);
+	// 再生指定したサウンドの未割り当て時 false
+	return ((id == -1) ? false : true);
 }
 
 bool Sound::Play(TIMES times, VECTOR pos, float radius)

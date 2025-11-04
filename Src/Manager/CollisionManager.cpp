@@ -304,10 +304,11 @@ void CollisionManager::CollisionEnemys(void)
 		}
 
 		// プレイヤー攻撃時の被ダメージ処理
-		if (player_->GetIsAttack())
+		if (player_->CheckActiveAttack())
 		{
 			pPos = player_->GetPosForward();
-			pRad = player_->GetRadiusForward();
+			int Rad = player_->GetMotionType();
+			pRad = player_->GetRadiusAttack(player_->GetMotionType());
 			ePos = enemy->GetFramePos(Object::COLLISION_TYPE::BODY);
 			eRad = enemy->GetRadius(COLLISION_TYPE::BODY);
 

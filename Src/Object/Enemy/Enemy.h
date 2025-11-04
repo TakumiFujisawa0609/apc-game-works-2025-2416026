@@ -70,6 +70,9 @@ public:
 
 protected:
 
+	// ƒXƒP[ƒ‹‚Ì·•ª
+	static constexpr float SCALE_DIFF = 0.25f;
+
 	struct ParamEnemy
 	{
 		std::string name;

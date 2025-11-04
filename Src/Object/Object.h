@@ -1,8 +1,10 @@
 #pragma once
 
 #include "../Common/Quaternion.h"
+#include "../Manager/ResourceManager.h"
 #include "../Manager/SoundManager.h"
 #include "./AnimationController.h"
+#include "./Common/AttackMotion.h"
 #include <DxLib.h>
 #include <memory>
 #include <map>
@@ -14,17 +16,11 @@ class AnimationController;
 
 class Object
 {
-public:
+	// リソース
+	using RES_SRC = ResourceManager::SRC;
 
-	// 行動状態
-	enum class ATTACK_STATE
-	{
-		NONE = -1, // 攻撃していない
-		START,     // 開始モーション
-		ACTIVE,    // 有効中
-		END,       // 終了
-		MAX
-	};
+
+public:
 
 	enum class COLLISION_TYPE
 	{
@@ -120,9 +116,7 @@ protected:
 		bool isVisible;
 	};
 
-	/// <summary>
-	/// プレイヤーのパラメータ
-	/// </summary>
+	/// @brief プレイヤーのパラメータ
 	struct ParamChara
 	{
 		// 位置
@@ -188,8 +182,6 @@ protected:
 		// 移動時の加速度
 		float speedAcc;
 
-		// 攻撃時間
-		float timeAct;
 
 		// 地面にいるか否か
 		bool isGround;
@@ -199,8 +191,8 @@ protected:
 		// 無敵時間
 		float timeInv;
 
-		// 攻撃状態
-		ATTACK_STATE attackState;
+		// 攻撃モーション処理
+		AttackMotion atkMotion;
 	};
 	ParamChara paramChara_;
 
@@ -380,19 +372,6 @@ public:
 
 	void SetIsActive(bool flag) { paramChara_.isActive = flag; };
 
-	/// @brief 攻撃状態を遷移
-	/// @param _state 攻撃状態
-	/// @param _activeTime 行動時間
-	/// @param _se 効果音
-	void ChangeAttackState(ATTACK_STATE _state, float _activeTime = 0.0f, SoundManager::SRC _se = SoundManager::SRC::NONE);
-
-
-	/// @brief  攻撃状態を遷移
-	/// @param _activeTime 行動時間
-	/// @param _se 効果音ソース
-	void ChangeAttackStateNext(float _activeTime = 0.0f, SoundManager::SRC _se = SoundManager::SRC::NONE);
-
-
 
 	/// @brief 現在位置取得
 	VECTOR& GetPos(void) { return paramChara_.pos; };
@@ -465,7 +444,7 @@ public:
 	bool GetIsAnimEnd(void)const { return anim_->IsEnd(); };
 
 	/// @brief 攻撃有効する猶予時間取得 
-	float GetActionTime(void) const { return paramChara_.timeAct; };
+	const AttackMotion& GetActionMotion(void) const { return paramChara_.atkMotion; };
 
 	/// @brief フレームの座標取得
 	/// @param _type 当たり判定の種類

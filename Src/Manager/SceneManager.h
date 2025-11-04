@@ -42,15 +42,10 @@ public:
 	static constexpr float SHAKE_MAX_Y = 5.0f;
 
 
-	/// <summary>
-	/// インスタンス生成処理
-	/// </summary>
+	/// @brief インスタンス生成処理
 	static void CreateInstance(void);
 
-	/// <summary>
-	/// インスタンス取得処理
-	/// </summary>
-	/// <returns></returns>
+	/// @brief インスタンス取得処理
 	static SceneManager& GetInstance(void) { return *instance_; };
 
 	/// @brief 初期化処理 

@@ -5,33 +5,25 @@ class UtilityCommon
 {
 public:
 
-	/// <summary>
-	/// 文字列→int型変換
-	/// </summary>
-	/// <param name="text">対象のテキスト</param>
-	/// <param name="target">数値割り当て先</param>
-	/// <param name="minNum">最小値</param>
-	static void ChangeString(const std::string& text, int& target, int minNum);
+	/// @brief 文字列→int型変換
+	/// @param _text 対象のテキスト
+	/// @param _target 数値割り当て先
+	/// @param _minNum 最小値
+	static void ChangeString(const std::string& _text, int& _target, int _minNum);
 
-	/// <summary>
-	/// 文字列→int型変換
-	/// </summary>
-	/// <param name="text">対象のテキスト</param>
-	/// <param name="target">数値割り当て先</param>
-	static void ChangeString(const std::string& text, int& target);
+	/// @brief 文字列→int型変換
+	/// @param _text 対象のテキスト
+	/// @param _target 数値割り当て先
+	static void ChangeString(const std::string& _text, int& _target);
 
-	/// <summary>
-	/// 文字列→float型変換
-	/// </summary>
-	/// <param name="text">対象のテキスト</param>
-	/// <param name="target">数値割り当て先</param>
-	/// <param name="minNum">最小値</param>
-	static void ChangeString(const std::string& text, float& target, float minNum);
+	/// @brief 文字列→float型変換
+	/// @param _text 対象のテキスト
+	/// @param _target 数値割り当て先
+	/// @param _minNum 最小値
+	static void ChangeString(const std::string& _text, float& _target, float _minNum);
 
-	/// <summary>
-	/// 文字列→float型変換
-	/// </summary>
-	/// <param name="text">対象のテキスト</param>
-	/// <param name="target">数値割り当て先</param>
-	static void ChangeString(const std::string& text, float& target);
+	/// @brief 文字列→float型変換
+	/// @param _text 対象のテキスト
+	/// @param _target 数値割り当て先
+	static void ChangeString(const std::string& _text, float& _target);
 };

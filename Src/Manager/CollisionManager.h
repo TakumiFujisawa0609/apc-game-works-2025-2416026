@@ -145,10 +145,8 @@ private:
 	//std::map < COL_TARGET, VECTOR* > collisionStage_;
 
 
-	/// <summary>
-	/// デフォルトコンストラクタ
-	/// </summary>
-	/// <param name="_player">プレイヤー</param>
+	/// @brief デフォルトコンストラクタ
+	/// @param プレイヤー
 	CollisionManager(Player& _player);
 
 	/// @briefデフォルトデストラクタ

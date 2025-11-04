@@ -39,18 +39,20 @@ StatusPlayer::StatusPlayer(void)
 
 	animSpeedDash_ = 0.0f;
 
-	mortion_.clear();
+	motion_.clear();
 }
 
-StatusPlayer::Mortion::Mortion(void)
+StatusPlayer::Motion::Motion(void)
 {
 	name = "";
 
-	timeStart = 0.0f;
-
 	timeActive = 0.0f;
 
+	timeInput = 0.0f;
+
 	timeEnd = 0.0f;
+
+	timeAttack = 0.0f;
 
 	animSpeed = 0.0f;
 

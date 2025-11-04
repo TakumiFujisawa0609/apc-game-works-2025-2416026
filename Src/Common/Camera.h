@@ -30,14 +30,14 @@ public:
 	{ (45.0f * (DX_PI_F / 180.0f)), 0.0f, 0.0f };
 
 	// カメラのローカル座標
-	static constexpr VECTOR LOCAL_POS = { 0.0, 600.0f, -900.0f };
+	static constexpr VECTOR LOCAL_POS = { 0.0, 850.0f, -850.0f };
 
 
 	// カメラ最小描画領域
 	static constexpr float CAMERA_NEAR = 20.0f;
 
 	// カメラ最大描画領域
-	static constexpr float CAMERA_FAR = 4000.0f;
+	static constexpr float CAMERA_FAR = 3000.0f;
 
 
 	// 最大ズームインローカル座標

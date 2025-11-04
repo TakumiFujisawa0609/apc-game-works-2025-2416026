@@ -42,9 +42,6 @@ void EnemyWarrior::InitModelFrame(void)
 
 void EnemyWarrior::InitAnim(void)
 {
-	int type;
-	float speed = 0.0f;
-
 	animSpeed_.emplace(WARRIER_ANIM::IDLE, status_.GetAnimSpeed(StatusEnemy::ANIM_TYPE::IDLE));
 	animSpeed_.emplace(WARRIER_ANIM::ATTACK, status_.GetAnimSpeed(StatusEnemy::ANIM_TYPE::ATTACK));
 	animSpeed_.emplace(WARRIER_ANIM::WALK, status_.GetAnimSpeed(StatusEnemy::ANIM_TYPE::WALK));
@@ -54,14 +51,12 @@ void EnemyWarrior::InitAnim(void)
 	animSpeed_.emplace(WARRIER_ANIM::DEATH, status_.GetAnimSpeed(StatusEnemy::ANIM_TYPE::DEATH));
 	
 
-	for (auto& anim : animSpeed_)
+	for (auto& [type, speed] : animSpeed_)
 	{
-		type = static_cast<int>(anim.first);
-
-		speed = animSpeed_[anim.first];
+		speed = animSpeed_[type];
 
 		// 内部アニメーション割り当て
-		anim_->AddInternal(type, speed);
+		anim_->AddInternal(static_cast<int>(type), speed);
 	}
 
 	// 待機アニメーション再生

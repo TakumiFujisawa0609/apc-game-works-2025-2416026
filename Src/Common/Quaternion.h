@@ -20,6 +20,8 @@ public:
 
 	~Quaternion(void) = default;
 
+	Quaternion operator-(void) { return Quaternion(w,x,-y,z); };
+
 	// オイラー角からクォータニオンへ変換
 	static Quaternion Euler(const VECTOR& rad);
 

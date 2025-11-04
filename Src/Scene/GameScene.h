@@ -1,5 +1,5 @@
 #pragma once
-#include "SceneBase.h"
+#include "./SceneBase.h"
 #include <DxLib.h>
 
 class Player;

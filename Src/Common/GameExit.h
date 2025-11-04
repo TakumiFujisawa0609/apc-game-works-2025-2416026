@@ -60,25 +60,17 @@ public:
 
 
 
-	/// <summary>
-	/// デフォルトコンストラクタ
-	/// </summary>
+	/// @brief デフォルトコンストラクタ
 	GameExit(void);
 
-	/// <summary>
-	/// デストラクタ
-	/// </summary>
+	/// @brief デストラクタ
 	~GameExit(void) = default;
 
 	
-	/// <summary>
-	/// 初期化処理
-	/// </summary>
+	/// @brief 初期化処理
 	void Init(void);
 
-	/// <summary>
-	/// 更新処理
-	/// </summary>
+	/// @brief 更新処理
 	void Update(void);
 
 	/// @brief 描画処理
@@ -105,19 +97,13 @@ private:
 	// ゲーム終了フラグ
 	bool isEnd_;
 
-	/// <summary>
-	/// メニュー有効判定
-	/// </summary>
+	/// @brief メニュー有効判定
 	bool IsActive(void);
 
 
-	/// <summary>
-	/// 選択判定
-	/// </summary>
+	/// @brief 選択判定
 	bool IsSelect(void);
 	
-	/// <summary>
-	/// 決定判定
-	/// </summary>
+	/// @brief 決定判定
 	bool IsCheck(void);
 };

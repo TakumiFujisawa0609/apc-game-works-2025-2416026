@@ -16,28 +16,29 @@ class Player : public Object
 	using PAD_ALGKEY = InputManager::JOYPAD_ALGKEY;
 	using PAD_NO = InputManager::PAD_NO;
 
-	using MORTION_TYPE = StatusPlayer::MORTION_TYPE;
-
 public:
 
+	using MOTION_TYPE = StatusPlayer::MOTION_TYPE;
 
 	enum class ACTION_STATE
 	{
 		NONE = -1,
 		IDLE, // 待機
 
+		ATTACK_JUB,  // 弱攻撃状態(判定のみ)
 		ATTACK_JUB_1, // 弱攻撃１回目(初回)
 		ATTACK_JUB_2, // 弱攻撃２回目
 		ATTACK_JUB_END, // 弱攻撃３回目
 
 		ATTACK_SPECIAL, // 強攻撃単体(必殺技)
+
+		ATTACK_STRONG,// 強攻撃状態(判定のみ)
 		ATTACK_STRONG_1, // 弱１回 強攻撃
 		ATTACK_STRONG_2, // 弱２回 強攻撃
 		ATTACK_STRONG_3, // 弱３回 強攻撃
 
 		DODGE, // 回避
 		GAME_OVER, // ゲームオーバー状態
-
 	};
 
 	enum class ANIM_STATE
@@ -60,8 +61,9 @@ public:
 		//VICTORY,
 		WALK = 15, // 歩く
 		//WALK_CARRY,
-		MAX,
+		MAX = 17,
 
+		JUB_1,
 		JUB_2,
 		JUB_END,
 		SPECIAL,
@@ -112,6 +114,8 @@ public:
 	static constexpr float CATCH_OFFSET = 75.0f;
 
 
+	static constexpr VECTOR LOCAL_POS = { 0.0f, -100.0f, 0.0f };
+
 	static constexpr float LOCAL_ANGLE_Y = (180.0f * (DX_PI_F / 180.0f));
 	// モデルの位置調整値
 	static constexpr VECTOR MODEL_OFFSET = { 0.0f, 0.0f, 0.0f };
@@ -133,10 +137,10 @@ public:
 	static constexpr float ANIM_SPEED_JUMP_ACTIVE = 50.0f;
 
 
-	// @brief デフォルトコンストラクタ
+	/// @brief デフォルトコンストラクタ
 	Player(void);
 
-	// @brief デフォルトデストラクタ
+	/// @brief デフォルトデストラクタ
 	~Player(void)override = default;
 
 	/// @brief 読み込み処理
@@ -163,13 +167,6 @@ public:
 
 	/// @brief 被ダメージ処理
 	void SetDamage(int _damage = 1)override;
-
-
-	/// <summary>
-	/// 攻撃処理
-	/// </summary>
-	/// <param name="flag"></param>
-	void SetIsAttack(bool flag);
 
 
 	/// @brief 行動状態
@@ -208,10 +205,11 @@ public:
 
 	int GetWeaponId(void) { return paramPlayer_.weaponId; };
 
-	bool GetIsAttack(void)const;
+	/// @brief 攻撃範囲取得
+	/// @param _motion モーションの種類
+	float GetRadiusAttack(int _motion)const { return status_.GetMotionRadius(_motion); };
 
-	float GetRadiusForward(void)const override
-		{ return status_.GetMortionRadius(static_cast<int>(paramPlayer_.actionState) + 1); };
+	int GetMotionType(void) { return motionType_; };
 
 
 protected:
@@ -255,6 +253,8 @@ protected:
 	};
 	ParamPlayer paramPlayer_;
 
+	// 現在のモーション
+	int motionType_;
 
 	StatusPlayer& status_;
 
@@ -264,9 +264,7 @@ protected:
 	// 入力するキーの種類
 	std::unordered_map<INPUT_TYPE, unsigned int> inputKey_;
 
-
-	// ジャンプ力
-	float jumpPower_;
+	
 
 	/// @brief 状態更新処理
 	void UpdateActionState(void);
@@ -291,7 +289,7 @@ protected:
 	/// <param name="_max">最大速度</param>
 	void DashProc(float& _acc, float& _max);
 
-	/// @brief モデ 
+	/// @brief モデルのフレーム初期化
 	void InitModelFrame(void)override;
 
 	/// @brief アニメーション割り当て
@@ -300,16 +298,26 @@ protected:
 	/// @briefアニメーション処理
 	void UpdateAnim(void)override;
 
+
+private:
+
 	/// @brief待機状態のアニメーション遷移処理
 	void AnimStateIdle(void);
 
-	/// <summary>
-	/// モーション処理
-	/// </summary>
-	/// <param name="_type">モーションの種類</param>
-	void UpdateMortion(MORTION_TYPE _type);
+	/// @brief モーション処理
+	void UpdateMotion(void);
 
 	void SetPosForward(void)override;
+
+	/// @brief 外部アニメーション割り当て処理
+	/// @param _state アニメーション種類
+	/// @param _motion モーション種類
+	/// @param _res ハンドルID
+	void SetExternalAnim(ANIM_STATE _state, MOTION_TYPE _motion, int _res);
+
+	bool IsActionJub(void);
+
+	bool IsActionStrong(void);
 
 	bool IsActionAttack(void);
 
@@ -328,9 +336,6 @@ protected:
 	/// @brief ダッシュ入力をしているか否か
 	bool IsInputDash(void);
 
-	/// @brief 外部アニメーション割り当て処理
-	/// @param _state アニメーション種類
-	/// @param _mortion モーション種類
-	/// @param _res ハンドルID
-	void SetExternalAnim(ANIM_STATE _state, MORTION_TYPE _mortion, int _res);
+	/// @brief 再生するSEの種類を取得
+	int GetSoundSrc(void);
 };

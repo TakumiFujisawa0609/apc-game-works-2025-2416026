@@ -40,6 +40,7 @@ public:
 
 protected:
 
+
 	// îwåi
 	int backImage_;
 

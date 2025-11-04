@@ -70,7 +70,9 @@ void Enemy::SetParam(void)
 		Quaternion::AngleAxis(0.0f, rotLocal));
 
 	float scale = status_.GetScale();
-	paramChara_.scale = { scale, scale, scale };
+	paramChara_.scale = { scale * (1.0f - SCALE_DIFF),
+						  scale * (1.0f + SCALE_DIFF),
+						  scale * (1.0f - SCALE_DIFF) };
 	paramChara_.radius = status_.GetRadius();
 
 	paramChara_.hp = status_.GetMaxHp();

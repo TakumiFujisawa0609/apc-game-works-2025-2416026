@@ -1,4 +1,5 @@
 #include "GameClearScene.h"
+#include "./SceneBase.h"
 #include "../Manager/SoundManager.h"
 #include "../Manager/ResourceManager.h"
 #include "../Manager/SceneManager.h"
@@ -23,33 +24,30 @@ void GameClearScene::Init(void)
 }
 
 void GameClearScene::Update(void)
-{
-	SoundManager& sound = SoundManager::GetInstance();
-	SceneManager& scene = SceneManager::GetInstance();
-	
+{	
 	if (IsCheck())
 	{
 		switch (state_)
 		{
 			case STATE_CLEAR::TITLE:
 			{
-				sound.Play(SoundManager::SRC::SE_CLICK, false);
+				SoundManager::GetInstance().Play(SoundManager::SRC::SE_CLICK, false);
 
-				scene.ChangeScene(SceneManager::SCENE_ID::TITLE);
+				SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::TITLE);
 			}
 			break;
 
 			case STATE_CLEAR::RESTART:
 			{
-				sound.Play(SoundManager::SRC::SE_CLICK, false);
+				SoundManager::GetInstance().Play(SoundManager::SRC::SE_CLICK, false);
 
-				scene.ChangeScene(SceneManager::SCENE_ID::GAME);
+				SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);
 			}
 			break;
 
 			case STATE_CLEAR::GAME_END:
 			{
-				sound.Play(SoundManager::SRC::SE_CLICK, false);
+				SoundManager::GetInstance().Play(SoundManager::SRC::SE_CLICK, false);
 
 				// ÉQÅ[ÉÄèIóπèàóù
 				Application::GetInstance().SetIsGameEnd();

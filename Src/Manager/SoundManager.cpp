@@ -11,8 +11,8 @@ const std::string SoundManager::PATH_BGM_TITLE = ResourceManager::PATH_BGM + "BG
 const std::string SoundManager::PATH_BGM_GAME  = ResourceManager::PATH_BGM + "GameBGM.mp3";
 
 const std::string SoundManager::PATH_SE_CLICK  = ResourceManager::PATH_SE + "Click.mp3";
-const std::string SoundManager::PATH_SE_SWORD_JUB = ResourceManager::PATH_SE + "SwordAttackJub.mp3";
-const std::string SoundManager::PATH_SE_SWORD_STRONG = ResourceManager::PATH_SE + "SwordAttackStrong.mp3";
+const std::string SoundManager::PATH_SE_SWORD_JUB = ResourceManager::PATH_SE + "SwordJub.mp3";
+const std::string SoundManager::PATH_SE_SWORD_STRONG = ResourceManager::PATH_SE + "SwordStrong.mp3";
 const std::string SoundManager::PATH_SE_KNOCK  = ResourceManager::PATH_SE + "KnockDown.mp3";
 
 void SoundManager::CreateInstance(void)
@@ -46,8 +46,9 @@ void SoundManager::SetSounds(void)
 	// SE
 
 	SetSound(SRC::SE_CLICK, PATH_SE_CLICK, Sound::TYPE::SOUND_2D, VOLUME_CLICK);
-	SetSound(SRC::SE_SWORD_JUB, PATH_SE_SWORD_JUB, Sound::TYPE::SOUND_2D, VOLUME_ATTACK);
-	SetSound(SRC::SE_SWORD_STRONG, PATH_SE_SWORD_STRONG, Sound::TYPE::SOUND_2D, VOLUME_ATTACK);
+	SetSound(SRC::SE_SWORD_JUB, PATH_SE_SWORD_JUB, Sound::TYPE::SOUND_2D, VOLUME_JUB);
+	SetSound(SRC::SE_SWORD_STRONG, PATH_SE_SWORD_STRONG, Sound::TYPE::SOUND_2D, VOLUME_STRONG);
+
 	SetSound(SRC::SE_KNOCK, PATH_SE_KNOCK, Sound::TYPE::SOUND_2D, VOLUME_KNOCK);
 
 
@@ -93,8 +94,9 @@ void SoundManager::Destroy(void)
 	delete instance_;
 }
 
-bool SoundManager::Play(SRC _src, bool _isLoop, bool _isForce)
+bool SoundManager::Play(SRC _src, bool _isLoop, bool _isPitch, float _pitchRange, bool _isForce)
 {
+	/* 2D‰¹º‚ğÄ¶ */
 	const auto& lPair = sounds_.find(_src);
 
 	if (lPair == sounds_.end())
@@ -114,10 +116,11 @@ bool SoundManager::Play(SRC _src, bool _isLoop, bool _isForce)
 
 	// 2DƒTƒEƒ“ƒhÄ¶ˆ—
 	Sound::TIMES times = ((_isLoop) ? Sound::TIMES::LOOP : Sound::TIMES::ONCE);
-	return lPair->second.Play(times, _isForce);
+	return lPair->second.Play(times, _isPitch, _pitchRange,_isForce);
 }
 bool SoundManager::Play(SRC _src, bool _isLoop, VECTOR _pos, float _radius)
 {
+	/* 3D‰¹º‚ğÄ¶ */
 	const auto& lPair = sounds_.find(_src);
 
 	if (lPair == sounds_.end())

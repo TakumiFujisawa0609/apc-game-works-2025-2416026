@@ -35,7 +35,7 @@ public:
 		MAX,
 	};
 
-	enum class MORTION_TYPE
+	enum class MOTION_TYPE
 	{
 		NONE = -1,
 		JUB_1,
@@ -49,12 +49,13 @@ public:
 
 		MAX,
 	};
-	enum class MORTION_PARAM
+	enum class MOTION_PARAM
 	{
 		NAME = 0,
-		TIME_START,
 		TIME_ACTIVE,
+		TIME_INPUT,
 		TIME_END,
+		TIME_ATTACK,
 		SPEED,  // モーションアニメーション速度
 		RADIUS, // 半径
 
@@ -90,17 +91,18 @@ public:
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_DASH)], animSpeedDash_, 0.0f);
 	}
 
-	void LoadMortionParam(MORTION_TYPE _type, const std::array<std::string, static_cast<int>(MORTION_PARAM::MAX)>& _loadString)
+	void LoadMotionParam(MOTION_TYPE _type, const std::array<std::string, static_cast<int>(MOTION_PARAM::MAX)>& _loadString)
 	{
-		Mortion mortion = Mortion();
+		Motion motion = Motion();
 
-		mortion.name = _loadString[static_cast<int>(MORTION_PARAM::NAME)];
-		UtilityCommon::ChangeString(_loadString[static_cast<int>(MORTION_PARAM::TIME_START)], mortion.timeStart, 0.0f);
-		UtilityCommon::ChangeString(_loadString[static_cast<int>(MORTION_PARAM::TIME_ACTIVE)], mortion.timeActive, 0.0f);
-		UtilityCommon::ChangeString(_loadString[static_cast<int>(MORTION_PARAM::TIME_END)], mortion.timeEnd, 0.0f);
-		UtilityCommon::ChangeString(_loadString[static_cast<int>(MORTION_PARAM::SPEED)], mortion.animSpeed, 0.0f);
-		UtilityCommon::ChangeString(_loadString[static_cast<int>(MORTION_PARAM::RADIUS)], mortion.radius, 0.0f);
-		mortion_.emplace(_type, mortion);
+		motion.name = _loadString[static_cast<int>(MOTION_PARAM::NAME)];
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(MOTION_PARAM::TIME_ACTIVE)], motion.timeActive, 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(MOTION_PARAM::TIME_INPUT)], motion.timeInput, 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(MOTION_PARAM::TIME_END)], motion.timeEnd, 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(MOTION_PARAM::TIME_ATTACK)], motion.timeAttack, 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(MOTION_PARAM::SPEED)], motion.animSpeed, 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(MOTION_PARAM::RADIUS)], motion.radius, 0.0f);
+		motion_.emplace(_type, motion);
 	}
 
 
@@ -155,25 +157,29 @@ public:
 	
 
 	// モーション開始時間
-	float GetMortionStart(MORTION_TYPE _type) { return mortion_[_type].timeStart; }
-	float GetMortionStart(int _type) { return mortion_[static_cast<MORTION_TYPE>(_type)].timeStart; }
+	float GetMotionStart(MOTION_TYPE _type) { return motion_[_type].timeActive; }
+	float GetMotionStart(int _type) { return motion_[static_cast<MOTION_TYPE>(_type)].timeActive; }
 
-	// 有効時間
-	float GetMortionActive(MORTION_TYPE _type) { return mortion_[_type].timeActive; }
-	float GetMortionActive(int _type) { return mortion_[static_cast<MORTION_TYPE>(_type)].timeActive; }
-
-	// モーション終了時間
-	float GetMortionEnd(MORTION_TYPE _type) { return mortion_[_type].timeEnd; }
-	float GetMortionEnd(int _type) { return mortion_[static_cast<MORTION_TYPE>(_type)].timeEnd; }
+	// 入力猶予時間
+	float GetMotionInput(MOTION_TYPE _type) { return motion_[_type].timeInput; }
+	float GetMotionInput(int _type) { return motion_[static_cast<MOTION_TYPE>(_type)].timeInput; }
 
 	// モーション終了時間
-	float GetMortionSpeed(MORTION_TYPE _type) { return mortion_[_type].animSpeed; }
-	float GetMortionSpeed(int _type) { return mortion_[static_cast<MORTION_TYPE>(_type)].animSpeed; }
+	float GetMotionEnd(MOTION_TYPE _type) { return motion_[_type].timeEnd; }
+	float GetMotionEnd(int _type) { return motion_[static_cast<MOTION_TYPE>(_type)].timeEnd; }
+
+	// 攻撃時間
+	float GetMotionAtk(MOTION_TYPE _type) { return motion_[_type].timeAttack; }
+	float GetMotionAtk(int _type) { return motion_[static_cast<MOTION_TYPE>(_type)].timeAttack; }
 
 
-	// モーション半径取得
-	float GetMortionRadius(MORTION_TYPE _type) { return mortion_[_type].radius; }
-	float GetMortionRadius(int _type) { return mortion_[static_cast<MORTION_TYPE>(_type)].radius; }
+	// アニメーション速度
+	float GetMotionSpeed(MOTION_TYPE _type) { return motion_[_type].animSpeed; }
+	float GetMotionSpeed(int _type) { return motion_[static_cast<MOTION_TYPE>(_type)].animSpeed; }
+
+	// 攻撃半径取得
+	float GetMotionRadius(MOTION_TYPE _type) { return motion_[_type].radius; }
+	float GetMotionRadius(int _type) { return motion_[static_cast<MOTION_TYPE>(_type)].radius; }
 
 
 private:
@@ -217,22 +223,24 @@ private:
 
 	float animSpeedDash_;
 
-	struct Mortion
+	struct Motion
 	{
-		Mortion(void);
+		Motion(void);
 
 		std::string name;
 
-		float timeStart;
-
 		float timeActive;
 
+		float timeInput;
+
 		float timeEnd;
+
+		float timeAttack;
 
 		float animSpeed;
 
 		float radius;
 	};
 
-	std::unordered_map<MORTION_TYPE, Mortion> mortion_;
+	std::unordered_map<MOTION_TYPE, Motion> motion_;
 };

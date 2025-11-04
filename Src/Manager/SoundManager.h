@@ -19,6 +19,7 @@ public:
 		SE_CLICK,  // クリック
 		SE_SWORD_JUB, // 弱攻撃
 		SE_SWORD_STRONG, // 強攻撃
+		SE_SWORD_SPECIAL, // 必殺攻撃
 		SE_KNOCK,  // 撃破
 	};
 
@@ -39,48 +40,48 @@ public:
 	// クリックSEの音量
 	static constexpr float VOLUME_CLICK = 0.9f;
 
-	// 攻撃SEの音量
-	static constexpr float VOLUME_ATTACK = 0.9f;
+	// 弱攻撃SEの音量
+	static constexpr float VOLUME_JUB = 0.9f;
+
+	// 強攻撃SEの音量
+	static constexpr float VOLUME_STRONG = 1.0f;
 
 	// 撃破SEの音量
 	static constexpr float VOLUME_KNOCK = 1.5f;
 
+	// ピッチの増減値
+	static constexpr float PITCH_RANGE_DEF = 1.0f;
 
 
-	/// <summary>
-	/// インスタンス生成
-	/// </summary>
+	/// @brief インスタンス生成
 	static void CreateInstance(void);
 
-	/// <summary>
-	/// インスタンス取得処理
-	/// </summary>
+	/// @brief インスタンス取得処理
 	static SoundManager& GetInstance(void) { return *instance_; };
 
 
-	/// <summary>
-	/// 初期化処理
-	/// </summary>
+	/// @brief 初期化処理
 	void Load(void);
 
-	/// <summary>
-	/// メモリ解放処理
-	/// </summary>
+	/// @brief メモリ解放処理
 	void Release(void);
 
-	/// <summary>
-	/// リソース完全破棄処理
-	/// </summary>
+	/// @brief リソース完全破棄処理
 	void Destroy(void);
 
-	/// <summary>
-	/// 2Dサウンド再生処理
-	/// </summary>
-	/// <param name="_sec">再生するサウンドの種類</param>
-	/// <param name="_isLoop">ループするか否か</param>
-	/// <param name="_isForce"></param>
-	/// <returns></returns>
-	bool Play(SRC _sec, bool _isLoop, bool _isForce = false);
+	/// @brief 2Dサウンド再生処理
+	/// @param _src 再生するサウンドの種類
+	/// @param _isLoop ループするか否か
+	/// @param _isPitch ピッチを変えるか否か
+	/// @param _pitchRange ピッチ増減の範囲
+	/// @param _isForce 
+	bool Play(SRC _src, bool _isLoop, bool _isPitch = false, float _pitchRange = PITCH_RANGE_DEF, bool _isForce = false);
+	/// @brief 2Dサウンド再生処理
+	/// @param _src 再生するサウンドの種類
+	/// @param _isLoop ループするか否か
+	/// @param _isForce 
+	bool Play(int _src, bool _isLoop, bool _isPitch = false, float _pitchRange = PITCH_RANGE_DEF, bool _isForce = false)
+		{ Play(static_cast<SRC>(_src), _isLoop, _isPitch, _pitchRange, _isForce); };
 
 	/// <summary>
 	/// 3Dサウンド再生処理

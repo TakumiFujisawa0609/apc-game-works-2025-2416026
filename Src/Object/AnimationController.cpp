@@ -83,8 +83,9 @@ void AnimationController::AddExternal(int _type, float _speed, int _handle)
 
 void AnimationController::Play(int _type, bool _isLoop, float _blendTime)
 {
-	// 同じアニメーション時、処理を終了
-	if (playType_ == _type) { return; }
+	
+	// アニメーション未割当時・同じアニメーション時、処理を終了
+	if (!IsFindAnimation(_type) || playType_ == _type) { return; }
 
 	if (prePlayType_ != -1)
 	{
@@ -218,6 +219,8 @@ void AnimationController::Release(void)
 		if (anim.type == ANIM_TYPE::EXTERNAL &&
 			anim.isLoadPath)
 		{
+			// アニメーションをリセット
+			MV1DetachAnim(modelId_, anim.attachNo);
 			// アニメーション解放
 			MV1DeleteModel(anim.modelId);
 		}

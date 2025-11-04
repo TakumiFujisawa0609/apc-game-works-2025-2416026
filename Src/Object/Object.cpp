@@ -10,6 +10,8 @@
 #include "../Utility/AsoUtility.h"
 #include "../Manager/SceneManager.h"
 #include "../Manager/SoundManager.h"
+#include "./Common/AttackMotion.h"
+
 
 Object::Object(void)
 {
@@ -52,6 +54,9 @@ void Object::Init(void)
 {
 	paramChara_.velocity = AsoUtility::VECTOR_ZERO;
 	paramChara_.dir = {};
+
+	// 攻撃状態初期化
+	paramChara_.atkMotion.Init();
 
 	// フレーム初期化処理
 	InitModelFrame();
@@ -101,11 +106,8 @@ void Object::Update(void)
 		paramChara_.pos.y = paramChara_.prePos.y = 0.0f;
 	}
 	
-
-	if(paramChara_.timeInv > 0.0f)
-	{
-		paramChara_.timeInv -= delta;
-	}
+	// 無敵時間減少
+	paramChara_.timeInv -= ((paramChara_.timeInv > 0.0f) ? delta : 0.0f);
 
 	if (!AsoUtility::EqualsVZero(paramChara_.knockBack))
 	{
@@ -296,7 +298,7 @@ void Object::SetDamage(int _damage)
 {
 	/*　被ダメージ処理　*/
 	
-	const float invTime = 0.75f;
+	const float invTime = 0.1f;
 	// ダメージが０の時は処理終了
 	if (_damage <= 0 || paramChara_.timeInv > 0.0f) { return; }
 
@@ -391,8 +393,7 @@ bool Object::CheckActiveAttack(void) const
 	bool ret = false;
 
 	// 攻撃判定が有効中か否か
-	if (paramChara_.attackState == ATTACK_STATE::ACTIVE &&
-		paramChara_.timeAct > 0.0f)
+	if (paramChara_.atkMotion.GetIsActionAttack())
 	{
 		// 攻撃有効時、true
 		ret = true;
@@ -491,50 +492,14 @@ float Object::DecVelocityXZ(const float* acc)
 }
 
 
-
-
 void Object::SetPosForward(void)
 {
-	VECTOR forward = VScale(paramChara_.quaRot.GetForward(), paramChara_.radius);
+	 VECTOR forward = VScale(paramChara_.quaRot.GetForward(), paramChara_.radius);
 	VECTOR pos = VAdd(paramChara_.colList[COLLISION_TYPE::BODY]->pos, forward);
 
 	paramChara_.posForward = pos;
 }
 
-void Object::ChangeAttackState(ATTACK_STATE _state, float _activeTime, SoundManager::SRC _se)
-{
-	// 状態割り当て
-	paramChara_.attackState = _state;
-
-	// 行動時間割り当て
-	paramChara_.timeAct = _activeTime;
-
-	if (_state == ATTACK_STATE::ACTIVE)
-	{
-		// 効果音再生
-		SoundManager::GetInstance().Play(_se, false);
-	}
-}
-
-void Object::ChangeAttackStateNext(float _activeTime, SoundManager::SRC _se)
-{
-	// 次の行動状態に遷移
-	ATTACK_STATE state = paramChara_.attackState;
-	int next = (static_cast<int>(state) + 1);
-	state = static_cast<ATTACK_STATE>(next);
-
-	// 攻撃が終了時、無効状態に戻す
-	if (state == ATTACK_STATE::MAX) { state = ATTACK_STATE::NONE; }
-
-	// 効果音再生
-	if (state == ATTACK_STATE::ACTIVE) { SoundManager::GetInstance().Play(_se, false); }
-
-	// 状態割り当て
-	paramChara_.attackState = state;
-
-	// 行動時間割り当て
-	paramChara_.timeAct = _activeTime;
-}
 
 VECTOR& Object::GetPosChatch(void)
 {

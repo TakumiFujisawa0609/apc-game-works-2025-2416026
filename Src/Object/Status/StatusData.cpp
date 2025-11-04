@@ -52,7 +52,7 @@ void StatusData::Load(void)
 {
 	LoadPlayerStatus();
 
-	LoadPlayerMortion();
+	LoadPlayerMotion();
 
 	LoadEnemy();
 
@@ -122,17 +122,17 @@ void StatusData::LoadPlayerStatus(void)
 	player_->LoadStatusParam(std::to_array(dataText));
 }
 
-void StatusData::LoadPlayerMortion(void)
+void StatusData::LoadPlayerMotion(void)
 {
 	/*　csvファイル読み込み処理　*/
 
 	// 文字列の一時格納配列
-	int max = static_cast<int>(StatusPlayer::MORTION_TYPE::MAX);
-	std::string dataText[static_cast<int>(StatusPlayer::MORTION_TYPE::MAX)][static_cast<int>(StatusPlayer::MORTION_PARAM::MAX)];
+	int max = static_cast<int>(StatusPlayer::MOTION_TYPE::MAX);
+	std::string dataText[static_cast<int>(StatusPlayer::MOTION_TYPE::MAX)][static_cast<int>(StatusPlayer::MOTION_PARAM::MAX)];
 
 	// 行
 	std::string line;
-	std::string path = (PATH_CSV_FILE + PATH_PLAYER_MORTION);
+	std::string path = (PATH_CSV_FILE + PATH_PLAYER_MOTION);
 
 	// セーブファイルパス
 	std::ifstream file = std::ifstream(path);
@@ -182,10 +182,10 @@ void StatusData::LoadPlayerMortion(void)
 	for (int i = 0; i < (param - 1); i++)
 	{
 		// プレイヤーのモーション時間の登録
-		StatusPlayer::MORTION_TYPE type = static_cast<StatusPlayer::MORTION_TYPE>(i);
+		StatusPlayer::MOTION_TYPE type = static_cast<StatusPlayer::MOTION_TYPE>(i);
 
 		// モーション格納
-		player_->LoadMortionParam(type, std::to_array(dataText[i]));
+		player_->LoadMotionParam(type, std::to_array(dataText[i]));
 	}
 }
 

@@ -3,6 +3,7 @@
 #include <DxLib.h>
 #include <EffekseerForDXLib.h>
 #include <string>
+#include "./SceneBase.h"
 #include "../Application.h"
 #include "../Utility/AsoUtility.h"
 #include "../Common/Vector2.h"
@@ -54,8 +55,7 @@ void GameScene::Init(void)
 	ReInit();
 
 	// BGM再生
-	SoundManager::GetInstance().Play(SoundManager::SRC::BGM_GAME,
-		true, true);
+	SoundManager::GetInstance().Play(SoundManager::SRC::BGM_GAME,true, true);
 }
 void GameScene::ReInit(void)
 {
@@ -119,15 +119,18 @@ void GameScene::Update(void)
 void GameScene::Draw(void)
 {
 	/*　描画処理　*/
-	SceneManager& scene = SceneManager::GetInstance();
 	Font& font = Font::GetInstance();
 
 	Vector2 textPos = {};
 	Vector2 midPos = { Application::SCREEN_HALF_X, Application::SCREEN_HALF_Y };
 
+	// 地面
+	DrawCube3D({ -5000.0f, 0.0f, -2500.0f },
+			   { 5000.0f, -100.0f, 30000.0f },
+				0x00aa00, 0x0, true);
 
 	// グリッド線描画
-	scene.DrawGrid();
+	SceneManager::GetInstance().DrawGrid();
 
 	// Effekseerにより再生中のエフェクトを更新する
 	UpdateEffekseer3D();
@@ -155,7 +158,7 @@ void GameScene::Draw(void)
 
 	player_->DrawDebug();
 
-	scene.DrawDebug();
+	SceneManager::GetInstance().DrawDebug();
 #endif
 }
 

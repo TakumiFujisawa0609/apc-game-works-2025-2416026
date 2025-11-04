@@ -83,14 +83,27 @@ void ResourceManager::SetResource(void)
 
 	// アニメーション
 	res = Resource(Resource::LOAD_TYPE::ANIM, PATH_ANIM + "SwordAnim1.mv1");
-	resourcesMap_.emplace(static_cast<SRC>(SRC::ANIM_SWORD_1), res);
+	resourcesMap_.emplace(SRC::ANIM_JUB_1_SWORD, res);
 
 	res = Resource(Resource::LOAD_TYPE::ANIM, PATH_ANIM + "SwordAnim2.mv1");
-	resourcesMap_.emplace(static_cast<SRC>(SRC::ANIM_SWORD_2), res);
+	resourcesMap_.emplace(SRC::ANIM_JUB_2_SWORD, res);
 
 	res = Resource(Resource::LOAD_TYPE::ANIM, PATH_ANIM + "SwordAnim3.mv1");
-	resourcesMap_.emplace(static_cast<SRC>(SRC::ANIM_SWORD_3), res);
-	
+	resourcesMap_.emplace(SRC::ANIM_JUB_3_SWORD, res);
+
+
+	res = Resource(Resource::LOAD_TYPE::ANIM, PATH_ANIM + "SwordAnim3.mv1");
+	resourcesMap_.emplace(SRC::ANIM_SPECIAL_SWORD, res);
+
+
+	res = Resource(Resource::LOAD_TYPE::ANIM, PATH_ANIM + "SwordAnim1.mv1");
+	resourcesMap_.emplace(SRC::ANIM_STRONG_1_SWORD, res);
+
+	res = Resource(Resource::LOAD_TYPE::ANIM, PATH_ANIM + "SwordAnim2.mv1");
+	resourcesMap_.emplace(SRC::ANIM_STRONG_2_SWORD, res);
+
+	res = Resource(Resource::LOAD_TYPE::ANIM, PATH_ANIM + "SwordAnim3.mv1");
+	resourcesMap_.emplace(SRC::ANIM_STRONG_3_SWORD, res);
 }
 
 
