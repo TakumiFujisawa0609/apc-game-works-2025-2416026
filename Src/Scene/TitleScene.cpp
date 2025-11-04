@@ -1,7 +1,7 @@
 #include "TitleScene.h"
 #include <string>
 #include <DxLib.h>
-
+#include "./SceneBase.h"
 #include "../Manager/InputManager.h"
 #include "../Manager/SceneManager.h"
 #include "../Manager/SoundManager.h"
@@ -9,7 +9,6 @@
 #include "../Manager/Resource.h"
 #include "../Common/Font.h"
 #include "../Application.h"
-#include "../Common/Font.h"
 #include "../Utility/AsoUtility.h"
 
 
@@ -22,22 +21,21 @@ TitleScene::TitleScene(void)
 
 void TitleScene::Load(void)
 {
-	ResourceManager& res = ResourceManager::GetInstance();
-
+	
 	/*
-	pv_ = res.LoadHandleId(ResourceManager::SRC::MOVIE_PV);
+	pv_ = resMng_.LoadHandleId(ResourceManager::SRC::MOVIE_PV);
 
 	//タイトル画像
-	titleImage_ = res.LoadHandleId(ResourceManager::SRC::IMAGE_TITLE);
+	titleImage_ = resMng_.LoadHandleId(ResourceManager::SRC::IMAGE_TITLE);
 
 	// パッド画像
-	padImage_ = res.LoadHandleId(ResourceManager::SRC::IMAGE_PAD);
+	padImage_ = resMng_.LoadHandleId(ResourceManager::SRC::IMAGE_PAD);
 
 	// キーボード画像
-	keyImage_ = res.LoadHandleId(ResourceManager::SRC::IMAGE_KEYBOARD);
+	keyImage_ = resMng_.LoadHandleId(ResourceManager::SRC::IMAGE_KEYBOARD);
 
 	// ボタン画像
-	buttonImage_ = res.LoadHandleId(ResourceManager::SRC::IMAGE_TITLE_BUTTON);
+	buttonImage_ = resMng_.LoadHandleId(ResourceManager::SRC::IMAGE_TITLE_BUTTON);
 
 	// 矢印画像
 	arrowImage_ = res.LoadHandleId(ResourceManager::SRC::IMAGE_ARROW);
@@ -58,9 +56,6 @@ void TitleScene::Init(void)
 
 void TitleScene::Update(void)
 {
-	SoundManager& sound = SoundManager::GetInstance();
-	SceneManager& scene = SceneManager::GetInstance();
-
 	float delta = SceneManager::GetInstance().GetDeltaTime();
 
 	arrowPerformTime_ -= delta;
@@ -79,11 +74,11 @@ void TitleScene::Update(void)
 		{
 			case TITLE_STATE::START_GAME:
 			{
-				sound.Play(SoundManager::SRC::SE_CLICK, false);
+				SoundManager::GetInstance().Play(SoundManager::SRC::SE_CLICK, false);
 
 				Application::GetInstance().SetIsExitMenu(true);
 			
-				scene.ChangeScene(SceneManager::SCENE_ID::GAME);
+				SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);
 			}
 			break;
 
@@ -106,7 +101,7 @@ void TitleScene::Update(void)
 
 			case TITLE_STATE::GAME_END:
 			{
-				sound.Play(SoundManager::SRC::SE_CLICK, false);
+				SoundManager::GetInstance().Play(SoundManager::SRC::SE_CLICK, false);
 
 				// ゲーム終了処理
 				Application::GetInstance().SetIsGameEnd();
@@ -141,7 +136,7 @@ void TitleScene::Update(void)
 			// 最初から再生
 			SeekMovieToGraph(pv_, 0);
 			PlayMovieToGraph(pv_);
-			sound.Stop(SoundManager::SRC::BGM_TITLE);
+			SoundManager::GetInstance().Stop(SoundManager::SRC::BGM_TITLE);
 		}
 	}
 	if (isPvActive_)
@@ -152,7 +147,7 @@ void TitleScene::Update(void)
 			PauseMovieToGraph(pv_);
 			isPvActive_ = false;
 			pvTime_ = 0.0f;
-			sound.Play(SoundManager::SRC::BGM_TITLE, true);
+			SoundManager::GetInstance().Play(SoundManager::SRC::BGM_TITLE, true);
 		}
 	}
 }

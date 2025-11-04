@@ -32,10 +32,13 @@ Resource::Resource(LOAD_TYPE type, const std::string& path, int numX, int numY, 
 	resType_ = type; // 読み込みファイル種類
 	path_	 = path; // 読み込み先
 
-	numX_  = numX;	// 横画像数
-	numY_  = numY;	// 縦画像数
-	sizeX_ = sizeX; // 横画像サイズ
-	sizeY_ = sizeY; // 縦画像サイズ
+	// 画像数
+	numX_ = numX;
+	numY_ = numY;
+
+	// 画像サイズ
+	sizeX_ = sizeX;
+	sizeY_ = sizeY;
 
 	handleId_  = -1;	  // 読み込みハンドルID
 	handleIds_ = nullptr; // 読み込み複数画像ハンドルID
@@ -65,6 +68,7 @@ void Resource::Load(void)
 		break;
 
 		case LOAD_TYPE::MODEL:
+		case LOAD_TYPE::ANIM:
 		{
 			handleId_ = MV1LoadModel(path_.c_str());
 		}
@@ -104,6 +108,7 @@ void Resource::Release(void)
 
 		// 3Dモデル
 		case LOAD_TYPE::MODEL:
+		case LOAD_TYPE::ANIM:
 		{
 			MV1DeleteModel(handleId_);
 			auto ids = duplicationModelIds_;
@@ -138,7 +143,8 @@ void Resource::CopyHandle(int* images)
 	int max = (numX_ * numY_);
 	for (int i = 0; i < max; i++)
 	{
-		images[i] = handleIds_[i]; // ハンドル割り当て
+		// ハンドル割り当て
+		images[i] = handleIds_[i];
 	}
 }
 

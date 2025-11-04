@@ -61,6 +61,13 @@ public:
 		WALK = 15, // 歩く
 		//WALK_CARRY,
 		MAX,
+
+		JUB_2,
+		JUB_END,
+		SPECIAL,
+		STRONG_1,
+		STRONG_2,
+		STRONG_3,
 	};
 
 
@@ -320,4 +327,10 @@ protected:
 
 	/// @brief ダッシュ入力をしているか否か
 	bool IsInputDash(void);
+
+	/// @brief 外部アニメーション割り当て処理
+	/// @param _state アニメーション種類
+	/// @param _mortion モーション種類
+	/// @param _res ハンドルID
+	void SetExternalAnim(ANIM_STATE _state, MORTION_TYPE _mortion, int _res);
 };

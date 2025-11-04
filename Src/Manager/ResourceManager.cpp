@@ -1,6 +1,5 @@
-
-#include "Resource.h"
 #include "ResourceManager.h"
+#include "Resource.h"
 #include <DxLib.h>
 #include <string>
 #include <vector>
@@ -18,6 +17,7 @@ const std::string ResourceManager::PATH_EFFECT = "Data/Effect/";
 const std::string ResourceManager::PATH_FONT   = "Data/Font/";
 const std::string ResourceManager::PATH_IMAGE  = "Data/Image/";
 const std::string ResourceManager::PATH_MODEL  = "Data/Model/";
+const std::string ResourceManager::PATH_ANIM  = "Data/Model/Animation/";
 const std::string ResourceManager::PATH_SE     = "Data/Sound/SE/";
 const std::string ResourceManager::PATH_BGM    = "Data/Sound/BGM/";
 const std::string ResourceManager::PATH_MOVIE  = "Data/Movie/";
@@ -80,6 +80,16 @@ void ResourceManager::SetResource(void)
 		resourcesMap_.emplace(static_cast<SRC>(src), res);
 		src++;
 	}
+
+	// アニメーション
+	res = Resource(Resource::LOAD_TYPE::ANIM, PATH_ANIM + "SwordAnim1.mv1");
+	resourcesMap_.emplace(static_cast<SRC>(SRC::ANIM_SWORD_1), res);
+
+	res = Resource(Resource::LOAD_TYPE::ANIM, PATH_ANIM + "SwordAnim2.mv1");
+	resourcesMap_.emplace(static_cast<SRC>(SRC::ANIM_SWORD_2), res);
+
+	res = Resource(Resource::LOAD_TYPE::ANIM, PATH_ANIM + "SwordAnim3.mv1");
+	resourcesMap_.emplace(static_cast<SRC>(SRC::ANIM_SWORD_3), res);
 	
 }
 
@@ -119,7 +129,8 @@ void ResourceManager::Destroy(void)
 
 Resource ResourceManager::Load(SRC src)
 {
-	Resource* res = _Load(src); // 読み込み処理
+	// 読み込み処理
+	Resource* res = _Load(src);
 
 	if (res == nullptr) return Resource();
 
@@ -127,13 +138,6 @@ Resource ResourceManager::Load(SRC src)
 
 	return *res;
 }
-
-int ResourceManager::LoadHandleId(SRC src)
-{
-	/*　ハンドルIDの取得処理　*/
-	return Load(src).GetHandleId();
-}
-
 Resource* ResourceManager::_Load(SRC src)
 {
 	// 読み込み済みリストを検索
@@ -163,6 +167,12 @@ Resource* ResourceManager::_Load(SRC src)
 }
 
 
+int ResourceManager::LoadHandleId(SRC src)
+{
+	/*　ハンドルIDの取得処理　*/
+	return Load(src).GetHandleId();
+}
+
 int ResourceManager::LoadModelDuplicate(SRC src)
 {
 	/* 3Dモデル重複利用時の読み込み */
@@ -171,7 +181,10 @@ int ResourceManager::LoadModelDuplicate(SRC src)
 	Resource* resource = _Load(src);
 
 	// 読み込み失敗
-	if (resource == nullptr) return -1;
+	if (resource == nullptr)
+	{
+		return -1;
+	}
 
 	// 重複するモデルのハンドルを取得
 	int id = MV1DuplicateModel(resource->GetHandleId());

@@ -14,76 +14,60 @@ public:
 		IMAGES, // 複数画像
 		MODEL,  // 3Dモデル
 		MOVIE,  // 映像ファイル
+		ANIM,   // アニメーションファイル
 		EFFECT  // エフェクト
 	};
 
 
-	/// <summary>
-	/// デフォルトコンストラクタ
-	/// </summary>
+	/// @brief デフォルトコンストラクタ
 	Resource(void);
 
-	/// <summary>
-	/// コンストラクタ
-	/// </summary>
-	/// <param name="type">読み込むファイルの種類</param>
-	/// <param name="path">ファイルパス(読み取り専用)</param>
-	Resource(LOAD_TYPE type, const std::string &path);
+	/// @brief コンストラクタ
+	/// @param _type 読み込むファイルの種類
+	/// @param _path ファイルパス
+	Resource(LOAD_TYPE _type, const std::string &_path);
 
-	/// <summary>
-	/// 複数画像時のコンストラクタ
-	/// </summary>
-	/// <param name="type">読み込むファイルの種類</param>
-	/// <param name="path">ファイルパス(読み取り専用)</param>
-	/// <param name="numX">横画像数</param>
-	/// <param name="numY">縦画像数</param>
-	/// <param name="sizeX">画像１枚の横サイズ</param>
-	/// <param name="sizeY">画像１枚の縦サイズ</param>
-	Resource(LOAD_TYPE type, const std::string& path, int numX, int numY, int sizeX, int sizeY);
+	/// @brief 複数画像時のコンストラクタ
+	/// @param _type 読み込むファイルの種類
+	/// @param _path ファイルパス
+	/// @param _numX 横画像数
+	/// @param _numY 縦画像数
+	/// @param _sizeX 画像１枚の横サイズ
+	/// @param _sizeY 画像１枚の縦サイズ
+	Resource(LOAD_TYPE _type, const std::string& _path, int _numX, int _numY, int _sizeX, int _sizeY);
 
-	/// <summary>
-	/// デストラクタ
-	/// </summary>
+	/// @brief デフォルトデストラクタ
 	~Resource(void) = default;
 
 
-	/// <summary>
-	/// 読み込み処理
-	/// </summary>
+	/// @brief 初回読み込み処理
 	void Load(void);
 
-	/// <summary>
-	/// 解放処理
-	/// </summary>
+	/// @brief 解放処理
 	void Release(void);
 
-	/// <summary>
-	/// ハンドルコピー処理
-	/// </summary>
-	/// <param name="images">画像ハンドル</param>
-	void CopyHandle(int* images);
+	/// @brief ハンドルコピー処理
+	/// @param _images 画像ハンドル
+	void CopyHandle(int* _images);
 
-	/// <summary>
-	/// 重複させる3DモデルID 割り当て処理
-	/// </summary>
-	/// <param name="id"></param>
-	void SetDuplicateModelId(int id);
+	/// @brief 重複させる3DモデルID割り当て処理
+	void SetDuplicateModelId(int _id);
 
-	/// <summary>
-	/// ハンドルID 取得処理
-	/// </summary>
-	/// <returns>ファイルのハンドル</returns>
+	/// @brief ハンドルID取得処理
 	int GetHandleId(void) { return handleId_; };
 
 
 private:
 
-	LOAD_TYPE resType_; // 読み込むファイルの種類
-	std::string path_;  // 読み込み先
+	// 読み込むファイルの種類
+	LOAD_TYPE resType_;
+
+	// 読み込み先
+	std::string path_;
 
 	union HandleId
 	{
-		int id_;	// ハンドルID
+		int id_;   // ハンドルID
 		int* ids_; // 複数画像のポインタ
 	};
 

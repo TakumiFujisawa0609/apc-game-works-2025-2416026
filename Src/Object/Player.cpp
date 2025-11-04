@@ -114,27 +114,51 @@ void Player::SetDamage(int _damage)
 
 void Player::InitAnim(void)
 {
-	int type;
 	int max = static_cast<int>(ANIM_STATE::MAX);
-	float speed = 0.0f;
 
+	// 内部アニメーション読み込み
 	paramPlayer_.animSpeed.emplace(ANIM_STATE::IDLE, status_.GetAnimSpeedIdle());
 	paramPlayer_.animSpeed.emplace(ANIM_STATE::WALK, status_.GetAnimSpeedWalk());
 	paramPlayer_.animSpeed.emplace(ANIM_STATE::DASH, status_.GetAnimSpeedDash());
 	paramPlayer_.animSpeed.emplace(ANIM_STATE::SWORD_SLASH, status_.GetMortionSpeed(MORTION_TYPE::JUB_1));
-
-	for (auto& anim : paramPlayer_.animSpeed)
+	for (auto& [type, speed] : paramPlayer_.animSpeed)
 	{
-		type = static_cast<int>(anim.first);
+		// アニメーション番号
+		int typeNum = static_cast<int>(type);
 
-		speed = paramPlayer_.animSpeed[anim.first];
+		speed = paramPlayer_.animSpeed[type];
 
-		// アニメーション割り当て
-		anim_->AddInternal(type, speed, type);
+		// 内部アニメーション以外ではスキップ
+		if (typeNum >= static_cast<int>(ANIM_STATE::MAX)) { continue; }
+
+		// 内部アニメーション割り当て
+		anim_->AddInternal(static_cast<int>(type), speed);
 	}
+
+	// 外部アニメーション読み込み
+	int res = -1;
+
+	// 弱攻撃2
+	res = ResourceManager::GetInstance().LoadHandleId(ResourceManager::SRC::ANIM_SWORD_2);
+	SetExternalAnim(ANIM_STATE::JUB_2, MORTION_TYPE::JUB_2, res);
+
+	// 弱攻撃3
+	res = ResourceManager::GetInstance().LoadHandleId(ResourceManager::SRC::ANIM_SWORD_3);
+	SetExternalAnim(ANIM_STATE::JUB_END, MORTION_TYPE::JUB_END, res);
 
 	// 待機アニメーション再生
 	anim_->Play(static_cast<int>(ANIM_STATE::IDLE));
+}
+void Player::SetExternalAnim(ANIM_STATE _state, MORTION_TYPE _mortion, int _res)
+{
+	/* 外部アニメーション割り当て処理 */
+	// アニメーション速度格納
+	int animSpeed = 0.0f;
+	paramPlayer_.animSpeed.emplace(_state, status_.GetMortionSpeed(_mortion));
+
+	// アニメーションに格納
+	animSpeed = paramPlayer_.animSpeed.at(_state);
+	anim_->AddExternal(static_cast<int>(_state), animSpeed, _res);
 }
 
 void Player::InitModelFrame(void)

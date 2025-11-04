@@ -150,7 +150,6 @@ void Camera::SetBeforeDraw_Follow(void)
 	// ‰ñ“]ˆ—
 	SmoothRotation();
 
-	TrackPlayer();
 	/*
 	if (follow_ == nullptr) return;
 	
@@ -261,12 +260,6 @@ void Camera::SetBeforeDraw_FollowZoom(void)
 	// ƒY[ƒ€”{—¦Š„‚è“–‚Ä
 	_SetZoomDiff(pos_.target);
 }
-
-void Camera::TrackPlayer(void)
-{
-	rot_.camera = rot_.target;
-}
-
 
 
 

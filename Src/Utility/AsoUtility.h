@@ -40,25 +40,30 @@ public:
 	static std::vector <std::string> Split(std::string& line, char delimiter);
 
 
-	///@brief ラジアン(rad)から度(deg)[double]
+	/// @brief ラジアン(rad)から度(deg)[double]
 	static double Rad2Deg(double rad) { return (rad * RAD2DEG); };
 
-	///@brief ラジアン(rad)から度(deg)[float]
+	/// @brief ラジアン(rad)から度(deg)[float]
 	static float Rad2Deg(float rad) { return (rad * RAD2DEG); };
 
-	///@brief ラジアン(rad)から度(deg)[int]
+	/// @brief ラジアン(rad)から度(deg)[int]
 	static int Rad2Deg(int rad) { return (rad * Round(RAD2DEG)); };
 
+	/// @brief ラジアン(rad)から度(deg)[vector]
+	static const VECTOR& Rad2Deg(const VECTOR& _vec) { return { (_vec.x * RAD2DEG),(_vec.y * RAD2DEG),(_vec.z * RAD2DEG) }; };
 
-	///@brief 度(deg)→ラジアン(rad)[double]
+
+	/// @brief 度(deg)→ラジアン(rad)[double]
 	static double Deg2Rad(double deg) { return (deg * DEG2RAD); };
 
-	///@brief 度(deg)→ラジアン(rad)[float]
+	/// @brief 度(deg)→ラジアン(rad)[float]
 	static float Deg2Rad(float deg) { return (deg * DEG2RAD); };
 
-	///@brief 度(deg)→ラジアン(rad)[int]
+	/// @brief 度(deg)→ラジアン(rad)[int]
 	static int Deg2Rad(int deg) { return (deg * Round(DEG2RAD)); };
 
+	/// @brief 度(deg)→ラジアン(rad)[vector]
+	static const VECTOR& Deg2Rad(const VECTOR& _vec) { return { (_vec.x * DEG2RAD),(_vec.y * DEG2RAD),(_vec.z * DEG2RAD) }; };
 
 	// 0～360度の範囲に収める
 	static double DegIn360(double deg);

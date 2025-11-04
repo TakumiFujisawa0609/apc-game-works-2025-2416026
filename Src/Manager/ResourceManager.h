@@ -4,16 +4,11 @@
 #include <string>
 class Resource;
 
-/// <summary>
-/// リソース管理マネージャ
-/// </summary>
 class ResourceManager
 {
 public:
 
-	/// <summary>
-	/// リソース識別列挙
-	/// </summary>
+	/// @brief リソース識別列挙
 	enum SRC
 	{
 		/*　3Dモデルリソース　*/
@@ -31,7 +26,10 @@ public:
 		/*　画像リソース　*/
 		IMAGE_PAD,
 
-		
+		/*　アニメーションリソース　*/
+		ANIM_SWORD_1,
+		ANIM_SWORD_2,
+		ANIM_SWORD_3,
 	};
 
 
@@ -49,6 +47,9 @@ public:
 	// 3Dモデルファイルパス
 	static const std::string PATH_MODEL;
 
+	// アニメーションファイルパス
+	static const std::string PATH_ANIM;
+
 	// BGMファイルパス
 	static const std::string PATH_BGM;
 
@@ -60,50 +61,32 @@ public:
 
 
 
-	/// <summary>
-	/// インスタンス生成
-	/// </summary>
+	/// @brief インスタンス生成
 	static void CreateInstance(void);
 
-	/// <summary>
-	/// インスタンス取得処理
-	/// </summary>
+	/// @brief インスタンス取得処理
 	static ResourceManager& GetInstance(void);
 
-	/// <summary>
-	/// 初期化処理
-	/// </summary>
+	/// @brief 初期化処理
 	void Load(void);
 
-	/// <summary>
-	/// 解放処理
-	/// </summary>
+	/// @brief 解放処理
 	void Release(void);
 
-	/// <summary>
-	/// インスタンス削除
-	/// </summary>
+	/// @brief インスタンス削除
 	void Destroy(void);
 
 
-	/// <summary>
-	/// リソースのロード
-	/// </summary>
-	/// <param name="src">読み込み対象</param>
-	/// <returns>リソース</returns>
-	Resource Load(SRC src);
+	/// @brief リソースのロード
+	/// @param _src 読み込み対象
+	Resource Load(SRC _src);
 
-	/// <summary>
-	/// リソースのハンドルを取得
-	/// </summary>
-	/// <param name="src">読み込み対象</param>
-	int LoadHandleId(SRC src);
+	/// @brief リソースのハンドルを取得
+	/// @param _src 読み込み対象
+	int LoadHandleId(SRC _src);
 
-	/// <summary>
-	/// 3Dモデル重複利用時の読み込み
-	/// </summary>
-	/// <param name="src">読み込み対象</param>
-	/// <returns>重複するモデルのハンドル</returns>
+	/// @brief 3Dモデル重複利用時の読み込み
+	/// @param src 読み込み対象
 	int LoadModelDuplicate(SRC src);
 
 
@@ -119,34 +102,21 @@ private:
 	// 読み込み済みリソース
 	std::map<SRC, Resource*> loadedMap_;
 
-	std::map<int, std::string> path_;
 
-
-	/// <summary>
-	/// デフォルトコンストラクタ(private化で外部生成不可化)
-	/// </summary>
+	/// @brief デフォルトコンストラクタ(private化で外部生成不可化)
 	ResourceManager(void);
 
-	/// <summary>
-	/// デストラクタ(private化で外部で生成不可化)
-	/// </summary>
+	/// @brief デフォルトデストラクタ(private化で外部で生成不可化)
 	~ResourceManager(void) = default;
 
-	/// <summary>
-	/// コピーコンストラクタ
-	/// </summary>
-	ResourceManager(const ResourceManager& other) = default;
+	/// @brief コピーコンストラクタ対策
+	ResourceManager(const ResourceManager& _other) = default;
 
 
-	/// <summary>
-	/// リソースを取得する処理
-	/// </summary>
+	/// @brief リソースを取得する処理
 	void SetResource(void);
 
-	/// <summary>
-	/// 内部ロード
-	/// </summary>
-	/// <param name="source">読み込み対象</param>
-	/// <returns></returns>
-	Resource* _Load(SRC source);
+	/// @brief 内部ロード処理
+	/// @param _source 読み込み対象
+	Resource* _Load(SRC _source);
 };

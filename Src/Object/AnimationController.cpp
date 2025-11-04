@@ -23,14 +23,12 @@ AnimationController::~AnimationController(void)
 }
 
 
-void AnimationController::AddInternal(int _type, float _speed, int _animIndex)
+void AnimationController::AddInternal(int _type, float _speed)
 {
 	/* 内部のアニメーションの追加 */
 	Animation anim;
 
-	anim.modelId = -1;
-
-	anim.animIndex = _animIndex;
+	anim.animIndex = _type;
 
 	// アニメーション速度割り当て
 	anim.speed = _speed;
@@ -49,6 +47,27 @@ void AnimationController::AddExternal(int _type, float _speed, const std::string
 	Animation anim;
 
 	anim.modelId = MV1LoadModel(_path.c_str());
+
+	// パス読み込み判定有効
+	anim.isLoadPath = true;
+
+	// アニメーション速度割り当て
+	anim.speed = _speed;
+
+	// アニメーション状態割り当て
+	anim.type = ANIM_TYPE::EXTERNAL;
+
+	anim.step = 0.0f;
+
+	// アニメーション追加処理
+	Add(_type, anim);
+}
+void AnimationController::AddExternal(int _type, float _speed, int _handle)
+{
+	/* 外部のアニメーションの追加 */
+	Animation anim;
+
+	anim.modelId = _handle;
 
 	// アニメーション速度割り当て
 	anim.speed = _speed;
@@ -195,8 +214,9 @@ void AnimationController::Release(void)
 	// ロードしたアニメーションを解放
 	for (auto& [type, anim] : animations_)
 	{
-		// 外部アニメーション時
-		if (anim.type == ANIM_TYPE::EXTERNAL)
+		// パス読み込みでの外部アニメーション時
+		if (anim.type == ANIM_TYPE::EXTERNAL &&
+			anim.isLoadPath)
 		{
 			// アニメーション解放
 			MV1DeleteModel(anim.modelId);

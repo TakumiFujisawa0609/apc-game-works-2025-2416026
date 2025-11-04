@@ -23,6 +23,7 @@ public:
 		float speed		= 0.0f; // 再生速度
 		float totalTime = 0.0f; // 最大再生時間
 		float step		= 0.0f; // 現在再生時間
+		bool isLoadPath = false; // パスで読み込んでいるか否か
 	};
 
 
@@ -36,14 +37,19 @@ public:
 	/// @brief 同じモデル内のアニメーションを準備
 	/// @param type アニメーション種類
 	/// @param speed アニメーション速度 
-	/// @param animIndex 
-	void AddInternal(int _type, float _speed, int _animIndex);
+	void AddInternal(int _type, float _speed);
 
 	/// @brief 別のアニメーションモデルから準備
 	/// @param _type アニメーション種類
 	/// @param _speed アニメーション速度 
 	/// @param _path アニメーションのパス
 	void AddExternal(int _type, float _speed, const std::string _path);
+
+	/// @brief 別の読み込み済みアニメーションモデルから準備
+	/// @param _type アニメーション種類
+	/// @param _speed アニメーション速度 
+	/// @param _handle アニメーションのハンドル
+	void AddExternal(int _type, float _speed, int _handle);
 
 
 	/// @brief アニメーション再生

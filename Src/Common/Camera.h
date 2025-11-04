@@ -224,11 +224,9 @@ private:
 
 	/// @brief 滑らかに追尾回転する処理
 	void SmoothRotation(void);
+
+	/// @brief カメラ回転処理
 	void _UpdateCameraRot(void);
 
 	void SetBeforeDraw_FollowZoom(void);
-
-	/// @brief プレイヤーの向きにカメラを合わせる
-	void TrackPlayer(void);
-
 };
