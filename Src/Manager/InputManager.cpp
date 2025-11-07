@@ -117,6 +117,7 @@ void InputManager::Update(void)
 		mouse.trgUp   = (!mouse.inputNew && mouse.inputOld);
 	}
 
+
 	// ゲームパッド入力判定更新
 	SetPadInState(PAD_NO::PAD1);
 	SetPadInState(PAD_NO::PAD2);
@@ -129,7 +130,11 @@ void InputManager::Destroy(void)
 	keys_.clear();	 // 入力キー配列 解放
 	mouses_.clear(); // マウス入力配列 解放
 
-	delete instance_; // マネージャ 削除
+	//delete instance_; // マネージャ 削除
+}
+
+void InputManager::InitInput(void)
+{
 }
 
 
@@ -269,11 +274,11 @@ void InputManager::SetPadInState(PAD_NO jPadNum)
 	}
 }
 
-InputManager::JOYPAD_IN_STATE& InputManager::GetPadInputState(PAD_NO _padNum)
+InputManager::Joypad& InputManager::GetPadInputState(PAD_NO _padNum)
 {
 	/* コントローラ入力取得処理 */
 
-	JOYPAD_IN_STATE ret = InputManager::JOYPAD_IN_STATE();
+	Joypad ret = InputManager::Joypad();
 
 	auto type = GetPadType(_padNum);
 
@@ -358,10 +363,10 @@ InputManager::JOYPAD_IN_STATE& InputManager::GetPadInputState(PAD_NO _padNum)
 		unsigned int up = 0;
 		unsigned int down = 18000;
 
-		if (d.POV == &left)  inputX = -1;
-		if (d.POV == &right) inputX = 1;
-		if (d.POV == &up)    inputY = -1;
-		if (d.POV == &down)  inputY = 1;
+		if (*d.POV == left)  inputX = -1;
+		if (*d.POV == right) inputX = 1;
+		if (*d.POV == up)    inputY = -1;
+		if (*d.POV == down)  inputY = 1;
 
 		ret.algKeyX[index] = inputX;
 		ret.algKeyY[index] = inputY;
@@ -454,6 +459,11 @@ XINPUT_STATE InputManager::GetPadXInputState(InputManager::PAD_NO _padNum)
 InputManager::JOYPAD_TYPE InputManager::GetPadType(PAD_NO padNo)
 {
 	return static_cast<InputManager::JOYPAD_TYPE>(GetJoypadType(static_cast<int>(padNo)));
+}
+
+int InputManager::GetMouseWheelRot(void)
+{
+	return 0;
 }
 
 bool InputManager::PadIsBtnNew(PAD_NO _padNum, PAD_BTN button) const

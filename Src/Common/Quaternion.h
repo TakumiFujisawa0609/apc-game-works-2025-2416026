@@ -22,21 +22,23 @@ public:
 
 	Quaternion operator-(void) { return Quaternion(w,x,-y,z); };
 
-	// オイラー角からクォータニオンへ変換
+	/// @brief オイラー角からクォータニオンへ変換
 	static Quaternion Euler(const VECTOR& rad);
 
-	// オイラー角からクォータニオンへ変換
+	/// @brief オイラー角からクォータニオンへ変換
 	static Quaternion Euler(double radX, double radY, double radZ);
 
 
-	// クォータニオンの合成
+	/// @brief クォータニオンの合成
 	static Quaternion Mult(const Quaternion& q1, const Quaternion& q2);
 
-	// クォータニオンの合成
+	/// @brief 別のクォータニオンの合成
 	Quaternion Mult(const Quaternion& q) const;
 
 
-	// 指定軸を指定角分、回転させる
+	/// @brief 指定軸を指定角分、回転させる
+	/// @param rad 角度(ラジアン)
+	/// @param axis 方向ベクトル
 	static Quaternion AngleAxis(double rad, VECTOR axis);
 
 	// 座標を回転させる
@@ -59,67 +61,52 @@ public:
 	static Quaternion GetRotation(MATRIX mat);
 
 #pragma region 基本ベクトルを取得
-	/// <summary>
-	/// 正面の位置取得
-	/// </summary>
+
+	/// @brief 正面の位置取得
 	VECTOR GetForward(void) const;
 
-	/// <summary>
-	/// 後ろの位置取得
-	/// </summary>
+	/// @brief 後ろの位置取得
 	VECTOR GetBack(void) const;
 
-	/// <summary>
-	/// 左の位置取得
-	/// </summary>
+	/// @brief 左の位置取得
 	VECTOR GetRight(void) const;
 
-	/// <summary>
-	/// 右の位置取得
-	/// </summary>
+	/// @brief 右の位置取得
 	VECTOR GetLeft(void) const;
 
-	/// <summary>
-	/// 上の位置取得
-	/// </summary>
+	/// @brief 上の位置取得
 	VECTOR GetUp(void) const;
 
-	/// <summary>
-	/// 下の位置取得
-	/// </summary>
+	/// @brief 下の位置取得
 	VECTOR GetDown(void) const;
 #pragma endregion
 
-	/// <summary>
-	/// 内積
-	/// </summary>
-	/// <param name="q1">クォータニオン１</param>
-	/// <param name="q2">クォータニオン２</param>
-	static double Dot(const Quaternion& q1, const Quaternion& q2);
-	double Dot(const Quaternion& b) const;
+	/// @brief 内積計算
+	/// @param _q1 クォータニオン１
+	/// @param _q2 クォータニオン２
+	static double Dot(const Quaternion& _q1, const Quaternion& _q2);
+
+	/// @brief 内積計算
+	/// @param _q 別クォータニオン
+	double Dot(const Quaternion& _q) const;
 
 
-	/// <summary>
-	/// 対象を正規化して返す
-	/// </summary>
-	static Quaternion Normalize(const Quaternion& q);
+	/// @brief 対象を正規化して返す
+	static Quaternion Normalize(const Quaternion& _q);
 
-	/// <summary>
-	/// 自分自身を正規化して返す
-	/// </summary>
+	/// @brief 自分自身を正規化して返す
 	Quaternion Normalized(void) const;
 
-	/// <summary>
-	/// 自分自身を正規化
-	/// </summary>
+	/// @brief 自分自身を正規化
 	void Normalize(void);
 
-	/// <summary>
-	/// 逆クォータニオン
-	/// </summary>
+	/// @brief 逆クォータニオン
 	Quaternion Inverse(void) const;
 
-	// 球面補間
+	/// @brief 球面補間
+	/// @param from 始点のクォータニオン
+	/// @param to 終点のクォータニオン
+	/// @param t 補間する値
 	static Quaternion Slerp(Quaternion from, Quaternion to, double t);
 
 	// ２つのベクトル間の回転量を取得する

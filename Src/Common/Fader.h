@@ -1,8 +1,5 @@
 #pragma once
 
-/// <summary>
-/// フェーダ
-/// </summary>
 class Fader
 {
 public:

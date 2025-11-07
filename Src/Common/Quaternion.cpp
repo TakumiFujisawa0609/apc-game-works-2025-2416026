@@ -467,12 +467,12 @@ VECTOR Quaternion::GetDown(void) const
 
 double Quaternion::Dot(const Quaternion& q1, const Quaternion& q2)
 {
-    return (q1.w * q2.w + q1.x * q2.x + q1.y * q2.y + q1.z * q2.z);
+    return ((q1.w * q2.w) + (q1.x * q2.x) + (q1.y * q2.y) + (q1.z * q2.z));
 }
 
-double Quaternion::Dot(const Quaternion& q) const
+double Quaternion::Dot(const Quaternion& _q) const
 {
-    return (w * q.w + x * q.x + y * q.y + z * q.z);
+    return ((w * _q.w) + (x * _q.x) + (y * _q.y) + (z * _q.z));
 }
 
 

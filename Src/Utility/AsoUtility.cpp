@@ -139,6 +139,25 @@ int AsoUtility::DirNearAroundDeg(float from, float to)
 
 }
 
+VECTOR AsoUtility::Clamp(const VECTOR& _target, const VECTOR& _min, const VECTOR& _max)
+{
+    // ”’l‚Ì”ÍˆÍ§ŒÀ
+    VECTOR ret = _target;
+    ret.x = std::clamp(ret.x, _min.x, _max.x);
+    ret.y = std::clamp(ret.y, _min.y, _max.y);
+    ret.z = std::clamp(ret.z, _min.z, _max.z);
+    return ret;
+}
+
+Vector2 AsoUtility::Clamp(const Vector2& _target, const Vector2& _min, const Vector2& _max)
+{
+    // ”’l‚Ì”ÍˆÍ§ŒÀ
+    Vector2 ret = _target;
+    ret.x = std::clamp(ret.x, _min.x, _max.x);
+    ret.y = std::clamp(ret.y, _min.y, _max.y);
+    return ret;
+}
+
 int AsoUtility::Lerp(int start, int end, float t)
 {
     // üŒ`•âŠÔ

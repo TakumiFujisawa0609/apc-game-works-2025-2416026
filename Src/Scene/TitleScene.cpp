@@ -232,11 +232,12 @@ void TitleScene::DrawFont(void)
 	// 描画ブレンドモードをノーブレンドにする
 	SetDrawBlendMode(DX_BLENDMODE_INVSRC, 200);
 
-	float y = Application::SCREEN_HALF_Y + TEXT_POS.y + 10;
+	int y = Application::SCREEN_HALF_Y + TEXT_POS.y + 10;
 	DrawRotaGraph(Application::SCREEN_HALF_X,
 		(y - (95 / 4) - 5 + (TEXT_POS_Y_OFFSET * static_cast<int>(state_))),
 		selectScale_, AsoUtility::Deg2Rad(-90.0), arrowImage_, true);
 
+	// 矢印位置
 	DrawRotaGraph(Application::SCREEN_HALF_X,
 		(y + (95 / 2) + (TEXT_POS_Y_OFFSET * static_cast<int>(state_))),
 		selectScale_, AsoUtility::Deg2Rad(90.0), arrowImage_, true);
@@ -310,7 +311,7 @@ void TitleScene::DrawInfo(void)
 	DrawBox(INFO_SIZE.x, INFO_SIZE.y,
 		(midX * 2) - INFO_SIZE.x,
 		(midY * 2) - INFO_SIZE.y,
-		GetColor(INFO_COLOR.r, INFO_COLOR.g, INFO_COLOR.b), true);
+		UtilityCommon::SetColor(INFO_COLOR), true);
 
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "./SceneBase.h"
 #include "../Common/Vector2.h"
+#include "../Utility/UtilityCommon.h"
 #include <DxLib.h>
 
 
@@ -89,7 +90,7 @@ private:
 	static constexpr Vector2 INFO_OFFSET = { 175, 16 };
 
 	// 説明背景色
-	static constexpr COLOR_F INFO_COLOR = { 200, 200, 200, 200 };
+	static constexpr UtilityCommon::Color INFO_COLOR = { 200, 200, 200, 200 };
 
 	// 遊び方の状態番号テキスト位置
 	static constexpr Vector2 INFO_PARAM = { 45, 32 };

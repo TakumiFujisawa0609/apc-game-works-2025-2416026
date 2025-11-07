@@ -4,12 +4,14 @@
 #include <chrono>
 #include "../Application.h"
 #include "../Common/Camera.h"
+#include "../Common/Perform.h"
 #include "../Scene/SceneBase.h"
 #include "../Scene/TitleScene.h"
 #include "../Scene/GameScene.h"
 #include "../Scene/GameClearScene.h"
 #include "../Scene/GameOverScene.h"
 #include "./InputManager.h"
+#include "./EffectController.h"
 #include "./ResourceManager.h"
 #pragma endregion
 
@@ -37,6 +39,9 @@ SceneManager::SceneManager(void)
 
 	isDebugMode_ = false;
 
+	// マウスカーソルの非表示
+	ShowCursor(FALSE);
+
 	Load(); // 初期化処理
 }
 
@@ -61,9 +66,11 @@ void SceneManager::Load(void)
 	// 現在時間取得
 	preTime_ = std::chrono::system_clock::now();
 
+	effects_ = new EffectController();
 
-	// ヒットストップ初期化
-	InitPerform();
+	// 演出初期化
+	perform_ = new Perform();
+
 
 	// 3D初期化処理
 	Init3D();
@@ -92,13 +99,6 @@ void SceneManager::Init3D(void)
 	ChangeLightTypeDir(LIGHT_DIR);
 }
 
-void SceneManager::InitPerform(void)
-{
-	perform_.type = PERFORM_TYPE::NONE;
-	perform_.time = 0.0f;
-	perform_.shakePos = {};
-	perform_.slowTerm = 0;
-}
 
 
 void SceneManager::Update(void)
@@ -111,8 +111,11 @@ void SceneManager::Update(void)
 	if (curScene_ == nullptr) return;
 
 	// 演出処理
-	bool isStop = Performance();
-	if (isStop) return;
+	perform_->Update();
+
+	// 停止演出時、処理終了
+	if (perform_->GetPerformStop()) { return; }
+
 
 	// 経過時間カウント
 	DeltaCount();
@@ -133,6 +136,8 @@ void SceneManager::Draw(void)
 {
 	/*　描画処理　*/
 	
+	perform_->BeforeDraw();
+
 	camera_->SetBeforeDraw();
 
 	// 現在シーン描画
@@ -194,6 +199,8 @@ void SceneManager::Destroy(void)
 	camera_->Release();
 	delete camera_;
 
+	delete perform_;
+
 	//delete fader_;	 // フェーダ削除
 	delete instance_; // マネージャ削除
 }
@@ -245,10 +252,6 @@ void SceneManager::DrawGrid(void)
 
 }
 
-bool SceneManager::GetIsDebugMode(void)
-{
-	return isDebugMode_;
-}
 
 void SceneManager::DoChangeState(SCENE_ID nextScene)
 {
@@ -345,36 +348,4 @@ void SceneManager::DeltaCount(void)
 		std::chrono::duration_cast<std::chrono::nanoseconds>(nowTime - preTime_).count() / 1000000000.0);
 
 	preTime_ = nowTime;
-}
-
-bool SceneManager::Performance(void)
-{
-	bool isStop = false;
-	float delta = GetDeltaTime();
-
-	if (perform_.time > 0.0f)
-	{
-		perform_.time -= delta;
-
-		// ヒットストップ処理
-		if (perform_.type == PERFORM_TYPE::HIT_STOP)
-		{
-			// 更新処理の停止
-			isStop = true;
-		}
-
-		// 遅延処理
-		if (perform_.type == PERFORM_TYPE::SLOW)
-		{
-			int slowCount = static_cast<int>(perform_.time * 10);
-
-			if (slowCount % perform_.slowTerm != 0)
-			{
-				// 更新処理の停止
-				isStop = true;
-			}
-		}
-	}
-
-	return isStop;
 }

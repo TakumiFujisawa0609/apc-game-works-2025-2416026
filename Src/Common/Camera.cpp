@@ -2,7 +2,7 @@
 #include "../Manager/InputManager.h"
 #include "../Scene/GameScene.h"
 #include "../Utility/AsoUtility.h"
-#include "../Object/Player.h"
+#include "../Object/Player/Player.h"
 #include <EffekseerForDXLib.h>
 #include <DxLib.h>
 
@@ -11,8 +11,7 @@ Camera::Camera(void)
 {
 	pos_ = {};
 	pos_.target = {};
-	rot_.camera = Quaternion::Identity();
-	rot_.target = Quaternion::Identity();
+	rot_.camera = rot_.target = Quaternion::Identity();
 
 	follow_ = nullptr;
 
@@ -26,8 +25,7 @@ Camera::Camera(void)
 
 void Camera::Load(void)
 {
-	rot_.camera = Quaternion::Identity();
-	rot_.target = Quaternion::Identity();
+	rot_.camera = rot_.target = Quaternion::Identity();
 
 }
 
@@ -53,30 +51,29 @@ void Camera::SetBeforeDraw(void)
 
 	switch (mode_)
 	{
-	case Camera::MODE::FIXEX_POINT:
-	{
+		case Camera::MODE::FIXEX_POINT:
+		{
 #ifdef _DEBUG
-		SetBeforeDraw_FixexPoint();
-		DebugMove();
+			SetBeforeDraw_FixexPoint();
+			DebugMove();
 #endif
-	}
-	break;
+		}
+		break;
 
-	case Camera::MODE::FOLLOW:
-	{
-		SetBeforeDraw_Follow();
-	}
-	break;
+		case Camera::MODE::FOLLOW:
+		{
+			SetBeforeDraw_Follow();
+		}
+		break;
 
-	case Camera::MODE::FOLLOW_AUTO_ZOOM:
-	{
-		SetBeforeDraw_FollowZoom();
-	}
-	break;
+		case Camera::MODE::FOLLOW_AUTO_ZOOM:
+		{
+			SetBeforeDraw_FollowZoom();
+		}
+		break;
 
-	case Camera::MODE::NONE:
-	default:
-
+		case Camera::MODE::NONE:
+		default:
 		break;
 	}
 
@@ -97,8 +94,8 @@ void Camera::SetBeforeDraw(void)
 void Camera::DebugMove(void)
 {
 	InputManager& input = InputManager::GetInstance();
-	float move = 2.5f;
-	float rot = 1.0f;
+	const float move = 2.5f;
+	const float rot = 1.0f;
 
 	if (input.KeyIsNew(KEY_INPUT_UP))
 	{
@@ -197,7 +194,7 @@ void Camera::SetBeforeDraw_Follow(void)
 void Camera::SmoothRotation(void)
 {
 	float smoothPow = 0.15f;
-	VECTOR pPos = follow_->GetPos();
+	VECTOR pPos = VAdd(follow_->GetPos(), TARGET_LOCAL_POS);
 	VECTOR pAngle = follow_->GetRotationEuler();
 	Quaternion pRot = follow_->GetRotation();
 	
@@ -255,7 +252,7 @@ void Camera::SetBeforeDraw_FollowZoom(void)
 	pos_.cameraPos = VAdd(pos_.target, LOCAL_POS);
 
 	// ˆÊ’u§ŒÀ
-	PosLimit();
+	pos_.cameraPos = AsoUtility::Clamp(pos_.cameraPos, pos_.limitMin, pos_.limitMax);
 
 	// ƒY[ƒ€”{—¦Š„‚è“–‚Ä
 	_SetZoomDiff(pos_.target);
@@ -366,21 +363,12 @@ void Camera::ResetTrackingTarget(void)
 	targetsPos_.clear();
 }
 
-void Camera::ZoomIn(void)
-{
-	pos_.cameraPos.y -= ZOOM_SPEED;
-}
-
-void Camera::ZoomOut(void)
-{
-	pos_.cameraPos.y += ZOOM_SPEED;
-}
 
 
-void Camera::SetPosLimit(VECTOR min, VECTOR max)
+void Camera::SetPosLimit(const VECTOR& _min, const VECTOR& _max)
 {
-	pos_.limitMin = min;
-	pos_.limitMax = max;
+	pos_.limitMin = _min;
+	pos_.limitMax = _max;
 }
 
 
@@ -462,39 +450,4 @@ void Camera::_SetZoomDiff(const VECTOR& vecDiff)
 	//ZŽ²”{—¦: Å‘åEÅ¬
 	if (zoom_.distance.z > -ZOOM_IN_MAX.z) { zoom_.distance.z = -ZOOM_IN_MAX.z; };
 	if (zoom_.distance.z < -ZOOM_OUT_MAX.z) { zoom_.distance.z = -ZOOM_OUT_MAX.z; };
-}
-
-void Camera::PosLimit(void)
-{
-	if (!AsoUtility::EqualsVZero(pos_.limitMin))
-	{
-		if (pos_.cameraPos.x < pos_.limitMin.x)
-		{
-			pos_.cameraPos.x = pos_.limitMin.x;
-		}
-		if (pos_.cameraPos.y < pos_.limitMin.y)
-		{
-			pos_.cameraPos.y = pos_.limitMin.y;
-		}
-		if (pos_.cameraPos.z < pos_.limitMin.z)
-		{
-			pos_.cameraPos.z = pos_.limitMin.z;
-		}
-	}
-
-	if (!AsoUtility::EqualsVZero(pos_.limitMax))
-	{
-		if (pos_.cameraPos.x > pos_.limitMax.x)
-		{
-			pos_.cameraPos.x = pos_.limitMax.x;
-		}
-		if (pos_.cameraPos.y > pos_.limitMax.y)
-		{
-			pos_.cameraPos.y = pos_.limitMax.y;
-		}
-		if (pos_.cameraPos.z > pos_.limitMax.z)
-		{
-			pos_.cameraPos.z = pos_.limitMax.z;
-		}
-	}
 }

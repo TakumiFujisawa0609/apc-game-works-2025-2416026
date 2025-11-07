@@ -68,10 +68,12 @@ public:
 
 
 	/// @brief 2Dサウンドの再生処
-	/// @param name times 再生種類を取得
-	/// @param name isForce
+	/// @param _times 再生種類を取得
+	/// @param _isPitch ピッチを上げるか否か
+	/// @param _pitchRange ピッチの増加範囲
+	/// @param isForce
 	/// @returns 音声未割当時、false
-	bool Play(TIMES times, bool _isPitch = false, float _pitchRange = 1.0f, bool isForce = false);
+	bool Play(TIMES times, bool _isPitch = false, int _pitchRange = 1, bool isForce = false);
 
 	/// @brief 3Dサウンドの再生処
 	/// @param times 再生種類を取得
@@ -109,6 +111,9 @@ public:
 
 
 private:
+
+	// 半音階(1オクターブ=1200.0f)
+	static constexpr float MUSICAL_SCALE_HALF = (100.0f / 2.0f);
 
 	SOUND sound_;
 };

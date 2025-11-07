@@ -11,9 +11,14 @@ class EnemyController
 {
 public:
 
-	static void CreateInstance(Player& player_);
+	using EnemyList = std::vector<Enemy*>;
 
-	static EnemyController& GetInstance(void);
+	/// @brief デフォルトコンストラクタ
+	/// @param player
+	EnemyController(Player& player);
+
+	/// @brief デフォルトデストラクタ
+	~EnemyController(void) = default;
 
 
 	void Init(void);
@@ -26,32 +31,15 @@ public:
 
 	void Release(void);
 
-	static void Destroy(void);
 
-
-	/// <summary>
-	/// 敵リスト取得
-	/// </summary>
-	const std::vector<Enemy*>& GetEnemys(void) { return enemys_; };
+	/// @brief 敵リスト取得
+	const EnemyList& GetEnemys(void)const { return enemys_; };
 
 private:
 
-	static EnemyController* instance_;
-
 	Player* player_;
 
-	std::vector<Enemy*> enemys_;
-
-
-	/// @brief デフォルトコンストラクタ
-	/// @param player
-	EnemyController(Player& player);
-
-	/// @brief デフォルトデストラクタ
-	~EnemyController(void) = default;
-
-	/// @brief コピーコンストラクタ対策
-	EnemyController(EnemyController& other) = default;
-
+	EnemyList enemys_;
+	
 	void EnemySpawn(ENEMY_TYPE type, const VECTOR& posField);
 };

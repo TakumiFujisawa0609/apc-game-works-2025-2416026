@@ -1,6 +1,6 @@
 #pragma once
 
-#include <map>
+#include <unordered_map>
 #include <string>
 class Resource;
 
@@ -12,14 +12,20 @@ public:
 	enum SRC
 	{
 		/*　3Dモデルリソース　*/
+
+		NONE = -1,
+
 		// プレイヤー
-		MODEL_PLAYER = 0,
+		MODEL_PLAYER,
+
 		// 敵
-		MODEL_SKELETON_WARRIOR = 1,
+		MODEL_ENEMY,
+		MODEL_SKELETON_WARRIOR,
 		MODEL_SKELETON_MAGE,
 
 		// 武器
 		MODEL_WEAPON,
+		MODEL_SWORD,
 
 		/*　エフェクトリソース　*/
 
@@ -101,10 +107,10 @@ private:
 	static ResourceManager* instance_;
 
 	// リソース管理対象
-	std::map<SRC, Resource> resourcesMap_;
+	std::unordered_map<SRC, Resource> resourcesMap_;
 
 	// 読み込み済みリソース
-	std::map<SRC, Resource*> loadedMap_;
+	std::unordered_map<SRC, Resource*> loadedMap_;
 
 
 	/// @brief デフォルトコンストラクタ(private化で外部生成不可化)

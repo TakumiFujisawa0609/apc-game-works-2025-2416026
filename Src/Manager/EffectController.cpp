@@ -1,53 +1,31 @@
-#include "EffectManager.h"
+#include "EffectController.h"
 #include <DxLib.h>
 #include <EffekseerForDXLib.h>
+#include <map>
 #include "../Manager/ResourceManager.h"
 #include "../Manager/Resource.h"
 #include "../Manager/SceneManager.h"
 
 
-EffectManager* EffectManager::instance_;
-
-void EffectManager::CreateInstance(void)
-{
-	if (instance_ == nullptr)
-	{
-		instance_ = new EffectManager();
-	}
-	instance_->Init(); // マネージャ初期化処理
-}
-
-EffectManager& EffectManager::GetInstance(void)
-{
-	if (instance_ == nullptr)
-	{
-#ifdef _DEBUG
-		OutputDebugString("\nエフェクトマネージャが生成されていません。\nエフェクトマネージャを生成しました。\n");
-#endif
-	}
-	return *instance_;
-}
-
-EffectManager::EffectManager(void)
+EffectController::EffectController(void)
 {
 	effects_.clear();
 }
 
-void EffectManager::Init(void)
+void EffectController::Init(void)
 {
 
 }
 
-void EffectManager::Update(void)
+void EffectController::Update(void)
 {
 	float delta = SceneManager::GetInstance().GetDeltaTime();
-	EFFECT effect;
 
-	for (auto effects : effects_)
+	for (auto [type, effects] : effects_)
 	{
-		effect = effects.second;
+		Effect effect = *effects;
 
-		if (!GetIsEffectAlive(effects.first)) continue;
+		if (!GetIsEffectAlive(type)) continue;
 
 		effect.playId = PlayEffekseer3DEffect(effect.handle);
 
@@ -80,31 +58,26 @@ void EffectManager::Update(void)
 		// エフェクト停止
 		if (effect.aliveTime < 0.0f)
 		{
-			StopEffect(effects.first);
+			StopEffect(type);
 		}
 
 	}
 }
 
-void EffectManager::Draw(void)
+void EffectController::Draw(void)
 {
 	
 }
 
-void EffectManager::Destroy(void)
-{
-	
-}
-
-void EffectManager::StopEffect(EFFECT_TYPE type)
+void EffectController::StopEffect(EFFECT_TYPE type)
 {
 	if (!GetIsEffectAlive(type)) return;
 
 	// エフェクト停止
-	StopEffekseer3DEffect(effects_[type].playId);
+	StopEffekseer3DEffect(effects_[type]->playId);
 }
 
-void EffectManager::ChangeEffect(EFFECT_TYPE type, VECTOR pos)
+void EffectController::ChangeEffect(EFFECT_TYPE type, VECTOR pos)
 {
 	// 既存のエフェクトを削除
 	if (!GetIsEffectAlive(type)) return;
@@ -115,7 +88,7 @@ void EffectManager::ChangeEffect(EFFECT_TYPE type, VECTOR pos)
 
 	switch (type_)
 	{
-	case EffectManager::EFFECT_TYPE::COTTON_DAMAGE:
+	case EffectController::EFFECT_TYPE::COTTON_DAMAGE:
 	{
 		effect_ = new EffectCotton();
 		effectId_ = res.LoadHandleId(ResourceManager::EFFECT_DAMAGE);
@@ -124,7 +97,7 @@ void EffectManager::ChangeEffect(EFFECT_TYPE type, VECTOR pos)
 	break;
 
 
-	case EffectManager::EFFECT_TYPE::COTTON_KNOCK:
+	case EffectController::EFFECT_TYPE::COTTON_KNOCK:
 	{
 		effect_ = new EffectCotton();
 		effectId_ = res.LoadHandleId(ResourceManager::EFFECT_KNOCK);
@@ -132,7 +105,7 @@ void EffectManager::ChangeEffect(EFFECT_TYPE type, VECTOR pos)
 	}
 	break;
 
-	case EffectManager::EFFECT_TYPE::STAR:
+	case EffectController::EFFECT_TYPE::STAR:
 	{
 		effect_ = new EffectStar();
 		effectId_ = res.LoadHandleId(ResourceManager::EFFECT_STAR);
@@ -140,7 +113,7 @@ void EffectManager::ChangeEffect(EFFECT_TYPE type, VECTOR pos)
 	}
 	break;
 
-	case EffectManager::EFFECT_TYPE::NONE:
+	case EffectController::EFFECT_TYPE::NONE:
 	default:
 	{
 		// エフェクトなしの場合は何もしない
@@ -151,8 +124,8 @@ void EffectManager::ChangeEffect(EFFECT_TYPE type, VECTOR pos)
 	effects_.*/
 }
 
-bool EffectManager::GetIsEffectAlive(EFFECT_TYPE type)
+bool EffectController::GetIsEffectAlive(EFFECT_TYPE type)
 {
-	return (effects_[type].aliveTime > 0.0f &&
-		effects_[type].handle != -1);
+	return (effects_[type]->aliveTime > 0.0f &&
+			effects_[type]->handle != -1);
 }

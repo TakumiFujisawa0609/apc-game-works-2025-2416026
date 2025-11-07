@@ -3,11 +3,11 @@
 #include "../Common/Quaternion.h"
 #include "../Manager/ResourceManager.h"
 #include "../Manager/SoundManager.h"
-#include "./AnimationController.h"
+#include "./Common/AnimationController.h"
 #include "./Common/AttackMotion.h"
 #include <DxLib.h>
 #include <memory>
-#include <map>
+#include <unordered_map>
 #include <vector>
 #include <string>
 
@@ -168,7 +168,7 @@ protected:
 		// フレームのリスト
 		std::vector<Frame> frames;
 
-		std::map<COLLISION_TYPE, Frame*> colList;
+		std::unordered_map<COLLISION_TYPE, Frame*> colList;
 
 		// HP
 		int hp;
@@ -265,17 +265,20 @@ protected:
 	/// @brief フレーム初期化
 	virtual void InitModelFrame(void);
 
+	/// @brief その他処理初期化 
+	virtual void InitPost(void) {};
+
 	/// @brief アニメーション更新処理
 	virtual void UpdateAnim(void) = 0;
 
 	virtual void SetPosForward(void);
 	
-	/// <summary>
-	/// フレーム番号を検索
-	/// </summary>
-	/// <param name="name">フレーム名</param>
-	int FindFrameNum(const std::string& name);
+	/// @brief フレーム番号を検索
+	/// @param _name フレーム名
+	int FindFrameNum(const std::string& _name);
 
+	/// @brief フレーム更新する時の条件
+	virtual bool IsUpdateFrame(void) = 0;
 
 public:
 
@@ -297,7 +300,7 @@ public:
 	virtual void Draw(void);
 
 	/// @brief デバッグ描画
-	virtual void DrawDebug(void);
+	virtual void DrawDebug(void) {};
 
 	/// @brief 解放処理
 	virtual void Release(void);

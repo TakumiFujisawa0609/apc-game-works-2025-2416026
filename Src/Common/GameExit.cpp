@@ -139,14 +139,14 @@ void GameExit::Draw(void)
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, MENU_COLOR.a);
 	DrawBox(0, Application::SCREEN_SIZE_X,
 			0, Application::SCREEN_SIZE_Y,
-			GetColor(MENU_COLOR.r, MENU_COLOR.g, MENU_COLOR.b), true);
+			UtilityCommon::SetColor(MENU_COLOR), true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
 	// ÉÅÉjÉÖÅ[âÊñ  îºìßñæï`âÊ
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, MENU_COLOR.a);
 	DrawBox((midX - MENU_WIDTH), (midY - MENU_HEIGHT),
 			(midX + MENU_WIDTH), (midY + MENU_HEIGHT),
-			GetColor(MENU_COLOR.r, MENU_COLOR.g, MENU_COLOR.b), true);
+			UtilityCommon::SetColor(MENU_COLOR), true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
 
@@ -162,7 +162,7 @@ void GameExit::Draw(void)
 	int x = midX - font.GetDefaultTextWidth(text) + MENU_TEXT_OFFSET.x;
 	int y = (midY + MENU_TEXT_OFFSET.y);
 	font.DrawTextA("GameFont", x, y, text,
-				   GetColor(MENU_TEXT_COLOR.r, MENU_TEXT_COLOR.g, MENU_TEXT_COLOR.b),
+				   UtilityCommon::SetColor(MENU_TEXT_COLOR),
 				   50, Font::FONT_TYPE_ANTIALIASING_EDGE);
 
 
@@ -170,7 +170,7 @@ void GameExit::Draw(void)
 	{
 		// "YES"ëIë í èÌï`âÊ
 		font.DrawTextA("GameFont", yesX, yesY, TEXT_YES,
-					   GetColor(MENU_TEXT_COLOR.r, MENU_TEXT_COLOR.g, MENU_TEXT_COLOR.b),
+					   UtilityCommon::SetColor(MENU_TEXT_COLOR),
 					   -1, Font::FONT_TYPE_ANTIALIASING_EDGE);
 
 		// "NO"ëIë îºìßñæï`âÊ
@@ -186,13 +186,13 @@ void GameExit::Draw(void)
 	{
 		// "NO"ëIë í èÌï`âÊ
 		font.DrawTextA("GameFont", noX, noY, TEXT_NO,
-					   GetColor(MENU_TEXT_COLOR.r, MENU_TEXT_COLOR.g, MENU_TEXT_COLOR.b),
+					   UtilityCommon::SetColor(MENU_TEXT_COLOR),
 					   -1, Font::FONT_TYPE_ANTIALIASING_EDGE);
 
 		// "YES"ëIë îºìßñæï`âÊ
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, MENU_TEXT_COLOR.a);
 		font.DrawTextA("GameFont", yesX, yesY, TEXT_YES,
-					   GetColor(MENU_TEXT_COLOR.r, MENU_TEXT_COLOR.g, MENU_TEXT_COLOR.b),
+					   UtilityCommon::SetColor(MENU_TEXT_COLOR),
 					   -1, Font::FONT_TYPE_ANTIALIASING_EDGE);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}

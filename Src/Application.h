@@ -78,8 +78,11 @@ private:
 	/// @brief デフォルトデストラクタ
 	~Application(void) = default;
 
-	/// @brief デフォルトコピーコンストラクタ
-	Application(const Application&) = default;
+	// コピーコンストラクタ対策
+	Application(const Application&) = delete;
+	Application& operator=(const Application&) = delete;
+	Application(Application&&) = delete;
+	Application& operator=(Application&&) = delete;
 
 
 	/// @brief 初期化処理

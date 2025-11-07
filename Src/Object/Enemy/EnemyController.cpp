@@ -6,33 +6,10 @@
 #include "../Object.h"
 #include "./Enemy.h"
 #include "./EnemyWarrior.h"
-#include "../Player.h"
+#include "../Player/Player.h"
 #include "../,./../../Utility/AsoUtility.h"
 #include "../,./../../Application.h"
 #include "../,./../../Manager/SceneManager.h"
-
-EnemyController* EnemyController::instance_ = nullptr;
-
-void EnemyController::CreateInstance(Player& _player)
-{
-	if (instance_ == nullptr)
-	{
-		instance_ = new EnemyController(_player);
-	}
-
-	instance_->player_ = &_player;
-
-	instance_->Init();
-}
-
-EnemyController& EnemyController::GetInstance(void)
-{
-	if (instance_ != nullptr)
-	{
-		return *instance_;
-	}
-	assert("\n敵管理クラスが取得できませんでした。\n");
-}
 
 
 EnemyController::EnemyController(Player& player)
@@ -47,8 +24,7 @@ void EnemyController::Init(void)
 
 	const int rangeXZ = 250.0f;
 	float x, z = 0.0f;
-	
-	for (int i = 0; i < 30; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		int randX = GetRand(rangeXZ + rangeXZ) - rangeXZ;
 		x = static_cast<float>(randX);
@@ -120,14 +96,9 @@ void EnemyController::DrawDebug(void)
 		if (enemy->GetAnimState() == Enemy::ANIM_STATE::DEATH) continue;
 
 		enemy->DrawDebug();
-		DrawFormatString(0, y, 0xff0000, "enemy: pos(%.2f,%.2f,%.2f), velo(%.2f,%.2f,%.2f), knock(%.1f, %.1f, %.1f), hp(%d), inv(%.2f)\n",
+		DrawFormatString(0, y, 0xff0000, "enemy: pos(%.2f,%.2f,%.2f), state(%d), hp(%d), inv(%.2f)\n",
 			enemy->GetPos().x,enemy->GetPos().y,enemy->GetPos().z,
-			AsoUtility::Rad2Deg(enemy->GetVelocity().x),
-			AsoUtility::Rad2Deg(enemy->GetVelocity().y),
-			AsoUtility::Rad2Deg(enemy->GetVelocity().z),
-			AsoUtility::Rad2Deg(enemy->GetKnockVelo().x),
-			AsoUtility::Rad2Deg(enemy->GetKnockVelo().y),
-			AsoUtility::Rad2Deg(enemy->GetKnockVelo().z),
+			enemy->GetActionState(),
 			enemy->GetCurHp(), enemy->GetTimeInv());
 		y += 16;
 	}
@@ -142,28 +113,15 @@ void EnemyController::Release(void)
 		enemys_.clear();
 	}
 }
-void EnemyController::Destroy(void)
-{
-	if (instance_ != nullptr)
-	{
-		// インスタンス解放
-		instance_->Release();
-
-		delete instance_;
-		
-		instance_ = nullptr;
-	}
-}
 
 void EnemyController::EnemySpawn(ENEMY_TYPE type, const VECTOR& posField)
 {
 	Enemy* enemy = nullptr;
 
-	enemy = new EnemyWarrior(*player_);
-
+	
 	if (type == ENEMY_TYPE::SKELETON_WARRIOR)
 	{
-		//enemy = new EnemyWarrior(*player_);
+		enemy = new EnemyWarrior(*player_);
 	}
 
 	// 敵を初期化してリストに格納

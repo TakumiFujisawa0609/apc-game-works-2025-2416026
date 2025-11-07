@@ -9,6 +9,8 @@ class Enemy : public Object
 {
 public:
 
+	using STATUS_ANIM_TYPE = StatusEnemy::ANIM_TYPE;
+
 	enum class ANIM_STATE
 	{
 		NONE = 0,
@@ -98,7 +100,8 @@ protected:
 
 	ParamEnemy paramEnemy_;
 
-	
+	// アニメーション速度
+	std::map<int, float> animSpeed_;
 
 	StatusEnemy& status_;
 
@@ -141,4 +144,8 @@ protected:
 	virtual void AnimState(void) = 0;
 
 	virtual void DamagePerform(void) = 0;
+
+	bool IsAttackState(void);
+
+	bool IsUpdateFrame(void)override;
 };

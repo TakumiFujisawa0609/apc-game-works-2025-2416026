@@ -5,7 +5,7 @@
 #include "../Object/Object.h"
 class Player;
 class Enemy;
-
+class EnemyController;
 
 class CollisionManager
 {
@@ -14,9 +14,7 @@ class CollisionManager
 
 public:
 
-	/// <summary>
-	/// 当たり判定種類
-	/// </summary>
+	/// @brief 当たり判定種類
 	enum class COL_TYPE
 	{
 		NONE,
@@ -27,9 +25,7 @@ public:
 	};
 
 
-	/// <summary>
-	/// 当たり判定判定対象
-	/// </summary>
+	/// @brief 当たり判定判定対象
 	enum class COL_TARGET
 	{
 		PLAYER_1 = 0,
@@ -61,7 +57,8 @@ public:
 
 	/// @brief インスタンス生成
 	/// @param _player プレイヤークラス
-	static void CreateInstance(Player& _player);
+	/// @param _enemy 敵クラス
+	static void CreateInstance(Player& _player, EnemyController& _enemy);
 
 	/// @brief インスタンス取得
 	static CollisionManager& GetInstance(void) { return *instance_; };
@@ -130,8 +127,8 @@ private:
 	Player* player_;
 
 
-	// キャラクター当たり判定対象リスト
-	//std::map < int, CharaBase* > colChara_;
+	// 敵のマネージャ
+	EnemyController* enemys_;
 
 
 	// ステージの当たり判定用モデルハンドル
@@ -147,7 +144,8 @@ private:
 
 	/// @brief デフォルトコンストラクタ
 	/// @param プレイヤー
-	CollisionManager(Player& _player);
+	/// @param 敵
+	CollisionManager(Player& _player, EnemyController& _enemy);
 
 	/// @briefデフォルトデストラクタ
 	~CollisionManager(void) = default;
@@ -159,8 +157,11 @@ private:
 	/// @brief キャラクター同士の当たり判定
 	void CollisionChara(void);
 
-	/// @brief 敵の当たり判定 
-	void CollisionEnemys(void);
+	/// @brief 敵とプレイヤーの当たり判定 
+	void CollisionPlayerToEnemy(void);
+
+	/// @brief 敵と敵の当たり判定
+	void CollisionEnemyToEnemy(void);
 
 	/// @brief 各キャラクターのステージ床の当たり判定
 	void CollisionsGround(void);

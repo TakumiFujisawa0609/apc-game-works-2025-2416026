@@ -6,7 +6,7 @@
 #include "../Utility/AsoUtility.h"
 #include "../Utility/UtilityCollision.h"
 #include "../Object/Object.h"
-#include "../Object/Player.h"
+#include "../Object/Player/Player.h"
 #include "../Object/Enemy/EnemyController.h"
 #include "../Object/Enemy/Enemy.h"
 #include "../Object/Enemy/EnemyWarrior.h"
@@ -14,25 +14,25 @@
 #include "../Manager/Resource.h"
 #include "../Manager/SceneManager.h"
 #include "../Manager/SoundManager.h"
-#include "../Manager/EffectManager.h"
+#include "../Manager/EffectController.h"
 
 // シングルトンクラス
 CollisionManager* CollisionManager::instance_ = nullptr;
 
-void CollisionManager::CreateInstance(Player& _player)
+void CollisionManager::CreateInstance(Player& _player, EnemyController& _enemys)
 {
 	if (instance_ == nullptr)
 	{
-		instance_ = new CollisionManager(_player);
+		instance_ = new CollisionManager(_player, _enemys);
 	}
 
-	instance_->player_ = &_player;
 	//instance_->Init();
 }
 
-CollisionManager::CollisionManager(Player& _player)
+CollisionManager::CollisionManager(Player& _player, EnemyController& _enemys)
 {
 	player_ = &_player;
+	enemys_ = &_enemys;
 	stageColHandle_ = -1;
 	stageDamageHandle_ = -1;
 
@@ -98,7 +98,7 @@ void CollisionManager::SetStageCollision(int& stageHandle, const VECTOR& stagePo
 void CollisionManager::Update(void)
 {
 	// プレイヤーと敵の当たり判定
-	CollisionEnemys();
+	CollisionPlayerToEnemy();
 
 	// キャラクター同士の当たり判定
 	CollisionChara();
@@ -153,7 +153,7 @@ void CollisionManager::CollisionChara(void)
 	/*
 	SceneManager& scene = SceneManager::GetInstance();
 	SoundManager& sound = SoundManager::GetInstance();
-	EffectManager& effect = EffectManager::GetInstance();
+	EffectController& effect = EffectController::GetInstance();
 
 	int max = static_cast<int>(COL_NUM::MAX);
 	int checkNum  = 0; // 判定対象
@@ -268,7 +268,7 @@ void CollisionManager::CollisionChara(void)
 					scene.SetPerform(SceneManager::PERFORM_TYPE::HIT_STOP, CharaBase::HIT_STOP_PUNCH);
 
 					//エフェクト再生
-					effect.ChangeEffect(EffectManager::EFFECT_TYPE::COTTON_DAMAGE, targetChara.GetPos());
+					effect.ChangeEffect(EffectController::EFFECT_TYPE::COTTON_DAMAGE, targetChara.GetPos());
 					effect.Update();
 				}
 		
@@ -282,45 +282,74 @@ void CollisionManager::CollisionChara(void)
 	}*/
 }
 
-void CollisionManager::CollisionEnemys(void)
+void CollisionManager::CollisionPlayerToEnemy(void)
 {
-	auto& enemys = EnemyController::GetInstance().GetEnemys();
-	VECTOR pPos, ePos = {};
+	/*　プレイヤーと敵の当たり判定　*/
+
+	VECTOR pBody, eBody, pPos, ePos = AsoUtility::VECTOR_ZERO;
 	float pRad, eRad = 0.0f;
+	pPos = player_->GetPos();
 
-	for (auto& enemy : enemys)
+	// 敵未割当時、処理終了
+	if (enemys_->GetEnemys().empty()) { return; }
+
+	for (auto& enemy : enemys_->GetEnemys())
 	{
-		if (!enemy->GetIsActive() || enemy->GetCurHp() <= 0)continue;
+		// 無効状態・HP0の時、スキップ
+		if (!enemy->GetIsActive() || enemy->GetCurHp() <= 0) { continue; }
 
-		pPos = player_->GetFramePos(COLLISION_TYPE::BODY);
+		pBody = player_->GetFramePos(COLLISION_TYPE::BODY);
 		pRad = player_->GetRadius(COLLISION_TYPE::BODY);
-		ePos = enemy->GetFramePos(COLLISION_TYPE::BODY);
+		eBody = enemy->GetFramePos(COLLISION_TYPE::BODY);
 		eRad = enemy->GetRadius(COLLISION_TYPE::BODY);
+		ePos = enemy->GetPos();
 
-		if (UtilityCollision::IsHitSphereToSphere(pPos, pRad, ePos, eRad))
+		if (UtilityCollision::IsHitSphereToSphere(pBody, pRad, eBody, eRad))
 		{
-			// 前フレーム位置に戻す
-			enemy->SetPos(enemy->GetPrePos());
+			// プレイヤーの位置と反発
+			enemy->SetPos(UtilityCollision::CollisionReflectXZ(ePos.y, eBody, eRad, pBody, pRad));
 		}
 
 		// プレイヤー攻撃時の被ダメージ処理
 		if (player_->CheckActiveAttack())
 		{
-			pPos = player_->GetPosForward();
-			int Rad = player_->GetMotionType();
-			pRad = player_->GetRadiusAttack(player_->GetMotionType());
-			ePos = enemy->GetFramePos(Object::COLLISION_TYPE::BODY);
-			eRad = enemy->GetRadius(COLLISION_TYPE::BODY);
-
 			enemy->UpdateModelFrames();
 
-			if (UtilityCollision::IsHitSphereToSphere(pPos, pRad, ePos, eRad))
+			pBody = player_->GetPosForward();
+			pRad = player_->GetRadiusAttack(player_->GetMotionType());
+			eBody = enemy->GetFramePos(Object::COLLISION_TYPE::BODY);
+			eRad = enemy->GetRadius(COLLISION_TYPE::BODY);
+
+			if (UtilityCollision::IsHitSphereToSphere(pBody, pRad, eBody, eRad))
 			{
 				EnemyDamageProc(*enemy);
 			}
 		}
 	}
-	
+}
+void CollisionManager::CollisionEnemyToEnemy(void)
+{
+	int size = enemys_->GetEnemys().size();
+	Enemy* enemy1;
+	Enemy* enemy2;
+	VECTOR pos1, pos2;
+	float eRad1 = 0.0f, eRad2 = 0.0f;
+
+	for (int y = 0; y < size; y++)
+	{
+		enemy1 = enemys_->GetEnemys().at(y);
+		for (int x = (y + 1); x < size; x++)
+		{
+			enemy2 = enemys_->GetEnemys().at(x);
+			pos1 = enemy1->GetPos();
+			if (UtilityCollision::IsHitSphereToSphere(pos1, eRad1, pos2, eRad2))
+			{
+				// 前フレーム位置に戻す
+				//enemy1->SetPos(UtilityCollision::CollisionReflectXZ(pPos, pRad, ePos, eRad));
+
+			}
+		}
+	}
 }
 void CollisionManager::EnemyDamageProc(Enemy& _enemy, int _damage)
 {
@@ -587,7 +616,7 @@ void CollisionManager::CollisionsStageDamage(void)
 {
 	/*　ダメージ領域の当たり判定処理　*/
 	/*
-	EffectManager& effect = EffectManager::GetInstance();
+	EffectController& effect = EffectController::GetInstance();
 	SoundManager& sound = SoundManager::GetInstance();
 
 	// ダメージ領域が未割当時、処理を終了
@@ -646,7 +675,7 @@ void CollisionManager::CollisionsStageDamage(void)
 				sound.Play(SoundManager::SRC::SE_KNOCK, Sound::TIMES::ONCE);
 
 				//エフェクト再生
-				effect.ChangeEffect(EffectManager::EFFECT_TYPE::COTTON_KNOCK, chara.GetPrePos());
+				effect.ChangeEffect(EffectController::EFFECT_TYPE::COTTON_KNOCK, chara.GetPrePos());
 				effect.Update();
 				
 			}

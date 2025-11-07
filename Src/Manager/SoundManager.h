@@ -180,10 +180,11 @@ private:
 	/// </summary>
 	~SoundManager(void) = default;
 
-	/// <summary>
-	/// コピーコンストラクタ
-	/// </summary>
-	SoundManager(const SoundManager& other) = default;
+	/// @brief コピーコンストラクタ対策
+	SoundManager(const SoundManager&) = delete;
+	SoundManager& operator=(const SoundManager&) = delete;
+	SoundManager(SoundManager&&) = delete;
+	SoundManager& operator=(SoundManager&&) = delete;
 
 	/// <summary>
 	/// 各音声割り当て処理

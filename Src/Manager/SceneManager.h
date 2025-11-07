@@ -2,9 +2,12 @@
 #include <chrono>
 #include <DxLib.h>
 #include "../Common/Vector2.h"
+#include "../Utility/UtilityCommon.h"
 class SceneBase;
 //class Fader;
 class Camera;
+class EffectController;
+class Perform;
 
 class SceneManager
 {
@@ -80,32 +83,22 @@ public:
 	/// @brief カメラ取得
 	Camera& GetCamera(void) { return *camera_; };
 
-	/// <summary>
-	/// 演出時間
-	/// </summary>
-	/// <param name="type">演出の種類</param>
-	/// <param name="time">演出の時間</param>
-	/// <param name="slowTerm">遅延の間隔</param>
-	/// <param name="shakePowerX">横の振動の強さ</param>
-	/// <param name="shakePowerY">縦の振動の強さ</param>
-	void SetPerform(PERFORM_TYPE type, float time,
-					int slowTerm = 2, float shakePowerX = 0.0f, float shakePowerY = 0.0f);
+	/// @brief エフェクトコントローラ取得 
+	EffectController& GetEffects(void) { return *effects_; };
 
-	/// <summary>
-	/// グリッド線描画
-	/// </summary>
+	Perform& GetPerform(void) { return *perform_; }
+
+	/// @brief グリッド線描画
 	void DrawGrid(void);
 
-	/// <summary>
-	/// デバッグモード有効判定
-	/// </summary>
-	bool GetIsDebugMode(void);
+	/// @brief デバッグモード有効判定
+	bool GetIsDebugMode(void) { return isDebugMode_; };
 
 
 private:
 
 	// 背景色
-	static constexpr COLOR_F BACK_COLOR = { 128,128,128 };
+	static constexpr UtilityCommon::Color BACK_COLOR = { 128,128,128 };
 
 
 	// 線の長さ
@@ -124,25 +117,8 @@ private:
 	static const int GRID_HNUM = GRID_NUM / 2;
 
 
-	/// <summary>
-	/// 演出
-	/// </summary>
-	struct Perform
-	{
-		// 演出状態
-		PERFORM_TYPE type;
-
-		// ヒットストップ演出時間
-		float time;
-
-		Vector2 shakePos;
-
-		int  slowTerm;
-
-		int tempScreen_;
-	};
 	// 演出
-	Perform perform_;
+	Perform* perform_;
 
 
 	// 静的インスタンス
@@ -159,6 +135,8 @@ private:
 
 	// カメラ
 	Camera* camera_;
+
+	EffectController* effects_;
 
 	//Fader* fader_; // フェーダー
 
@@ -179,18 +157,16 @@ private:
 	SceneManager(void);
 
 	/// @brief コピーコンストラクタ対策
-	SceneManager(const SceneManager &other) = default;
+	SceneManager(const SceneManager&) = delete;
+	SceneManager& operator=(const SceneManager&) = delete;
+	SceneManager(SceneManager&&) = delete;
+	SceneManager& operator=(SceneManager&&) = delete;
 
 	/// @brief デフォルトデストラクタ
 	~SceneManager(void) = default;
 
 	/// @brief 3Dの初期化処理
 	void Init3D(void);
-
-	/// <summary>
-	/// ヒットストップ初期化
-	/// </summary>
-	void InitPerform(void);
 
 
 	/// <summary>
@@ -204,10 +180,4 @@ private:
 
 	/// @brief 経過時間の処理
 	void DeltaCount(void);
-
-	/// <summary>
-	/// 演出処理
-	/// </summary>
-	/// <returns>停止するか否か</returns>
-	bool Performance(void);
 };

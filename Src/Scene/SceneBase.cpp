@@ -66,6 +66,11 @@ bool SceneBase::IsSelectUp(void)
 		input.PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) &&
 		input.PadAlgKeyY(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) < 0 ||
 
+		input.PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::D_PAD) &&
+		input.PadAlgKeyX(PAD_NO::PAD1, PAD_ALGKEY::D_PAD) < 0 ||
+		input.PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::D_PAD) &&
+		input.PadAlgKeyY(PAD_NO::PAD1, PAD_ALGKEY::D_PAD) < 0 ||
+
 		input.KeyIsTrgDown(KEY_INPUT_W) ||
 		input.KeyIsTrgDown(KEY_INPUT_A) ||
 		input.KeyIsTrgDown(KEY_INPUT_LEFT) ||
@@ -90,6 +95,11 @@ bool SceneBase::IsSelectDown(void)
 		input.PadAlgKeyX(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) > 0 ||
 		input.PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) &&
 		input.PadAlgKeyY(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) > 0 ||
+
+		input.PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::D_PAD) &&
+		input.PadAlgKeyX(PAD_NO::PAD1, PAD_ALGKEY::D_PAD) > 0 ||
+		input.PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::D_PAD) &&
+		input.PadAlgKeyY(PAD_NO::PAD1, PAD_ALGKEY::D_PAD) > 0 ||
 
 		input.KeyIsTrgDown(KEY_INPUT_S) ||
 		input.KeyIsTrgDown(KEY_INPUT_D) ||

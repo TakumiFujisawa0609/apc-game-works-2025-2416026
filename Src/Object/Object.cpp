@@ -3,7 +3,7 @@
 #include <string>
 #include <cassert>
 #include "./Status/StatusData.h"
-#include "./AnimationController.h"
+#include "./Common/AnimationController.h"
 #include "../Application.h"
 #include "../Common/Quaternion.h"
 #include "../Common/Vector2.h"
@@ -112,7 +112,10 @@ void Object::Update(void)
 	if (!AsoUtility::EqualsVZero(paramChara_.knockBack))
 	{
 		GravityKnock();
+	}
 
+	if (IsUpdateFrame())
+	{
 		UpdateModelFrames();
 	}
 }
@@ -124,7 +127,7 @@ void Object::Draw(void)
 	// ƒ‚ƒfƒ‹•`‰æˆ—
 	MV1DrawModel(paramChara_.handle);
 
-	if (SceneManager::GetInstance().GetIsDebugMode())
+	if (!SceneManager::GetInstance().GetIsDebugMode())
 	{
 		// Œü‚«•`‰æ
 		VECTOR pos = VAdd(paramChara_.pos, paramChara_.posLocal);
@@ -151,17 +154,11 @@ void Object::Draw(void)
 		}
 
 		// “·‘Ì‚Ì“–‚½‚è”»’è
-		DrawSphere3D(paramChara_.colList[COLLISION_TYPE::BODY]->pos, paramChara_.radius, 8,
-			0xffffff, 0xffffff, false);
+		DrawSphere3D(paramChara_.colList[COLLISION_TYPE::BODY]->pos, paramChara_.radius,
+					 16, 0xffffff, 0xffffff, false);
 	}
 }
 
-void Object::DrawDebug(void)
-{
-	//#ifdef _DEBUG
-	
-	//#endif
-}
 
 void Object::Release(void)
 {
@@ -235,7 +232,7 @@ int Object::FindFrameNum(const std::string& name)
 		if (frame.name == name)
 		{
 			num = frame.num;
-			break;
+			return num;
 		}
 	}
 	assert("\nƒtƒŒ[ƒ€–¼‚ªˆê’v‚µ‚Ü‚¹‚ñ‚Å‚µ‚½B\n");

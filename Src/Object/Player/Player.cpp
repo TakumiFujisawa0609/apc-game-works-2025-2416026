@@ -5,18 +5,19 @@
 #include <map>
 #include <unordered_map>
 
-#include "./Object.h"
-#include "../Application.h"
-#include "../Manager/ResourceManager.h"
-#include "../Manager/SoundManager.h"
-#include "../Manager/InputManager.h"
-#include "../Manager/SceneManager.h"
-#include "./Status/StatusData.h"
-#include "./Status/StatusPlayer.h"
-#include "../Utility/AsoUtility.h"
-#include "../Common/Quaternion.h"
-#include "../Common/Camera.h"
-#include "./AnimationController.h"
+#include "../Object.h"
+#include "../../Application.h"
+#include "../../Manager/ResourceManager.h"
+#include "../../Manager/SoundManager.h"
+#include "../../Manager/InputManager.h"
+#include "../../Manager/SceneManager.h"
+#include "../Status/StatusData.h"
+#include "../Status/StatusPlayer.h"
+#include "../../Utility/AsoUtility.h"
+#include "../../Common/Quaternion.h"
+#include "../../Common/Camera.h"
+#include "../../Common/Perform.h"
+#include "../Common/AnimationController.h"
 
 
 Player::Player(void):
@@ -30,6 +31,8 @@ Player::Player(void):
 	inputType_ = INPUT_TYPE::NONE;
 
 	paramPlayer_.isDash = false;
+
+	Load();
 }
 
 void Player::Load(void)
@@ -170,7 +173,7 @@ void Player::SetExternalAnim(ANIM_STATE _state, MOTION_TYPE _motion, int _res)
 {
 	/* 外部アニメーション割り当て処理 */
 	// アニメーション速度格納
-	int animSpeed = 0.0f;
+	float animSpeed = 0.0f;
 	paramPlayer_.animSpeed.emplace(_state, status_.GetMotionSpeed(_motion));
 
 	// アニメーションに格納
@@ -317,12 +320,6 @@ void Player::UpdateStateIdle(void)
 
 	// アニメーション遷移処理
 	AnimStateIdle();
-
-	// 移動時、フレーム位置更新
-	if (!AsoUtility::EqualsVZero(paramChara_.velocity))
-	{
-		UpdateModelFrames();
-	}
 }
 
 
@@ -330,9 +327,6 @@ void Player::UpdateStateAtk(void)
 {
 	// 攻撃モーション更新
 	UpdateMotion();
-
-	// フレーム位置更新
-	UpdateModelFrames();
 
 	// モーション終了時、通常状態に戻す
 	if (anim_->IsEnd() &&
@@ -656,7 +650,9 @@ void Player::UpdateMotion(void)
 		SoundManager::SRC src = static_cast<SoundManager::SRC>(GetSoundSrc());
 		
 		// 効果音再生
-		SoundManager::GetInstance().Play(src, false, true, 10.0f);
+		SoundManager::GetInstance().Play(src, false, true, 3);
+
+		//SceneManager::GetInstance().GetPerform().SetHitStop(1.0f);
 
 		// 待機状態に戻す
 		if (paramChara_.atkMotion.GetAttackState() == AttackMotion::ATTACK_STATE::NONE)
@@ -701,6 +697,20 @@ void Player::SetPosForward(void)
 	paramChara_.posForward = {pos.x, pos.y, pos.z};
 }
 
+bool Player::IsUpdateFrame(void)
+{
+	/*　フレーム更新の条件　*/
+	bool ret = false;
+
+	// 待機時の移動中・攻撃中
+	if (paramPlayer_.actionState == ACTION_STATE::IDLE &&
+		!AsoUtility::EqualsVZero(paramChara_.velocity) ||
+		IsActionAttack())
+	{
+		ret = true;
+	}
+	return ret;
+}
 
 bool Player::IsActiveAction(void)const
 {

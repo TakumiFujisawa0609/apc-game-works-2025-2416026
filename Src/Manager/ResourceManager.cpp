@@ -2,9 +2,7 @@
 #include "Resource.h"
 #include <DxLib.h>
 #include <string>
-#include <vector>
-#include <iostream>
-#include <filesystem>
+#include <unordered_map>
 #include "../Application.h"
 #include "../Object/Status/StatusData.h"
 #include "../Object/Status/StatusEnemy.h"
@@ -61,25 +59,27 @@ void ResourceManager::SetResource(void)
 	// プレイヤー
 	res = Resource(Resource::LOAD_TYPE::MODEL, PATH_MODEL + data.GetHandlePathPlayer());
 	resourcesMap_.emplace(static_cast<SRC>(src), res);
-	src++;
 
 	// 敵
 	max = static_cast<int>(StatusEnemy::TYPE::MAX) - 1;
+	src = static_cast<int>(SRC::MODEL_ENEMY);
 	for (int i = 0; i < max; i++)
 	{
+		src++;
 		res = Resource(Resource::LOAD_TYPE::MODEL, PATH_MODEL + data.GetHandlePathEnemy(i));
 		resourcesMap_.emplace(static_cast<SRC>(src), res);
-		src++;
 	}
 
 	// 武器
 	max = static_cast<int>(StatusWeapon::TYPE::MAX) - 1;
+	src = static_cast<int>(SRC::MODEL_WEAPON);
 	for (int i = 0; i < max; i++)
 	{
+		src++;
 		res = Resource(Resource::LOAD_TYPE::MODEL, PATH_MODEL + data.GetHandlePathWeapon(i));
 		resourcesMap_.emplace(static_cast<SRC>(src), res);
-		src++;
 	}
+
 
 	// アニメーション
 	res = Resource(Resource::LOAD_TYPE::ANIM, PATH_ANIM + "SwordAnim1.mv1");

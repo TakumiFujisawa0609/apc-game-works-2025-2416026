@@ -3,9 +3,9 @@
 #include "../../Manager/ResourceManager.h"
 #include "../Status/StatusData.h"
 #include "../Status/StatusEnemy.h"
-#include "../AnimationController.h"
+#include "../Common/AnimationController.h"
 #include "../Object.h"
-#include "../Player.h"
+#include "../Player/Player.h"
 
 EnemyWarrior::EnemyWarrior(Player& player)
 		:Enemy(StatusEnemy::TYPE::SKELETON_WARRIOR, player)
@@ -23,7 +23,7 @@ void EnemyWarrior::InitModelFrame(void)
 	Object::InitModelFrame();
 
 	// 当たり判定のフレーム割り当て
-	int index;
+	int index = -1;
 	index = FindFrameNum("chest");
 	paramChara_.colList.emplace(COLLISION_TYPE::BODY, &paramChara_.frames[index]);
 
@@ -42,13 +42,13 @@ void EnemyWarrior::InitModelFrame(void)
 
 void EnemyWarrior::InitAnim(void)
 {
-	animSpeed_.emplace(WARRIER_ANIM::IDLE, status_.GetAnimSpeed(StatusEnemy::ANIM_TYPE::IDLE));
-	animSpeed_.emplace(WARRIER_ANIM::ATTACK, status_.GetAnimSpeed(StatusEnemy::ANIM_TYPE::ATTACK));
-	animSpeed_.emplace(WARRIER_ANIM::WALK, status_.GetAnimSpeed(StatusEnemy::ANIM_TYPE::WALK));
-	animSpeed_.emplace(WARRIER_ANIM::SPAWN, status_.GetAnimSpeed(StatusEnemy::ANIM_TYPE::SPAWN));
-	animSpeed_.emplace(WARRIER_ANIM::HIT_1, status_.GetAnimSpeed(StatusEnemy::ANIM_TYPE::HIT_1));
-	animSpeed_.emplace(WARRIER_ANIM::HIT_2, status_.GetAnimSpeed(StatusEnemy::ANIM_TYPE::HIT_2));
-	animSpeed_.emplace(WARRIER_ANIM::DEATH, status_.GetAnimSpeed(StatusEnemy::ANIM_TYPE::DEATH));
+	SetAnimSpeed(WARRIER_ANIM::IDLE, STATUS_ANIM_TYPE::IDLE);
+	SetAnimSpeed(WARRIER_ANIM::ATTACK, STATUS_ANIM_TYPE::ATTACK);
+	SetAnimSpeed(WARRIER_ANIM::WALK, STATUS_ANIM_TYPE::WALK);
+	SetAnimSpeed(WARRIER_ANIM::SPAWN, STATUS_ANIM_TYPE::SPAWN);
+	SetAnimSpeed(WARRIER_ANIM::HIT_1, STATUS_ANIM_TYPE::HIT_1);
+	SetAnimSpeed(WARRIER_ANIM::HIT_2, STATUS_ANIM_TYPE::HIT_2);
+	SetAnimSpeed(WARRIER_ANIM::DEATH, STATUS_ANIM_TYPE::DEATH);
 	
 
 	for (auto& [type, speed] : animSpeed_)
@@ -60,7 +60,12 @@ void EnemyWarrior::InitAnim(void)
 	}
 
 	// 待機アニメーション再生
-	ChangeAnimState(ANIM_STATE::IDLE);
+	ChangeAnimState(ANIM_STATE::SPAWN);
+}
+void EnemyWarrior::SetAnimSpeed(WARRIER_ANIM _type, STATUS_ANIM_TYPE _speedType)
+{
+	int type = static_cast<int>(_type);
+	animSpeed_.emplace(type, status_.GetAnimSpeed(_speedType));
 }
 
 void EnemyWarrior::DamagePerform(void)
@@ -124,4 +129,3 @@ void EnemyWarrior::ChangeAnimState(ANIM_STATE _state, bool _isLoop)
 
 	anim_->Play(static_cast<int>(animType), _isLoop);
 }
-

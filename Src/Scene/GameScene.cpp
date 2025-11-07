@@ -7,9 +7,9 @@
 #include "../Application.h"
 #include "../Utility/AsoUtility.h"
 #include "../Common/Vector2.h"
-#include "../Object/Player.h"
+#include "../Object/Player/Player.h"
 #include "../Object/Enemy/EnemyController.h"
-#include "../Manager/EffectManager.h"
+#include "../Manager/EffectController.h"
 #include "../Manager/SceneManager.h"
 #include "../Manager/CollisionManager.h"
 #include "../Manager/SoundManager.h"
@@ -19,6 +19,7 @@
 #include "../Common/Camera.h"
 #include "../Common/HpBer.h"
 #include "../Common/Font.h"
+#include "../Common/Perform.h"
 #pragma endregion
 
 
@@ -35,21 +36,17 @@ void GameScene::Load(void)
 {
 	// プレイヤー処理
 	player_ = new Player();
-	player_->Load();
 
 	// 敵マネージャー
-	EnemyController::CreateInstance(*player_);
-
-	EnemyController& enemys = EnemyController::GetInstance();
+	enemys_ = new EnemyController(*player_);
 
 	// 当たり判定マネージャ
-	CollisionManager::CreateInstance(*player_);
+	CollisionManager::CreateInstance(*player_, *enemys_);
 }
 
 void GameScene::Init(void)
 {
 	/*　初期化処理　*/
-
 
 	// 初期化処理
 	ReInit();
@@ -63,7 +60,7 @@ void GameScene::ReInit(void)
 	gameState_ = GAME_STATE::IDLE;
 
 	// 敵初期化処理
-	EnemyController::GetInstance().Init();
+	enemys_->Init();
 
 	// プレイヤー処理
 	player_->Init(POS_START_PLAYER, 90.0f);
@@ -75,7 +72,8 @@ void GameScene::ReInit(void)
 
 	// カメラ移動領域割り当て
 	Camera& camera = SceneManager::GetInstance().GetCamera();
-	camera.Init(Camera::MODE::FOLLOW, player_->GetPos(), player_->GetRotationLocal().y, player_);
+	float angleY = static_cast<float>(player_->GetRotationLocal().y);
+	camera.Init(Camera::MODE::FOLLOW, player_->GetPos(), angleY, player_);
 
 	// カメラ追従対象初期化
 	camera.SetTrackingTarget(&player_->GetPos());
@@ -86,6 +84,11 @@ void GameScene::ReInit(void)
 void GameScene::Update(void)
 {
 	/*　更新処理　*/
+		
+	if (InputManager::GetInstance().KeyIsTrgDown(KEY_INPUT_SPACE))
+	{
+		SceneManager::GetInstance().GetPerform().SetHitStop(1.0f);
+	}
 
 	// ステージ更新処理
 	//gameStage_->Update();
@@ -136,7 +139,7 @@ void GameScene::Draw(void)
 	UpdateEffekseer3D();
 
 	// 敵描画
-	EnemyController::GetInstance().Draw();
+	enemys_->Draw();
 
 	// プレイヤー描画
 	player_->Draw();
@@ -150,7 +153,7 @@ void GameScene::Draw(void)
 	// ゲーム描画
 	DrawUI();
 
-	EnemyController::GetInstance().DrawDebug();
+	enemys_->DrawDebug();
 	 
 #ifdef _DEBUG
 
@@ -170,7 +173,7 @@ void GameScene::Release(void)
 	CollisionManager::GetInstance().Destroy();
 
 	// 敵マネージャ解放
-	EnemyController::GetInstance().Destroy();
+	enemys_->Release();
 
 	// 当たり判定解放
 	//CollisionManager::Destroy();
@@ -200,10 +203,5 @@ void GameScene::GameIdleProc(void)
 	player_->Update();
 
 	// 敵マネージャ更新
-	EnemyController::GetInstance().Update();
-}
-
-void GameScene::GameOverProc(void)
-{
-	
+	enemys_->Update();
 }

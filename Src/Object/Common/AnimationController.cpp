@@ -2,7 +2,7 @@
 #include <DxLib.h>
 #include <string>
 #include <cassert>
-#include "../Manager/SceneManager.h"
+#include "../../Manager/SceneManager.h"
 
 AnimationController::AnimationController(int _modelId)
 {
@@ -215,21 +215,15 @@ void AnimationController::Release(void)
 	// ロードしたアニメーションを解放
 	for (auto& [type, anim] : animations_)
 	{
+		// アニメーションをリセット
+		MV1DetachAnim(modelId_, anim.attachNo);
+
 		// パス読み込みでの外部アニメーション時
 		if (anim.type == ANIM_TYPE::EXTERNAL &&
 			anim.isLoadPath)
 		{
-			// アニメーションをリセット
-			MV1DetachAnim(modelId_, anim.attachNo);
 			// アニメーション解放
 			MV1DeleteModel(anim.modelId);
-		}
-		
-		// 取付られているアニメーションの場合
-		if (anim.type == ANIM_TYPE::INTERNAL)
-		{
-			// アニメーションをリセット
-			MV1DetachAnim(modelId_, anim.attachNo);
 		}
 	}
 

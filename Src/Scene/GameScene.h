@@ -4,8 +4,9 @@
 
 class Player;
 class GameStageController;
+class EnemyController;
 class CollisionManager;
-class EffectManager;
+class EffectController;
 class HpBer;
 
 
@@ -26,44 +27,35 @@ public:
 
 
 	// プレイヤー開始位置
-	static constexpr VECTOR POS_START_PLAYER = { 0.0f, 0.0f, 0.0f };
+	static constexpr VECTOR POS_START_PLAYER = { 0.0f, 0.0f, -250.0f };
 
 	// プレイヤー開始時の向き
 	static constexpr float ANGLE_START_PLAYER = 90.0f;
 
 
 	
-	// デフォルトコンストラクタ
+	/// @brief デフォルトコンストラクタ
 	GameScene(void);
 
-	// デフォルトデストラクタ
+	/// @brief デフォルトデストラクタ
 	~GameScene(void) = default;
 
-	/// <summary>
-	/// 初回読み込み処理
-	/// </summary>
+	/// @brief 初回読み込み処理
 	void Load(void)override;
 
-	/// <summary>
-	/// 初期化処理
-	/// </summary>
+	/// @brief 初期化処理
 	void Init(void)override;
 
-	/// <summary>
-	/// 更新処理
-	/// </summary>
+	/// @brief 更新処理
 	void Update(void)override;
 
-	/// <summary>
-	/// 描画処理
-	/// </summary>
+	/// @brief 描画処理
 	void Draw(void)override;
 
-	/// <summary>
-	/// 解放処理
-	/// </summary>
+	/// @brief 解放処理
 	void Release(void)override;
 
+	const EnemyController& GetEnemyController(void) { return *enemys_; };
 
 private:
 
@@ -76,6 +68,8 @@ private:
 	//ステージオブジェクト
 	GameStageController* gameStage_;
 
+	EnemyController* enemys_;
+
 
 	/// @brief 再初期化処理
 	void ReInit(void);
@@ -84,7 +78,9 @@ private:
 	/// @brief UI描画
 	void DrawUI(void);
 
+	/// @brief ゲーム有効処理
 	void GameIdleProc(void);
 
-	void GameOverProc(void);
+	/// @brief ゲームオーバー処理
+	void GameOverProc(void) {};
 };

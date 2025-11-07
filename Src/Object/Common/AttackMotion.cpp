@@ -2,6 +2,7 @@
 #include <DxLib.h>
 #include <unordered_map>
 #include "../../Manager/SceneManager.h"
+#include "../../Common/Perform.h"
 
 
 AttackMotion::AttackMotion(void)
@@ -54,7 +55,7 @@ bool AttackMotion::GetIsActionAttack(void) const
 	bool ret = false;
 
 	if (attackState_ == ATTACK_STATE::ACTIVE &&
-		timeAttack_ < DAMAGE_ACTIVE_TIME)
+		timeAttack_ <= DAMAGE_ACTIVE_TIME)
 	{
 		ret = true;
 	}

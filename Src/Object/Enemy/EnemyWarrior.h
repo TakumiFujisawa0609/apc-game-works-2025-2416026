@@ -45,6 +45,5 @@ protected:
 
 private:
 
-	// アニメーション速度
-	std::map<WARRIER_ANIM, float> animSpeed_;
+	void SetAnimSpeed(WARRIER_ANIM _type, STATUS_ANIM_TYPE _speedType);
 };

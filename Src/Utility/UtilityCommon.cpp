@@ -1,4 +1,5 @@
 #include "UtilityCommon.h"
+#include <DxLib.h>
 #include <cassert>
 #include <algorithm>
 
@@ -203,4 +204,22 @@ void UtilityCommon::ChangeString(const std::string& text, float& target)
         assert(error.c_str());
 
     }
+}
+
+unsigned int UtilityCommon::SetColor(Color _color)
+{
+    return SetColor(_color.r, _color.g, _color.b);
+}
+unsigned int UtilityCommon::SetColor(COLOR_F _color)
+{
+    return SetColor(_color.r, _color.g, _color.b);
+}
+unsigned int UtilityCommon::SetColor(float _r, float _g, float _b)
+{
+    int red, green, blue;
+    red = static_cast<int>(_r);
+    green = static_cast<int>(_g);
+    blue = static_cast<int>(_b);
+
+    return GetColor(red, green, blue);
 }

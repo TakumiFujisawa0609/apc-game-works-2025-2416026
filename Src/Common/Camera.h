@@ -7,37 +7,34 @@
 class Player;
 class StageTutorial;
 
-/// <summary>
-/// カメラ
-/// </summary>
+
 class Camera
 {
 public:
 
-	/// <summary>
-	/// カメラ状態
-	/// </summary>
+	/// @brief カメラ状態
 	enum class MODE
 	{
 		NONE = -1,
-		FIXEX_POINT, // 定点カメラモード
-		FOLLOW,       // 追従モード
-		FOLLOW_AUTO_ZOOM,  // 追従モード[自動調整型]
+		FIXEX_POINT,      // 定点カメラモード
+		FOLLOW,           // 追従モード
+		FOLLOW_AUTO_ZOOM, // 追従モード[自動調整型]
 	};
 
 	// カメラの初期角度
 	static constexpr VECTOR DEFAULT_ANGLES =
-	{ (45.0f * (DX_PI_F / 180.0f)), 0.0f, 0.0f };
+	{ (75.0f * (DX_PI_F / 180.0f)), 0.0f, 0.0f };
 
 	// カメラのローカル座標
 	static constexpr VECTOR LOCAL_POS = { 0.0, 850.0f, -850.0f };
 
+	static constexpr VECTOR TARGET_LOCAL_POS = { 0.0f, 100.0f, 0.0f };
 
 	// カメラ最小描画領域
 	static constexpr float CAMERA_NEAR = 20.0f;
 
 	// カメラ最大描画領域
-	static constexpr float CAMERA_FAR = 3000.0f;
+	static constexpr float CAMERA_FAR = 5000.0f;
 
 
 	// 最大ズームインローカル座標
@@ -56,16 +53,14 @@ public:
 	static constexpr float CAMERA_LOOK_SPEED = 0.0f;
 
 
-	// デフォルトコンストラクタ
+	/// @brief デフォルトコンストラクタ
 	Camera(void);
 
-	// デフォルトデストラクタ
+	/// @brief デフォルトデストラクタ
 	~Camera(void) = default;
 
 
-	/// <summary>
-	/// 初回読み込み処理
-	/// </summary>
+	/// @brief 初回読み込み処理
 	void Load(void);
 
 	/// <summary>
@@ -81,14 +76,10 @@ public:
 	/// </summary>
 	void SetBeforeDraw(void);
 	
-	/// <summary>
-	/// 描画処理
-	/// </summary>
+	/// @brief 描画処理
 	void DrawDebug(void);
 
-	/// <summary>
-	/// メモリ解放処理
-	/// </summary>
+	/// @brief メモリ解放処理
 	void Release(void);
 
 
@@ -104,16 +95,6 @@ public:
 	/// </summary>
 	/// <returns>現在カメラ位置</returns>
 	const VECTOR& GetPos(void) const { return pos_.cameraPos;  };
-
-	/// <summary>
-	/// ズームイン
-	/// </summary>
-	void ZoomIn(void);
-
-	/// <summary>
-	/// ズームアウト
-	/// </summary>
-	void ZoomOut(void);
 
 	/// <summary>
 	/// カメラ位置割り当て
@@ -142,12 +123,8 @@ public:
 	//対象同士の中間座標
 	void SetCameraTarget(void);
 
-	/// <summary>
-	/// カメラ移動制限割り当て
-	/// </summary>
-	/// <param name="min"></param>
-	/// <param name="max"></param>
-	void SetPosLimit(VECTOR min, VECTOR max);
+	/// @brief カメラ移動制限割り当て
+	void SetPosLimit(const VECTOR& _min, const VECTOR& _max);
 
 	const VECTOR& GetCameraPos(void) const { return pos_.cameraPos; }
 
@@ -207,10 +184,6 @@ private:
 	/// <param name="pos">２つの座標間のベクトル</param>
 	void _SetZoomDiff(const VECTOR& vecDiff);
 
-	/// <summary>
-	/// カメラ位置制限
-	/// </summary>
-	void PosLimit(void);
 
 	// カメラ移動処理
 	void DebugMove(void);

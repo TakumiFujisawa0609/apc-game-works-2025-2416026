@@ -1,8 +1,8 @@
 #include "Enemy.h"
 #include <DxLib.h>
 #include "../Object.h"
-#include "../Player.h"
-#include "../AnimationController.h"
+#include "../Player/Player.h"
+#include "../Common/AnimationController.h"
 #include "../Status/StatusData.h"
 #include "../Status/StatusEnemy.h"
 #include "../../Manager/ResourceManager.h"
@@ -23,7 +23,9 @@ void Enemy::Load(void)
 }
 void Enemy::LoadResource(void)
 {
+	// 敵のハンドル割り当て
 	int type = static_cast<int>(status_.GetEnemyType());
+	type += static_cast<int>(ResourceManager::SRC::MODEL_ENEMY);
 	ResourceManager::SRC src = static_cast<ResourceManager::SRC>(type);
 
 	paramChara_.handle = ResourceManager::GetInstance().LoadModelDuplicate(src);
@@ -55,7 +57,6 @@ void Enemy::SetParam(void)
 	paramChara_.posLocal = VSub(paramChara_.pos, sub);
 
 	paramEnemy_.type = status_.GetEnemyType();
-	paramEnemy_.actionState = ACTION_STATE::IDLE;
 	paramEnemy_.searchRange = status_.GetSearchRange();
 	paramEnemy_.atkRange = status_.GetAtkRange();
 
@@ -79,6 +80,9 @@ void Enemy::SetParam(void)
 	paramChara_.power = status_.GetPower();
 	paramChara_.speed = status_.GetSpeed();
 	paramChara_.speedAcc = status_.GetSpeedAcc();
+
+	// 行動状態
+	paramEnemy_.actionState = ACTION_STATE::IDLE;
 }
 
 void Enemy::SetDamage(int _damage)
@@ -133,7 +137,7 @@ void Enemy::UpdateState(void)
 	if (paramEnemy_.actionState == ACTION_STATE::IDLE) { UpdateStateIdle(); }
 	if (paramEnemy_.actionState == ACTION_STATE::MOVE) { UpdateStateMove(); }
 	if (paramEnemy_.actionState == ACTION_STATE::KNOCK) { UpdateStateKnock(); }
-	//if (paramEnemy_.actionState == ACTION_STATE::IDLE) { UpdateStateIdle(); }
+	if (IsAttackState()) { UpdateStateAtk(); }
 }
 
 void Enemy::UpdateStateSpawn(void)
@@ -146,11 +150,6 @@ void Enemy::UpdateStateIdle(void)
 	{
 		ChangeActionState(ACTION_STATE::MOVE);
 	}
-
-	if (!AsoUtility::EqualsVZero(paramChara_.velocity))
-	{
-		UpdateModelFrames();
-	}
 }
 
 
@@ -162,6 +161,8 @@ void Enemy::UpdateStateMove(void)
 
 	// 無敵中・撃破時・移動アニメーション以外のとき、処理終了
 	if (paramChara_.timeInv > 0.0f || paramChara_.hp <= 0) { return; }
+
+	if (paramEnemy_.isAttack) { ChangeActionState(ACTION_STATE::ATTACK_ACTIVE); }
 
 	// プレイヤー追従
 	LookPlayerPos();
@@ -187,13 +188,10 @@ void Enemy::UpdateStateMove(void)
 	VECTOR dir = { paramChara_.dir.x, 0.0f, paramChara_.dir.z };
 
 	paramChara_.pos = VAdd(paramChara_.pos, VAdd(dir, velo));
-
-	UpdateModelFrames();
 }
 
 void Enemy::UpdateStateKnock(void)
 {
-	UpdateModelFrames();
 	if (AsoUtility::EqualsVZero(paramChara_.knockBack)) 
 	{
 		ChangeActionState(ACTION_STATE::IDLE);
@@ -224,9 +222,11 @@ void Enemy::Draw(void)
 
 	if (scene.GetIsDebugMode())
 	{
-		DrawSearchRange();
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
+		//DrawSearchRange();
 
 		DrawAttackRange();
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
 		if (paramChara_.timeInv > 0.0f && paramEnemy_.animState != ANIM_STATE::DEATH)
 		{
@@ -346,12 +346,13 @@ void Enemy::DrawSearchRange(void)
 		rightPos = VAdd(pos, VScale(right, paramEnemy_.searchRange));
 
 		DrawTriangle3D(pos, leftPos, rightPos, color, true);
+		DrawLine3D(leftPos, rightPos, 0x0);
 	}
 }
 
 void Enemy::DrawAttackRange(void)
 {
-	unsigned int color = ((paramEnemy_.isAttack) ? 0xffaaaa : 0xaa00ff);
+	unsigned int color = ((paramEnemy_.isAttack) ? 0xff0000 : 0xaa00ff);
 	const float searchAngle = 50.0f;
 
 	MATRIX mat = Quaternion::ToMatrix(paramChara_.quaRot);
@@ -382,4 +383,22 @@ void Enemy::DrawAttackRange(void)
 	// 描画処理
 	DrawTriangle3D(pos, leftPos, forwardPos, color, true);
 	DrawTriangle3D(pos, forwardPos, rightPos, color, true);
+}
+
+
+bool Enemy::IsAttackState(void)
+{
+	return (paramEnemy_.actionState == ACTION_STATE::ATTACK_START ||
+			paramEnemy_.actionState == ACTION_STATE::ATTACK_ACTIVE ||
+			paramEnemy_.actionState == ACTION_STATE::ATTACK_END);
+}
+
+bool Enemy::IsUpdateFrame(void)
+{
+	bool ret = false;
+	if (paramChara_.isActive)
+	{
+		UpdateModelFrames();
+	}
+	return ret;
 }

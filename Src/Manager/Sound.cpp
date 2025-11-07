@@ -1,6 +1,6 @@
 #include "Sound.h"
 #include "./SoundManager.h"
-
+#include <algorithm>
 
 Sound::Sound(void)
 {
@@ -74,7 +74,7 @@ void Sound::Release(void)
 }
 
 
-bool Sound::Play(TIMES times, bool _isPitch, float _pitchRange, bool isForce)
+bool Sound::Play(TIMES times, bool _isPitch, int _pitchRange, bool isForce)
 {
 	sound_.isPlayOld = sound_.isPlay;
 
@@ -105,8 +105,8 @@ bool Sound::Play(TIMES times, bool _isPitch, float _pitchRange, bool isForce)
 	if (_isPitch)
 	{
 		int range = _pitchRange;
-		int rand = GetRand(range + range) - range;
-		SetCreateSoundPitchRate(static_cast<float>(rand) * 10.0f);
+		int rand = GetRand(range + range) - (range / 2);
+		SetCreateSoundPitchRate(static_cast<float>(rand) * (MUSICAL_SCALE_HALF / 2.0f));
 		sound_.handle = LoadSoundMem(sound_.path.c_str());
 	}
 
@@ -230,14 +230,8 @@ bool Sound::IsLoad(void)
 void Sound::SetVolume(float per)
 {
 	// ‰¹—Ê‚ÌãŒÀE‰ºŒÀ§ŒÀ(0.0`1.0)
-	if (per > 1.0f)
-	{
-		per = 1.0f;
-	}
-	if (per < 0.0f)
-	{
-		per = 0.0f;
-	}
+
+	std::clamp(per, 0.0f, 1.0f);
 
 	// ‰¹—ÊŠ„‚è“–‚Ä
 	ChangeVolumeSoundMem((per * sound_.maxVolume), sound_.handle);

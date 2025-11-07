@@ -1,6 +1,7 @@
 #pragma once
 #include <DxLib.h>
 #include <string>
+#include "../Utility/UtilityCommon.h"
 #include "../Common/Vector2.h"
 
 class GameExit
@@ -8,10 +9,7 @@ class GameExit
 public:
 
 	
-	/// <summary>
-	/// 
-	/// 終了確認状態
-	/// </summary>
+	/// @brief 終了確認状態
 	enum class SELECT
 	{
 		NONE = -1,
@@ -46,14 +44,14 @@ public:
 	static constexpr int MENU_HEIGHT = 250;
 
 	// メニューの色
-	static constexpr COLOR_F MENU_COLOR = {125, 125, 125,(255 - 50)};
+	static constexpr UtilityCommon::Color MENU_COLOR = { 125, 125, 125, (255 - 50) };
 
 	// 背景の透明度
 	static constexpr int BACK_ALPHA = (255 - 50);
 
 
 	// メニューのテキストの非選択時の透明度
-	static constexpr COLOR_F MENU_TEXT_COLOR = { 255, 0, 0, (255 - 200) };
+	static constexpr UtilityCommon::Color MENU_TEXT_COLOR = { 255, 0, 0, (255 - 200) };
 
 	// テキストの間隔
 	static constexpr Vector2 TEXT_OFFSET = {200, 75};

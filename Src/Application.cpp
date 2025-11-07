@@ -12,9 +12,7 @@
 #include "./Manager/ConfigManager.h"
 #include "./Manager/InputManager.h"
 #include "./Manager/SceneManager.h"
-#include "./Manager/EffectManager.h"
 #include "./Manager/ResourceManager.h"
-#include "./Manager/Resource.h"
 #include "./Manager/SoundManager.h"
 
 
@@ -107,9 +105,6 @@ void Application::CreateManagers(void)
 
 	// 音声マネージャー生成
 	SoundManager::CreateInstance();
-
-	// エフェクトマネージャー生成
-	EffectManager::CreateInstance();
 
 	// フレームレートマネージャ生成
 	FrameRate::CreateInstance();
@@ -228,9 +223,6 @@ void Application::Destroy(void)
 
 	// フレームレートマネージャ
 	FrameRate::GetInstance().Destroy();
-
-	// エフェクトマネージャー
-	EffectManager::GetInstance().Destroy();
 
 	// 音声マネージャ
 	SoundManager::GetInstance().Destroy();

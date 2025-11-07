@@ -143,6 +143,58 @@ bool UtilityCollision::IsHitCapsuleToCapsule(const VECTOR& _capTop1, const VECTO
 	return ret;
 }
 
+void UtilityCollision::CollisionsReflectXZ(VECTOR& _targetPos1, float _targetRad1, VECTOR& _targetPos2, float _targetRad2)
+{
+	VECTOR target1XZ = { _targetPos1.x, 0.0f, _targetPos1.z };
+	VECTOR target2XZ = { _targetPos2.x, 0.0f, _targetPos2.z };;
+	// 反発方向
+	VECTOR target1RefDir = VNorm(VSub(target2XZ, target1XZ));
+	VECTOR target2RefDir = VNorm(VSub(target1XZ, target2XZ));
+
+	// オブジェクト間の距離
+	float size = VSize(VSub(target1XZ, target2XZ));
+
+	float offset = ((_targetRad1 + _targetRad2) - abs(size));
+
+	// 両者を均等に反発させる
+	target1XZ = VAdd(target1XZ, VScale(target1RefDir, (offset / 2)));
+	target2XZ = VAdd(target2XZ, VScale(target2RefDir, (offset / 2)));
+
+	// 位置を反映
+	_targetPos1 = { target1XZ.x, _targetPos1.y, target1XZ.z };
+	_targetPos2 = { target2XZ.x, _targetPos2.y, target2XZ.z };
+}
+const VECTOR& UtilityCollision::CollisionReflectXZ(float _targetPosY, const VECTOR& _fromPos, float _fromRad, const VECTOR& _toPos, float _toRad)
+{
+	VECTOR ret = AsoUtility::VECTOR_ZERO;
+
+	// オブジェクト間の距離
+	VECTOR diff = VSub(_fromPos, _toPos);
+	diff.y = 0.0f;
+
+	// 反発方向
+	VECTOR refDir = VNorm(diff);
+
+	float size = VSize(diff);
+	/*
+	// 反発する値(オブジェクト同士の半径-距離)
+	float offset = ((_fromRad + _toRad) - size)	;
+
+	if (offset > 0.0f)
+	{
+		// 横反発方向を正規化
+		VECTOR refDirXZ = VNorm(diff);
+		ret = VScale(refDirXZ, offset);
+		ret.y = 0.0f;
+	}*/
+
+	// 反発後の位置を割り当て
+	ret = VAdd(refDir, ret);
+	ret.y = _targetPosY;
+
+	return ret;
+}
+
 float UtilityCollision::_CapPointBitween(const VECTOR& _capTop1, const VECTOR& _capBottom1, VECTOR& _capCtc1,
 	                                     const VECTOR& _capTop2, const VECTOR& _capBottom2, VECTOR& _capCtc2)
 {

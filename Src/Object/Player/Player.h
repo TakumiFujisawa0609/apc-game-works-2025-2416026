@@ -1,9 +1,9 @@
 #pragma once
-#include "./Object.h"
+#include "../Object.h"
 #include <DxLib.h>
 #include <unordered_map>
-#include "../Manager/InputManager.h"
-#include "./Status/StatusPlayer.h"
+#include "../../Manager/InputManager.h"
+#include "../Status/StatusPlayer.h"
 
 class PlayerCollision;
 class CollisionBase;
@@ -298,6 +298,7 @@ protected:
 	/// @briefアニメーション処理
 	void UpdateAnim(void)override;
 
+	bool IsUpdateFrame(void)override;
 
 private:
 

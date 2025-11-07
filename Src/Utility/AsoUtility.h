@@ -77,6 +77,10 @@ public:
 	// 回転が少ない方の回転向きを取得する(時計回り:1、反時計回り:-1)
 	static int DirNearAroundDeg(float from, float to);
 	
+	// ベクトルの数値の範囲制限
+	static VECTOR Clamp(const VECTOR& _target, const VECTOR& _min, const VECTOR& _max);
+	static Vector2 Clamp(const Vector2& _target, const Vector2& _min, const Vector2& _max);
+
 	// 線形補間
 	static int Lerp(int start, int end, float t);
 	static float Lerp(float start, float end, float t);
