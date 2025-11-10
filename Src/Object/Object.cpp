@@ -16,11 +16,11 @@
 Object::Object(void)
 {
 	paramChara_.handle = -1;
-	paramChara_.velocity = {};
+	paramChara_.velocity = AsoUtility::VECTOR_ZERO;
 
-	paramChara_.pos = paramChara_.prePos = {};
-	paramChara_.posLocal = {};
-	paramChara_.posForward = {};
+	paramChara_.pos = paramChara_.posLocal = AsoUtility::VECTOR_ZERO;
+	paramChara_.prePos = AsoUtility::VECTOR_ZERO;
+	paramChara_.posForward = AsoUtility::VECTOR_ZERO;
 	paramChara_.isActive = false;	
 
 	paramChara_.quaRot = Quaternion::Identity();
@@ -41,17 +41,23 @@ Object::Object(void)
 
 	anim_ = nullptr;
 	//collision_ = nullptr;
-
-	Load();
 }
 
 void Object::Load(void)
 {
+	// 各オブジェクト独自の読み込み
+	LoadPost();
+
 	anim_ = new AnimationController(paramChara_.handle);
 }
 
-void Object::Init(void)
+void Object::Init(const VECTOR& _pos, float _angleY)
 {
+	// 位置割り当て
+	paramChara_.pos = paramChara_.prePos = _pos;
+	float rotY = AsoUtility::Deg2Rad(_angleY);
+	paramChara_.quaRot = Quaternion::Euler({ 0.0f, rotY, 0.0f });
+
 	paramChara_.velocity = AsoUtility::VECTOR_ZERO;
 	paramChara_.dir = {};
 
@@ -65,6 +71,9 @@ void Object::Init(void)
 
 	// アニメーション初期化処理
 	InitAnim();
+
+	// 各オブジェクトの初期化
+	InitPost();
 
 	// モデル位置割り当て処理
 	SetMatrixModel();
@@ -97,6 +106,8 @@ void Object::Update(void)
 {
 	float delta = SceneManager::GetInstance().GetDeltaTime();
 
+	if (!paramChara_.isActive) { return; }
+
 	// 現在位置割り当て
 	paramChara_.prePos = paramChara_.pos;
 
@@ -105,29 +116,40 @@ void Object::Update(void)
 	{
 		paramChara_.pos.y = paramChara_.prePos.y = 0.0f;
 	}
-	
+
 	// 無敵時間減少
 	paramChara_.timeInv -= ((paramChara_.timeInv > 0.0f) ? delta : 0.0f);
+
+	if (IsUpdateFrame())
+	{
+		UpdateModelFrames();
+	}
 
 	if (!AsoUtility::EqualsVZero(paramChara_.knockBack))
 	{
 		GravityKnock();
 	}
 
-	if (IsUpdateFrame())
-	{
-		UpdateModelFrames();
-	}
+
+	// アニメーション更新
+	UpdateAnim();
+
+	// 個別更新処理
+	UpdatePost();
 }
 
 void Object::Draw(void)
 {
 	/*　描画処理　*/
 
+	// 無効状態時、処理終了
+	if (!paramChara_.isActive) { return; }
+
+
 	// モデル描画処理
 	MV1DrawModel(paramChara_.handle);
 
-	if (!SceneManager::GetInstance().GetIsDebugMode())
+	if (SceneManager::GetInstance().GetIsDebugMode())
 	{
 		// 向き描画
 		VECTOR pos = VAdd(paramChara_.pos, paramChara_.posLocal);
@@ -157,11 +179,18 @@ void Object::Draw(void)
 		DrawSphere3D(paramChara_.colList[COLLISION_TYPE::BODY]->pos, paramChara_.radius,
 					 16, 0xffffff, 0xffffff, false);
 	}
+
+	// 各オブジェクト独自の描画
+	DrawPost();
 }
 
 
 void Object::Release(void)
 {
+	// その他解放
+	ReleasePost();
+
+	// アニメーション解放
 	anim_->Release();
 	delete anim_;
 }
@@ -308,6 +337,9 @@ void Object::SetDamage(int _damage)
 	paramChara_.timeInv = invTime;
 
 	if (paramChara_.hp < 0) { paramChara_.hp = 0; }
+
+	// 各キャラのダメージ処理
+	DamageProc();
 }
 
 void Object::GravityKnock(void)
@@ -351,28 +383,23 @@ float Object::WeightCalc(float weight, float weightPower, float velocity)
 	return num;
 }
 
-void Object::KnockBack(const VECTOR& targetPos, float invTime,
+void Object::KnockBack(const VECTOR& _knockDir, float invTime,
 	float powerY, float powerXZ, float minPowerXZ)
 {
 	// 吹っ飛ばす方向
-	VECTOR knockVelo = VSub(paramChara_.pos, targetPos);
-
-	// Y軸調整
-	knockVelo.y = powerY;
-
-	// 吹っ飛ばし方向を正規化
-	knockVelo = AsoUtility::VNormalize(knockVelo);
+	VECTOR knockVelo = _knockDir;
 
 	float power = powerXZ;
 
 	// 重さを計算に含める
-	knockVelo.x *= power;
-	knockVelo.z *= power;
-	knockVelo.y *= powerY;
+	
+	knockVelo.x = _knockDir.x * power;
+	knockVelo.z = _knockDir.z * power;
+	knockVelo.y = _knockDir.y * powerY;
 
-
-	float gravity = Application::GRAVITY_ACC;
-	knockVelo.y += gravity;
+	// 重力加算
+	//float gravity = Application::GRAVITY_ACC;
+	//knockVelo.y += gravity;
 
 
 	// Yの加速度が負の値の時は、Y吹っ飛ばしを０にする

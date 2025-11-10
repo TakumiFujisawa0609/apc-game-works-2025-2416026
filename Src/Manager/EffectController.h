@@ -12,6 +12,7 @@ public:
 	enum class EFFECT_TYPE
 	{
 		NONE = -1,
+		SPAWN_SKELETON, // 魔法陣
 		SWORD_SLASH,
 	};
 
@@ -34,8 +35,12 @@ public:
 	/// @brief エフェクト停止処理
 	void StopEffect(EFFECT_TYPE type);
 
+	
 	/// @brief エフェクト種別変更関数
-	void ChangeEffect(EFFECT_TYPE type, VECTOR pos);
+	/// @param _type エフェクトの種類
+	/// @param _pos 位置
+	/// @param _scale スケール
+	void SetEffect(EFFECT_TYPE _type, const VECTOR& _pos, const VECTOR& _scale);
 
 
 	//void CreateEffect(EFFECT_TYPE _type);
@@ -45,11 +50,12 @@ private:
 	struct Effect
 	{
 		VECTOR pos;
-		VECTOR size;
+		VECTOR scale;
 		VECTOR angle;
 
 		int handle;
 		int playId;
+		EFFECT_TYPE type;
 		float aliveTime; // 有効時間
 	};
 	std::map<EFFECT_TYPE, Effect*> effects_;

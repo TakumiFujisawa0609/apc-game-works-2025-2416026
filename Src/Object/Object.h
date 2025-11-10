@@ -259,6 +259,13 @@ protected:
 	/// <returns></returns>
 	float DecVelocityXZ(const float* acc);
 
+
+	/// @brief パラメータ割り当て
+	virtual void SetParam(void) = 0;
+
+	/// @brief 各オブジェクトの読み込み処理
+	virtual void LoadPost(void) = 0;
+
 	/// @brief アニメーション初期化
 	virtual void InitAnim(void) {};
 
@@ -266,10 +273,16 @@ protected:
 	virtual void InitModelFrame(void);
 
 	/// @brief その他処理初期化 
-	virtual void InitPost(void) {};
+	virtual void InitPost(void) = 0;
 
 	/// @brief アニメーション更新処理
 	virtual void UpdateAnim(void) = 0;
+
+	// @brief サブクラス独自更新処理
+	virtual void UpdatePost(void) = 0;
+
+	/// @brief 各オブジェクト独自の描画
+	virtual void DrawPost(void) {};
 
 	virtual void SetPosForward(void);
 	
@@ -280,6 +293,12 @@ protected:
 	/// @brief フレーム更新する時の条件
 	virtual bool IsUpdateFrame(void) = 0;
 
+	// ダメージ時の処理
+	virtual void DamageProc(void) = 0;
+
+	/// @brief 各オブジェクトのメモリ解放
+	virtual void ReleasePost(void) {};
+
 public:
 
 
@@ -289,9 +308,9 @@ public:
 	/// @brief デフォルトデストラクタ
 	virtual ~Object(void) = default;
 
-	virtual void Load(void);
+	void Load(void);
 
-	void Init(void);
+	void Init(const VECTOR& _pos, float _angleY = 0.0f);
 
 	/// @brief 更新処理
 	virtual void Update(void);
@@ -303,10 +322,7 @@ public:
 	virtual void DrawDebug(void) {};
 
 	/// @brief 解放処理
-	virtual void Release(void);
-
-	/// @brief パラメータ割り当て
-	virtual void SetParam(void) = 0;
+	void Release(void);
 
 
 	/// @brief 行列割り当て処理
@@ -333,7 +349,7 @@ public:
 
 	/// @brief 被ダメージ処理\
 	/// @param _damage ダメージ量
-	virtual void SetDamage(int _damage = 1);
+	void SetDamage(int _damage = 1);
 
 	/// <summary>
 	/// 重量の計算
@@ -346,12 +362,12 @@ public:
 	/// <summary>
 	/// 吹っ飛ばし処理
 	/// </summary>
-	/// <param name="targetPos">吹っ飛ばしてくる相手の位置</param>
+	/// <param name="_knockDir">吹っ飛ばし方向</param>
 	/// <param name="invTime">無敵時間</param>
 	/// <param name="powerY">上方向の吹っ飛ばし</param>
 	/// <param name="powerXZ">横方向の吹っ飛ばし力</param>
 	/// <param name="minPowerXZ">最低限の横方向の吹っ飛ばし力</param>
-	void KnockBack(const VECTOR& targetPos, float invTime,
+	void KnockBack(const VECTOR& _knockDir, float invTime,
 		float powerY, float powerXZ = 1.0f, float minPowerXZ = 1.0f);
 	
 	/// @brief 攻撃をできるかどうかの判定

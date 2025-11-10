@@ -10,15 +10,13 @@ class StatusWeapon;
 
 class StatusData
 {
-private:
+public:
 
 	// 敵パラメータマップ
 	using EnemyMap = std::map<int, std::unique_ptr<StatusEnemy>>;
 
 	// 武器パラメータマップ
 	using WeaponMap = std::map<int, std::unique_ptr<StatusWeapon>>;
-
-public:
 
 	// ステータスの種類
 	enum class STATUS_TYPE

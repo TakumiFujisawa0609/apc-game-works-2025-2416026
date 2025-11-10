@@ -119,7 +119,11 @@ void UtilityCommon::ChangeString(const std::string& text, float& target, float m
 
 
     // •¶š‚ª‹ó”’‚Ì‚Æ‚«AÅ¬’l‚Ì•¶š—ñ‚É‚·‚é
-    if (text == "") { txt = std::to_string(minNum); }
+    if (text == "")
+    {
+        txt = std::to_string(minNum);
+        return;
+    }
 
 
     for (auto t : text)

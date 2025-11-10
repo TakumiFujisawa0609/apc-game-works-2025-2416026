@@ -33,14 +33,13 @@ public:
 		ATTACK_INTERVAL, // 攻撃間隔
 		ATTACK_RANEGE,   // 攻撃範囲
 		SEARCH_RANGE,    // 索敵範囲
-		TIME_INVINCIBLE, // 無敵時間
 
-		ANIM_SPEED_IDLE, // 待機アニメーション速度
+		ANIM_SPEED_SPAWN,  // 生成時のアニメーション速度
+		ANIM_SPEED_IDLE,   // 待機アニメーション速度
 		ANIM_SPEED_ATTACK, // 攻撃アニメーション速度
-		ANIM_SPEED_WALK, // 移動アニメーション速度
-		ANIM_SPEED_SPAWN, // 生成時のアニメーション速度
-		ANIM_SPEED_HIT_1, // 弱被ダメージアニメーション速度
-		ANIM_SPEED_HIT_2, // 強被ダメージアニメーション速度
+		ANIM_SPEED_WALK,   // 移動アニメーション速度
+		ANIM_SPEED_HIT_1,  // 弱被ダメージアニメーション速度
+		ANIM_SPEED_HIT_2,  // 強被ダメージアニメーション速度
 		ANIM_SPEED_DEATH,
 
 		MAX,
@@ -75,19 +74,26 @@ public:
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::HP)], hp_, 1);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::POWER)], power_, 0);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::RADIUS)], radius_, 0.0f);
-		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::SPEED)], speed_, 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::SPEED)], speedMax_, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::SPEED_ACC)], speedAcc_, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ATTACK_INTERVAL)], atkInterval_, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ATTACK_RANEGE)], atkRange_, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::SEARCH_RANGE)], searchRange_, 0.0f);
 
-		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_IDLE)], animSpeed_[static_cast<int>(ANIM_TYPE::IDLE)], 0.0f);
-		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_ATTACK)], animSpeed_[static_cast<int>(ANIM_TYPE::ATTACK)], 0.0f);
-		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_WALK)], animSpeed_[static_cast<int>(ANIM_TYPE::WALK)], 0.0f);
-		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_SPAWN)], animSpeed_[static_cast<int>(ANIM_TYPE::SPAWN)], 0.0f);
-		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_HIT_1)], animSpeed_[static_cast<int>(ANIM_TYPE::HIT_1)], 0.0f);
-		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_HIT_2)], animSpeed_[static_cast<int>(ANIM_TYPE::HIT_2)], 0.0f);
-		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_DEATH)], animSpeed_[static_cast<int>(ANIM_TYPE::DEATH)], 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_IDLE)],
+									animSpeed_[static_cast<int>(ANIM_TYPE::IDLE)], 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_ATTACK)],
+									animSpeed_[static_cast<int>(ANIM_TYPE::ATTACK)], 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_WALK)],
+									animSpeed_[static_cast<int>(ANIM_TYPE::WALK)], 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_SPAWN)],
+									animSpeed_[static_cast<int>(ANIM_TYPE::SPAWN)], 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_HIT_1)],
+									animSpeed_[static_cast<int>(ANIM_TYPE::HIT_1)], 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_HIT_2)],
+									animSpeed_[static_cast<int>(ANIM_TYPE::HIT_2)], 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_DEATH)],
+									animSpeed_[static_cast<int>(ANIM_TYPE::DEATH)], 0.0f);
 	}
 
 
@@ -105,7 +111,7 @@ public:
 
 	int GetPower(void)const { return power_; };
 
-	float GetSpeed(void)const { return speed_; };
+	float GetSpeed(void)const { return speedMax_; };
 
 	float GetSpeedAcc(void)const { return speedAcc_; }
 
@@ -145,8 +151,10 @@ private:
 
 	int power_;
 
-	float speed_;
+	// 移動速度
+	float speedMax_;
 
+	// 移動上昇値
 	float speedAcc_;
 
 	float atkInterval_;

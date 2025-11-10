@@ -11,17 +11,19 @@ public:
 
 	using STATUS_ANIM_TYPE = StatusEnemy::ANIM_TYPE;
 
+	/// @brief アニメーションの種類
 	enum class ANIM_STATE
 	{
 		NONE = 0,
-		ATTACK,
-		DEATH,
+		ATTACK, // 攻撃
+		DEATH,  // 死亡
 		DEATH_STOP,
-		HIT_1,
-		HIT_2,
-		IDLE,
-		WALK,
-		SPAWN,
+		HIT_1, // 被ダメージ(弱)
+		HIT_2, // 被ダメージ(強)
+		IDLE, // 待機
+		WALK, // 歩行
+		SPAWN, // 生成
+
 		MAX,
 	};
 
@@ -36,11 +38,18 @@ public:
 		ATTACK_START, 
 		ATTACK_ACTIVE,
 		ATTACK_END,
+
 		MAX,
 	};
 
 	static constexpr float LOCAL_ANGLE_Y = (180.0f * (DX_PI_F / 180.0f));
 	
+	// 召喚時の無敵時間
+	static constexpr float SPAWN_TIME = 1.0f;
+
+	// 召喚時間の乱数
+	static constexpr float SPAWN_TIME_RANGE = 0.5f;
+
 	
 	Enemy(StatusEnemy::TYPE type, Player& players);
 
@@ -48,22 +57,9 @@ public:
 	virtual ~Enemy(void) = default;
 
 
-	/// @brief 初回読み込み処理
-	/// @param  
-	void Load(void)override;
-
-	void Init(const VECTOR& pos, float angleY = 0.0f, ACTION_STATE state = ACTION_STATE::IDLE);
-
-	void Draw(void)override;
-
 	void Update(void)override;
 
-	void Release(void)override;
-
-
-	void SetParam(void) override;
-
-	void SetDamage(int _damage = 1)override;
+	void DamageProc(void)override;
 
 	/// @brief 行動状態取得
 	ACTION_STATE GetActionState(void)const { return paramEnemy_.actionState; };
@@ -108,17 +104,25 @@ protected:
 	Player& player_;
 
 
-	void LoadResource(void);
+	void SetParam(void) override;
+
+	/// @brief 初回読み込み処理
+	void LoadPost(void)override;
 
 	/// @brief プレイヤーの方向を追尾
 	void LookPlayerPos(void);
 
-
+	virtual void InitPost(void)override;
 	virtual void InitModelFrame(void)override = 0;
 
 	virtual void InitAnim(void) = 0;
 
 	void UpdateAnim(void)override;
+
+	void UpdatePost(void)override;
+
+	void DrawPost(void)override;
+
 
 	void SearchField(void);
 
@@ -140,7 +144,12 @@ protected:
 
 	void ChangeActionState(ACTION_STATE _state);
 
-	virtual void ChangeAnimState(ANIM_STATE _state, bool _isLoop = true) { paramEnemy_.animState = _state; };
+	/// @brief アニメーション遷移処理
+	/// @param _state 状態
+	/// @param _isLoop ループ判定
+	virtual void ChangeAnimState(ANIM_STATE _state, bool _isLoop = true) = 0;
+
+	// アニメーション状態遷移処理
 	virtual void AnimState(void) = 0;
 
 	virtual void DamagePerform(void) = 0;
@@ -148,4 +157,10 @@ protected:
 	bool IsAttackState(void);
 
 	bool IsUpdateFrame(void)override;
+
+
+private:
+
+	// 初期行動状態
+	static constexpr ACTION_STATE ACTION_STATE_START = ACTION_STATE::SPAWN;
 };

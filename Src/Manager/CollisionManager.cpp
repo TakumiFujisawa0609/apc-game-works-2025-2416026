@@ -291,62 +291,74 @@ void CollisionManager::CollisionPlayerToEnemy(void)
 	pPos = player_->GetPos();
 
 	// 敵未割当時、処理終了
-	if (enemys_->GetEnemys().empty()) { return; }
+	if (enemys_->GetEnemyLists().empty()) { return; }
 
-	for (auto& enemy : enemys_->GetEnemys())
+	for (auto& [type, enemyList] : enemys_->GetEnemyLists())
 	{
-		// 無効状態・HP0の時、スキップ
-		if (!enemy->GetIsActive() || enemy->GetCurHp() <= 0) { continue; }
-
-		pBody = player_->GetFramePos(COLLISION_TYPE::BODY);
-		pRad = player_->GetRadius(COLLISION_TYPE::BODY);
-		eBody = enemy->GetFramePos(COLLISION_TYPE::BODY);
-		eRad = enemy->GetRadius(COLLISION_TYPE::BODY);
-		ePos = enemy->GetPos();
-
-		if (UtilityCollision::IsHitSphereToSphere(pBody, pRad, eBody, eRad))
+		for (auto& enemy : enemyList)
 		{
-			// プレイヤーの位置と反発
-			enemy->SetPos(UtilityCollision::CollisionReflectXZ(ePos.y, eBody, eRad, pBody, pRad));
-		}
+			// 無効状態・HP0の時、スキップ
+			if (!enemy->GetIsActive() || enemy->GetCurHp() <= 0) { continue; }
 
-		// プレイヤー攻撃時の被ダメージ処理
-		if (player_->CheckActiveAttack())
-		{
-			enemy->UpdateModelFrames();
-
-			pBody = player_->GetPosForward();
-			pRad = player_->GetRadiusAttack(player_->GetMotionType());
-			eBody = enemy->GetFramePos(Object::COLLISION_TYPE::BODY);
+			pBody = player_->GetFramePos(COLLISION_TYPE::BODY);
+			pRad = player_->GetRadius(COLLISION_TYPE::BODY);
+			eBody = enemy->GetFramePos(COLLISION_TYPE::BODY);
 			eRad = enemy->GetRadius(COLLISION_TYPE::BODY);
+			ePos = enemy->GetPos();
 
 			if (UtilityCollision::IsHitSphereToSphere(pBody, pRad, eBody, eRad))
 			{
-				EnemyDamageProc(*enemy);
+				// プレイヤーの位置と反発
+				enemy->SetPos(UtilityCollision::CollisionReflectXZ(ePos.y, eBody, eRad, pBody, pRad));
+			}
+
+			// プレイヤー攻撃時の被ダメージ処理
+			if (player_->CheckActiveAttack())
+			{
+				enemy->UpdateModelFrames();
+
+				pBody = player_->GetPosForward();
+				pRad = player_->GetRadiusAttack(player_->GetMotionType());
+				eBody = enemy->GetFramePos(Object::COLLISION_TYPE::BODY);
+				eRad = enemy->GetRadius(COLLISION_TYPE::BODY);
+
+				if (UtilityCollision::IsHitSphereToSphere(pBody, pRad, eBody, eRad))
+				{
+					EnemyDamageProc(*enemy);
+				}
 			}
 		}
 	}
 }
 void CollisionManager::CollisionEnemyToEnemy(void)
 {
-	int size = enemys_->GetEnemys().size();
-	Enemy* enemy1;
-	Enemy* enemy2;
+	int listSize = enemys_->GetListCnt();
+	int size = 0;
+	
 	VECTOR pos1, pos2;
 	float eRad1 = 0.0f, eRad2 = 0.0f;
 
-	for (int y = 0; y < size; y++)
+	
+	for (int list = 0; list < size; list++)
 	{
-		enemy1 = enemys_->GetEnemys().at(y);
-		for (int x = (y + 1); x < size; x++)
+		size = enemys_->GetEnemys(list).size();
+		for (int y = 0; y < size; y++)
 		{
-			enemy2 = enemys_->GetEnemys().at(x);
-			pos1 = enemy1->GetPos();
-			if (UtilityCollision::IsHitSphereToSphere(pos1, eRad1, pos2, eRad2))
+			for (int x = y; x < size; x++)
 			{
-				// 前フレーム位置に戻す
-				//enemy1->SetPos(UtilityCollision::CollisionReflectXZ(pPos, pRad, ePos, eRad));
+				Enemy& enemy1 = enemys_->GetEnemy(list, y);
+				Enemy& enemy2 = enemys_->GetEnemy(list, x);
+				pos1 = enemy1.GetPos();
+				pos2 = enemy2.GetPos();
+				eRad1 = enemy1.GetRadius(Object::COLLISION_TYPE::BODY);
+				eRad2 = enemy2.GetRadius(Object::COLLISION_TYPE::BODY);
 
+				if (UtilityCollision::IsHitSphereToSphere(pos1, eRad1, pos2, eRad2))
+				{
+					// 前フレーム位置に戻す
+					//enemy1->SetPos(UtilityCollision::CollisionReflectXZ(pPos, pRad, ePos, eRad));
+
+				}
 			}
 		}
 	}
@@ -355,7 +367,7 @@ void CollisionManager::EnemyDamageProc(Enemy& _enemy, int _damage)
 {
 	// 被ダメージ処理
 	_enemy.SetDamage(_damage);
-
+	_enemy.KnockBack(player_->GetDir(),0.5f, 10.0f);
 	// 
 	// 
 }

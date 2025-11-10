@@ -42,15 +42,14 @@ void EnemyWarrior::InitModelFrame(void)
 
 void EnemyWarrior::InitAnim(void)
 {
+	SetAnimSpeed(WARRIER_ANIM::SPAWN, STATUS_ANIM_TYPE::SPAWN);
 	SetAnimSpeed(WARRIER_ANIM::IDLE, STATUS_ANIM_TYPE::IDLE);
 	SetAnimSpeed(WARRIER_ANIM::ATTACK, STATUS_ANIM_TYPE::ATTACK);
 	SetAnimSpeed(WARRIER_ANIM::WALK, STATUS_ANIM_TYPE::WALK);
-	SetAnimSpeed(WARRIER_ANIM::SPAWN, STATUS_ANIM_TYPE::SPAWN);
 	SetAnimSpeed(WARRIER_ANIM::HIT_1, STATUS_ANIM_TYPE::HIT_1);
 	SetAnimSpeed(WARRIER_ANIM::HIT_2, STATUS_ANIM_TYPE::HIT_2);
 	SetAnimSpeed(WARRIER_ANIM::DEATH, STATUS_ANIM_TYPE::DEATH);
 	
-
 	for (auto& [type, speed] : animSpeed_)
 	{
 		speed = animSpeed_[type];
@@ -58,14 +57,12 @@ void EnemyWarrior::InitAnim(void)
 		// 内部アニメーション割り当て
 		anim_->AddInternal(static_cast<int>(type), speed);
 	}
-
-	// 待機アニメーション再生
-	ChangeAnimState(ANIM_STATE::SPAWN);
 }
 void EnemyWarrior::SetAnimSpeed(WARRIER_ANIM _type, STATUS_ANIM_TYPE _speedType)
 {
 	int type = static_cast<int>(_type);
-	animSpeed_.emplace(type, status_.GetAnimSpeed(_speedType));
+	float speed = status_.GetAnimSpeed(static_cast<int>(_speedType));
+	animSpeed_.emplace(type, speed);
 }
 
 void EnemyWarrior::DamagePerform(void)
@@ -82,6 +79,10 @@ void EnemyWarrior::DamagePerform(void)
 
 void EnemyWarrior::AnimState(void)
 {
+	// 生成アニメーション時は処理終了
+	if (paramEnemy_.animState == ANIM_STATE::SPAWN) { return; }
+
+
 	// 撃破アニメーション時、無効化
 	if (paramEnemy_.animState == ANIM_STATE::DEATH)
 	{
@@ -98,12 +99,14 @@ void EnemyWarrior::AnimState(void)
 		{
 			if (anim_->IsEnd())
 			{
+				// 被ダメージアニメーション終了時、待機状態化
 				ChangeAnimState(ANIM_STATE::IDLE);
 			}
 			return;
 		}
 
-		if (paramEnemy_.actionState == ACTION_STATE::MOVE && paramChara_.timeInv <= 0.0f)
+		if (paramEnemy_.actionState == ACTION_STATE::MOVE &&
+			paramChara_.timeInv <= 0.0f)
 		{
 			ChangeAnimState(ANIM_STATE::WALK);
 		}
@@ -120,12 +123,12 @@ void EnemyWarrior::ChangeAnimState(ANIM_STATE _state, bool _isLoop)
 	WARRIER_ANIM animType = WARRIER_ANIM::NONE;
 
 	if (_state == ANIM_STATE::SPAWN) { animType = WARRIER_ANIM::SPAWN; }
-	if (_state == ANIM_STATE::IDLE) { animType = WARRIER_ANIM::IDLE; }
-	if (_state == ANIM_STATE::WALK) { animType = WARRIER_ANIM::WALK; }
-	if (_state == ANIM_STATE::ATTACK) { animType = WARRIER_ANIM::ATTACK; }
-	if (_state == ANIM_STATE::HIT_1) { animType = WARRIER_ANIM::HIT_1; }
-	if (_state == ANIM_STATE::HIT_2) { animType = WARRIER_ANIM::HIT_2; }
-	if (_state == ANIM_STATE::DEATH) { animType = WARRIER_ANIM::DEATH; }
+	else if (_state == ANIM_STATE::IDLE) { animType = WARRIER_ANIM::IDLE; }
+	else if (_state == ANIM_STATE::WALK) { animType = WARRIER_ANIM::WALK; }
+	else if (_state == ANIM_STATE::ATTACK) { animType = WARRIER_ANIM::ATTACK; }
+	else if (_state == ANIM_STATE::HIT_1) { animType = WARRIER_ANIM::HIT_1; }
+	else if (_state == ANIM_STATE::HIT_2) { animType = WARRIER_ANIM::HIT_2; }
+	else if (_state == ANIM_STATE::DEATH) { animType = WARRIER_ANIM::DEATH; }
 
 	anim_->Play(static_cast<int>(animType), _isLoop);
 }

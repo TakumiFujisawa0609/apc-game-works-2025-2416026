@@ -1,5 +1,6 @@
 #include "Resource.h"
 #include <DxLib.h>
+#include <EffekseerForDXLib.h>
 #include <string>
 
 
@@ -74,12 +75,12 @@ void Resource::Load(void)
 		}
 		break;
 		
-		/*
+		
 		case LOAD_TYPE::EFFECT:
 		{
 			handleId_ = LoadEffekseerEffect(path_.c_str());
 		}
-		break;*/
+		break;
 	}
 }
 
@@ -126,12 +127,11 @@ void Resource::Release(void)
 		break;
 
 		// エフェクト
-		/*
 		case LOAD_TYPE::EFFECT:
 		{
 			DeleteEffekseerEffect(handleId_);
 		}
-		break;*/
+		break;
 	}
 }
 

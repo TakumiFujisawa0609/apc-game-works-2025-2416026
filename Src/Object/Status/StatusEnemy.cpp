@@ -16,7 +16,7 @@ StatusEnemy::StatusEnemy(void)
 
 	power_ = 0;
 
-	speed_ = 0.0f;
+	speedMax_ = 0.0f;
 
 	speedAcc_ = 0.0f;
 
@@ -26,9 +26,10 @@ StatusEnemy::StatusEnemy(void)
 
 	searchRange_ = 0.0f;
 
-	for (int i = 0; i < static_cast<int>(ANIM_TYPE::MAX); i++)
+	const int max = static_cast<int>(ANIM_TYPE::MAX);
+	for (int i = 0; i < max; i++)
 	{
- 		animSpeed_[i] = 0.0f;
+ 		animSpeed_[i] = -1;
 	}
 }
 

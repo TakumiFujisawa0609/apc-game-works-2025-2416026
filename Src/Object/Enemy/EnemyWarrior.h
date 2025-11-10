@@ -18,7 +18,7 @@ public:
 		HIT_2 = 40,
 		IDLE = 42,
 		WALK = 56,
-		SPAWN = 81,
+		SPAWN = 74,
 		MAX,
 	};
 

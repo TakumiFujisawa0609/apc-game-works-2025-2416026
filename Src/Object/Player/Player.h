@@ -143,30 +143,13 @@ public:
 	/// @brief デフォルトデストラクタ
 	~Player(void)override = default;
 
-	/// @brief 読み込み処理
-	void Load(void)override;
-
-	/// @brief 初期化処理
-	void Init(const VECTOR& pos, float angleY = 0.0f);
-
-	/// @brief 更新処理
-	void Update(void) override;
-
-	/// @brief 描画処理
-	void Draw(void)override;
 
 	/// @brief デバッグ表示
 	void DrawDebug(void);
 	
-	/// @brief 解放処理
-	void Release(void) override;
-
-
-	/// @brief パラメータ割り当て
-	void SetParam(void) override;
 
 	/// @brief 被ダメージ処理
-	void SetDamage(int _damage = 1)override;
+	void DamageProc(void)override;
 
 
 	/// @brief 行動状態
@@ -264,7 +247,16 @@ protected:
 	// 入力するキーの種類
 	std::unordered_map<INPUT_TYPE, unsigned int> inputKey_;
 
-	
+
+	/// @brief パラメータ割り当て
+	void SetParam(void) override;
+
+	/// @brief 読み込み処理
+	void LoadPost(void)override;
+
+	/// @brief プレイヤー描画処理
+	void DrawPost(void)override;
+
 
 	/// @brief 状態更新処理
 	void UpdateActionState(void);
@@ -275,7 +267,7 @@ protected:
 	/// @brief 攻撃更新処理
 	void UpdateStateAtk(void);
 
-	/// @brief ゲームオーバー状態の更新処理|
+	/// @brief ゲームオーバー状態の更新処理
 	void UpdateStateOver(void);
 
 
@@ -289,6 +281,9 @@ protected:
 	/// <param name="_max">最大速度</param>
 	void DashProc(float& _acc, float& _max);
 
+	/// @brief プレイヤーの初期化処理
+	void InitPost(void)override;
+
 	/// @brief モデルのフレーム初期化
 	void InitModelFrame(void)override;
 
@@ -297,6 +292,8 @@ protected:
 
 	/// @briefアニメーション処理
 	void UpdateAnim(void)override;
+
+	void UpdatePost(void)override;
 
 	bool IsUpdateFrame(void)override;
 

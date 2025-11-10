@@ -21,51 +21,19 @@
 
 
 Player::Player(void):
-	status_(StatusData::GetInstance().GetPlayerStatus())
-{
-	paramChara_ = {};
-
-	
+	Object::Object(),
+	status_(StatusData::GetInstance().GetPlayerStatus()),
+	inputType_(INPUT_TYPE::NONE),
+	motionType_(-1)
+{	
 	inputKey_.clear();
-
-	inputType_ = INPUT_TYPE::NONE;
-
-	paramPlayer_.isDash = false;
 
 	Load();
 }
 
-void Player::Load(void)
+void Player::LoadPost(void)
 {
 	paramChara_.handle = ResourceManager::GetInstance().LoadHandleId(ResourceManager::SRC::MODEL_PLAYER);
-
-	Object::Load();
-}
-
-void Player::Init(const VECTOR& pos, float angleY)
-{
-	// 位置割り当て
-	paramChara_.pos = paramChara_.prePos = pos;
-	float rotY = AsoUtility::Deg2Rad(angleY);
-	paramChara_.quaRot = Quaternion::Euler({ 0.0f, rotY, 0.0f });
-
-	// 初期化処理
-	Object::Init();
-
-	/*　初期化処理　*/
-	inputKey_.emplace(INPUT_TYPE::MOVE_BACK, KEY_INPUT_W);
-	inputKey_.emplace(INPUT_TYPE::MOVE_FRONT, KEY_INPUT_S);
-	inputKey_.emplace(INPUT_TYPE::MOVE_LEFT, KEY_INPUT_A);
-	inputKey_.emplace(INPUT_TYPE::MOVE_RIGHT, KEY_INPUT_D);
-	inputKey_.emplace(INPUT_TYPE::DASH, KEY_INPUT_LSHIFT);
-	inputKey_.emplace(INPUT_TYPE::ATTACK_JUB, MOUSE_INPUT_LEFT);
-	inputKey_.emplace(INPUT_TYPE::ATTACK_STRONG, MOUSE_INPUT_RIGHT);
-
-	//jumpPower_ = START_JUMP_POWER;
-
-	// 当たり判定割り当て
-	//collision_ = new PlayerCollision;
-	//collision_->Init(*this);
 }
 
 void Player::SetParam(void)
@@ -104,13 +72,9 @@ void Player::SetParam(void)
 
 	paramPlayer_.weaponId = status_.GetWeaponId();
 	paramPlayer_.luck = status_.GetLuck();
-}
 
-void Player::SetDamage(int _damage)
-{
-	Object::SetDamage(_damage);
+	paramChara_.isActive = true;
 }
-
 void Player::InitAnim(void)
 {
 	int max = static_cast<int>(ANIM_STATE::MAX);
@@ -201,15 +165,32 @@ void Player::InitModelFrame(void)
 	index = FindFrameNum("Fist.R");
 	paramChara_.colList.emplace(COLLISION_TYPE::HAND_R, &paramChara_.frames[index]);
 }
-
-
-
-void Player::Update(void)
+void Player::InitPost(void)
 {
-	/*　更新処理　*/
+	inputKey_.emplace(INPUT_TYPE::MOVE_BACK, KEY_INPUT_W);
+	inputKey_.emplace(INPUT_TYPE::MOVE_FRONT, KEY_INPUT_S);
+	inputKey_.emplace(INPUT_TYPE::MOVE_LEFT, KEY_INPUT_A);
+	inputKey_.emplace(INPUT_TYPE::MOVE_RIGHT, KEY_INPUT_D);
+	inputKey_.emplace(INPUT_TYPE::DASH, KEY_INPUT_LSHIFT);
+	inputKey_.emplace(INPUT_TYPE::ATTACK_JUB, MOUSE_INPUT_LEFT);
+	inputKey_.emplace(INPUT_TYPE::ATTACK_STRONG, MOUSE_INPUT_RIGHT);
 
-	Object::Update();
+	//jumpPower_ = START_JUMP_POWER;
 
+	// 当たり判定割り当て
+	//collision_ = new PlayerCollision;
+	//collision_->Init(*this);
+}
+
+
+void Player::UpdateAnim(void)
+{
+	// アニメーション更新
+	anim_->Update();
+}
+void Player::UpdatePost(void)
+{
+	/*　プレイヤー独自処理　*/
 	// 反転回転フラグ
 	bool isRevert = false;
 
@@ -219,9 +200,6 @@ void Player::Update(void)
 	// 回転処理
 	Rotation(isRevert);
 
-	// アニメーション更新
-	UpdateAnim();
-
 	// 行列更新
 	SetMatrixModel();
 
@@ -229,9 +207,9 @@ void Player::Update(void)
 	//collision_->Update();
 }
 
-void Player::Draw(void)
+
+void Player::DrawPost(void)
 {
-	Object::Draw();
 	unsigned int color = ((paramChara_.atkMotion.GetIsActionAttack()) ? 0xff0000 : 0xcccccc);
 	if (SceneManager::GetInstance().GetIsDebugMode())
 	{
@@ -263,16 +241,6 @@ void Player::DrawDebug(void)
 					 ,paramChara_.atkMotion.GetAttackState(), paramChara_.atkMotion.GetTimeAction()
 		             ,paramPlayer_.actionState ,anim_->GetPlayType() ,paramPlayer_.jubCnt);
 #endif
-}
-
-void Player::Release(void)
-{
-	/*　解放処理　*/
-	Object::Release();
-
-	// 当たり判定解放	
-	//collision_->Release();
-	//delete collision_;
 }
 
 void Player::UpdateActionState(void)
@@ -541,6 +509,10 @@ void Player::Move(void)
 	paramChara_.pos = VAdd(paramChara_.pos, paramChara_.velocity);
 }
 
+void Player::DamageProc(void)
+{
+
+}
 void Player::DashProc(float& _acc, float& _max)
 {
 	if (AsoUtility::EqualsVZero(paramChara_.velocity))
@@ -588,12 +560,6 @@ void Player::DashProc(float& _acc, float& _max)
 	}
 }
 
-
-void Player::UpdateAnim(void)
-{
-	// アニメーション更新
-	anim_->Update();
-}
 
 void Player::AnimStateIdle(void)
 {
