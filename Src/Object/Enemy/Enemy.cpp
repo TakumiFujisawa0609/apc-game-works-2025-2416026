@@ -10,10 +10,11 @@
 #include "../../Utility/AsoUtility.h"
 #include "../../Common/Quaternion.h"
 
-Enemy::Enemy(StatusEnemy::TYPE type, Player& player)
+Enemy::Enemy(StatusEnemy::TYPE type, Player& player, bool _isElite)
 	:status_(StatusData::GetInstance().GetEnemyStatus(static_cast<int>(type))),
-	 player_(player)
+	player_(player)
 {
+	paramEnemy_.isElite = _isElite;
 	Load();
 }
 
@@ -60,6 +61,7 @@ void Enemy::SetParam(void)
 	paramChara_.speed = status_.GetSpeed();
 	paramChara_.speedAcc = status_.GetSpeedAcc();
 
+	paramEnemy_.timeAtkInterval = status_.GetAtkInterval();
 	paramEnemy_.isHearing = false;
 	paramChara_.isActive = true;
 
@@ -109,7 +111,7 @@ void Enemy::UpdateState(void)
 	else if (paramEnemy_.actionState == ACTION_STATE::MOVE) { UpdateStateMove(); }
 
 	// 攻撃状態
-	else if (IsAttackState()) { UpdateStateAtk(); }
+	//else if (IsAttackState()) { UpdateStateAtk(); }
 
 	// 吹っ飛ばし状態
 	else  if (paramEnemy_.actionState == ACTION_STATE::KNOCK) { UpdateStateKnock(); }
@@ -141,36 +143,32 @@ void Enemy::UpdateStateMove(void)
 	// 無敵中・撃破時・移動アニメーション以外のとき、処理終了
 	if (paramChara_.timeInv > 0.0f || paramChara_.hp <= 0) { return; }
 
-	//if (paramEnemy_.isAttack) { ChangeActionState(ACTION_STATE::ATTACK_ACTIVE); }
+	if (paramEnemy_.isAttack)
+	{
+		// 攻撃間隔減少
+		float delta = SceneManager::GetInstance().GetDeltaTime();
+		paramEnemy_.timeAtkInterval -= ((paramEnemy_.timeAtkInterval > 0.0f) ? delta : 0.0f);
+
+		// 一定時間プレイヤーが攻撃範囲内進入時、攻撃状態化
+		if (paramEnemy_.timeAtkInterval <= 0.0f)
+		{
+			//ChangeActionState(ACTION_STATE::ATTACK_ACTIVE);
+		}
+	}
 
 	// プレイヤー追従
 	LookPlayerPos();
 
-	VECTOR pos = VAdd(paramChara_.pos, paramChara_.posLocal);
-
-	// Z軸の移動速度
-	float speedZ = ((pos.z < player_.GetPos().z) ? paramChara_.speed : -paramChara_.speed);
-	float accZ = ((pos.z < player_.GetPos().z) ? paramChara_.speedAcc : -paramChara_.speedAcc);
-	accZ = ((pos.z == player_.GetPos().z) ? 0.0f : accZ);
-
-	float speedX = ((pos.z < player_.GetPos().x) ? paramChara_.speed : -paramChara_.speed);
-	float accX = ((pos.x < player_.GetPos().z) ? paramChara_.speedAcc : -paramChara_.speedAcc);
-	accZ = ((pos.z == player_.GetPos().x) ? 0.0f : accZ);
-
-	VECTOR velo;
-	velo.x = _Move(&paramChara_.velocity.x, accX, speedX);
-	velo.y = 0.0f;
-	velo.z = _Move(&paramChara_.velocity.z, accZ, speedZ);
-
-	paramChara_.velocity = VAdd(paramChara_.velocity, velo);
-
-	VECTOR dir = { paramChara_.dir.x, 0.0f, paramChara_.dir.z };
-
-	paramChara_.pos = VAdd(paramChara_.pos, VAdd(dir, velo));
+	// 吹っ飛ばされていないとき、移動
+	if (AsoUtility::EqualsVZero(paramChara_.knockBack))
+	{
+		Move();
+	}
 }
 void Enemy::UpdateStateKnock(void)
 {
-	if (AsoUtility::EqualsVZero(paramChara_.knockBack)) 
+	if (AsoUtility::EqualsVZero(paramChara_.knockBack) &&
+		anim_->IsEnd()) 
 	{
 		ChangeActionState(ACTION_STATE::IDLE);
 	}
@@ -198,6 +196,19 @@ void Enemy::ChangeActionState(ACTION_STATE state)
 	else if (state == ACTION_STATE::ATTACK_START)
 	{
 		ChangeAnimState(ANIM_STATE::ATTACK, false);
+	}
+
+	else if (state == ACTION_STATE::KNOCK)
+	{
+		// ダメージ演出
+		if (paramChara_.hp > 0)
+		{
+			ChangeAnimState(ANIM_STATE::HIT_2, false);
+		}
+		else
+		{
+			ChangeAnimState(ANIM_STATE::DEATH, false);
+		}
 	}
 }
 
@@ -234,25 +245,7 @@ void Enemy::DrawPost(void)
 
 void Enemy::DamageProc(void)
 {
-	if (paramChara_.timeInv > 0.0f) { return; }
-	/*
-	const float knockXZ = 1.0f;
-	const float knockY = 3.5f;
-
-	//　吹っ飛ばし処理
-	VECTOR dir = paramChara_.dir;
-	dir.x /= 5.0f;
-	dir.z /= 5.0f;
-
-	// 後方+上に吹っ飛ばす
-	dir.y = knockY;
-	dir.x *= -(knockXZ);
-	dir.z *= -(knockXZ);
-	paramChara_.knockBack = dir;*/
 	ChangeActionState(ACTION_STATE::KNOCK);
-
-	// ダメージ演出
-	DamagePerform();
 }
 
 void Enemy::LookPlayerPos(void)
@@ -287,6 +280,32 @@ void Enemy::UpdateAnim(void)
 }
 void Enemy::UpdatePost(void)
 {
+}
+
+void Enemy::Move(void)
+{
+	VECTOR pos = VAdd(paramChara_.pos, paramChara_.posLocal);
+
+	// Z軸の移動速度
+	float speedZ = ((pos.z < player_.GetPos().z) ? paramChara_.speed : -paramChara_.speed);
+	float accZ = ((pos.z < player_.GetPos().z) ? paramChara_.speedAcc : -paramChara_.speedAcc);
+	accZ = ((pos.z == player_.GetPos().z) ? 0.0f : accZ);
+
+	// X軸の移動速度
+	float speedX = ((pos.x < player_.GetPos().x) ? paramChara_.speed : -paramChara_.speed);
+	float accX = ((pos.x < player_.GetPos().x) ? paramChara_.speedAcc : -paramChara_.speedAcc);
+	accX = ((pos.x == player_.GetPos().x) ? 0.0f : accZ);
+
+	VECTOR velo;
+	velo.x = _Move(&paramChara_.velocity.x, accX, speedX);
+	velo.y = 0.0f;
+	velo.z = _Move(&paramChara_.velocity.z, accZ, speedZ);
+
+	paramChara_.velocity = VAdd(paramChara_.velocity, velo);
+
+	VECTOR dir = { paramChara_.dir.x, 0.0f, paramChara_.dir.z };
+
+	paramChara_.pos = VAdd(paramChara_.pos, VAdd(dir, velo));
 }
 
 void Enemy::SearchField(void)
@@ -400,6 +419,36 @@ void Enemy::DrawAttackRange(void)
 	DrawTriangle3D(pos, forwardPos, rightPos, color, true);
 }
 
+
+void Enemy::AnimState(void)
+{
+	// 生成アニメーション時は処理終了
+	if (paramEnemy_.animState == ANIM_STATE::SPAWN ||
+		!AsoUtility::EqualsVZero(paramChara_.knockBack)) { return; }
+
+
+	// 撃破アニメーション時、無効化
+	if (paramEnemy_.animState == ANIM_STATE::DEATH)
+	{
+		if (anim_->IsEnd())
+		{
+			paramChara_.hp = 0;
+			paramChara_.isActive = false;
+		}
+	}
+	else
+	{
+		if (paramEnemy_.actionState == ACTION_STATE::MOVE &&
+			paramChara_.timeInv <= 0.0f)
+		{
+			ChangeAnimState(ANIM_STATE::WALK);
+		}
+		else
+		{
+			ChangeAnimState(ANIM_STATE::IDLE);
+		}
+	}
+}
 
 bool Enemy::IsAttackState(void)
 {

@@ -309,7 +309,7 @@ void CollisionManager::CollisionPlayerToEnemy(void)
 			if (UtilityCollision::IsHitSphereToSphere(pBody, pRad, eBody, eRad))
 			{
 				// プレイヤーの位置と反発
-				enemy->SetPos(UtilityCollision::CollisionReflectXZ(ePos.y, eBody, eRad, pBody, pRad));
+				//enemy->SetPos(UtilityCollision::CollisionReflectXZ(ePos.y, eBody, eRad, pBody, pRad));
 			}
 
 			// プレイヤー攻撃時の被ダメージ処理
@@ -367,7 +367,7 @@ void CollisionManager::EnemyDamageProc(Enemy& _enemy, int _damage)
 {
 	// 被ダメージ処理
 	_enemy.SetDamage(_damage);
-	_enemy.KnockBack(player_->GetDir(),0.5f, 10.0f);
+	_enemy.KnockBack(player_->GetDir(), 2.5f, 0.05f);
 	// 
 	// 
 }

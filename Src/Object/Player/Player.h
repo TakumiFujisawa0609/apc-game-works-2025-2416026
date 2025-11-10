@@ -272,7 +272,7 @@ protected:
 
 
 	/// @brief 移動処理
-	void Move(void);
+	void Move(void)override;
 
 	/// <summary>
 	/// ダッシュ処理
@@ -295,6 +295,8 @@ protected:
 
 	void UpdatePost(void)override;
 
+	void SetPosForward(void)override;
+
 	bool IsUpdateFrame(void)override;
 
 private:
@@ -305,7 +307,6 @@ private:
 	/// @brief モーション処理
 	void UpdateMotion(void);
 
-	void SetPosForward(void)override;
 
 	/// @brief 外部アニメーション割り当て処理
 	/// @param _state アニメーション種類

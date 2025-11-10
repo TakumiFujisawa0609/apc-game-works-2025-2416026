@@ -35,6 +35,7 @@ public:
 		SEARCH,   // プレイヤー追従
 		MOVE,     // 移動状態
 		KNOCK,    // 吹っ飛ばし状態
+		DEAD,	  // 死亡状態
 		ATTACK_START, 
 		ATTACK_ACTIVE,
 		ATTACK_END,
@@ -51,7 +52,7 @@ public:
 	static constexpr float SPAWN_TIME_RANGE = 0.5f;
 
 	
-	Enemy(StatusEnemy::TYPE type, Player& players);
+	Enemy(StatusEnemy::TYPE type, Player& players, bool _isElite = false);
 
 	/// @brief デフォルトデストラクタ
 	virtual ~Enemy(void) = default;
@@ -81,7 +82,7 @@ protected:
 
 		StatusEnemy::TYPE type;
 
-		float curAtkInterval;
+		float timeAtkInterval;
 
 		float atkRange;
 
@@ -92,6 +93,9 @@ protected:
 
 		// 攻撃有効フラグ
 		bool isAttack;
+
+		// エリートか否か(ボスは除く)
+		bool isElite;
 	};
 
 	ParamEnemy paramEnemy_;
@@ -150,14 +154,13 @@ protected:
 	virtual void ChangeAnimState(ANIM_STATE _state, bool _isLoop = true) = 0;
 
 	// アニメーション状態遷移処理
-	virtual void AnimState(void) = 0;
-
-	virtual void DamagePerform(void) = 0;
+	void AnimState(void);
 
 	bool IsAttackState(void);
 
 	bool IsUpdateFrame(void)override;
 
+	void Move(void)override;
 
 private:
 

@@ -65,57 +65,6 @@ void EnemyWarrior::SetAnimSpeed(WARRIER_ANIM _type, STATUS_ANIM_TYPE _speedType)
 	animSpeed_.emplace(type, speed);
 }
 
-void EnemyWarrior::DamagePerform(void)
-{
-	if (paramChara_.hp > 0)
-	{
-		ChangeAnimState(ANIM_STATE::HIT_2, false);
-	}
-	else
-	{
-		ChangeAnimState(ANIM_STATE::DEATH, false);
-	}
-}
-
-void EnemyWarrior::AnimState(void)
-{
-	// 生成アニメーション時は処理終了
-	if (paramEnemy_.animState == ANIM_STATE::SPAWN) { return; }
-
-
-	// 撃破アニメーション時、無効化
-	if (paramEnemy_.animState == ANIM_STATE::DEATH)
-	{
-		if (anim_->IsEnd())
-		{
-			paramChara_.hp = 0;
-			paramChara_.isActive = false;
-		}
-	}
-	else
-	{
-		if (paramEnemy_.animState == ANIM_STATE::HIT_1 ||
-			paramEnemy_.animState == ANIM_STATE::HIT_2)
-		{
-			if (anim_->IsEnd())
-			{
-				// 被ダメージアニメーション終了時、待機状態化
-				ChangeAnimState(ANIM_STATE::IDLE);
-			}
-			return;
-		}
-
-		if (paramEnemy_.actionState == ACTION_STATE::MOVE &&
-			paramChara_.timeInv <= 0.0f)
-		{
-			ChangeAnimState(ANIM_STATE::WALK);
-		}
-		else
-		{
-			ChangeAnimState(ANIM_STATE::IDLE);
-		} 
-	}
-}
 
 void EnemyWarrior::ChangeAnimState(ANIM_STATE _state, bool _isLoop)
 {

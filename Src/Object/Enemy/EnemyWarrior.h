@@ -36,10 +36,6 @@ protected:
 
 	void InitAnim(void)override;
 
-	void DamagePerform(void)override;
-
-	void AnimState(void)override;
-
 	void ChangeAnimState(ANIM_STATE _state, bool isLoop = true)override;
 
 

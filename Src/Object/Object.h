@@ -299,6 +299,8 @@ protected:
 	/// @brief 各オブジェクトのメモリ解放
 	virtual void ReleasePost(void) {};
 
+	// 移動処理
+	virtual void Move(void) {};
 public:
 
 
@@ -359,16 +361,12 @@ public:
 	/// <param name = "velocity">移動量</param>
 	static float WeightCalc(float weight, float weightPower = 1.0f, float velocity = 0.0f);
 
-	/// <summary>
-	/// 吹っ飛ばし処理
-	/// </summary>
-	/// <param name="_knockDir">吹っ飛ばし方向</param>
-	/// <param name="invTime">無敵時間</param>
-	/// <param name="powerY">上方向の吹っ飛ばし</param>
-	/// <param name="powerXZ">横方向の吹っ飛ばし力</param>
-	/// <param name="minPowerXZ">最低限の横方向の吹っ飛ばし力</param>
-	void KnockBack(const VECTOR& _knockDir, float invTime,
-		float powerY, float powerXZ = 1.0f, float minPowerXZ = 1.0f);
+	
+	/// @brief 吹っ飛ばし処理
+	/// @param _knockDir 吹っ飛ばし方向
+	/// @param _powerY 上方向の吹っ飛ばし力
+	/// @param _powerXZ 横方向の吹っ飛ばし力
+	void KnockBack(const VECTOR& _knockDir, float _powerY, float _powerXZ = 1.0f);
 	
 	/// @brief 攻撃をできるかどうかの判定
 	bool CheckActiveAttack(void) const;

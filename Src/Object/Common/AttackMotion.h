@@ -61,6 +61,10 @@ public:
 	void SetAttackTime(float _time) { timeAttack_ = _time; };
 
 
+	/// @brief モーション状態が遷移可能か否か
+	bool GetIsChangeMotion(void) { return (timeChangeMotion_ <= 0.0f); };
+
+
 private:
 
 	// 行動状態
@@ -75,6 +79,9 @@ private:
 	// 攻撃間隔時間
 	float timeAtkMax_;
 
+	// モーションが可能になる時間
+	float timeChangeMotion_;
+
 	// 各モーション時間のリスト
 	float timeActions_[static_cast<int>(ATTACK_STATE::MAX)];
 
@@ -83,8 +90,10 @@ private:
 
 
 	void UpdateActive(void);
-	void UpdateInput(void);
 	void UpdateEnd(void);
+
+	void UpdateChangeMotion(void);
+
 	void ChangeAction(void);
 
 	void _SetMotionTime(float _activeTime, float _endTime, float _atkTime,

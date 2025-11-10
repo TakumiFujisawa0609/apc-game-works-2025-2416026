@@ -37,7 +37,7 @@ void Camera::Init(MODE mode, const VECTOR& pos, float angleY, Player* player)
 
 	follow_ = player;
 
-	zoom_.distance = LOCAL_POS;
+	zoom_.distance = LOCAL_CAMERA_POS;
 
 	rot_.camera = Quaternion::Euler(0.0f, AsoUtility::Deg2Rad(angleY), 0.0f);
 
@@ -85,8 +85,16 @@ void Camera::SetBeforeDraw(void)
 	}
 
 	// 追尾位置
-	//DrawSphere3D(pos_.target, 10.0f, 10, GetColor(255, 0, 0), GetColor(255, 0, 0), true);
+#ifdef _DEBUG
+	if (follow_ != nullptr)
+	{
+		VECTOR forward = VScale(follow_->GetRotation().GetForward(), 2.0f);
+		VECTOR followPos = VAdd(follow_->GetPos(), forward);
+		followPos = VAdd(followPos, TARGET_LOCAL_POS);
+		DrawSphere3D(followPos, 10.0f, 10, GetColor(255, 0, 0), GetColor(255, 0, 0), true);
+	}
 
+#endif
 	// DXライブラリのカメラとEffekseerのカメラを同期する
 	Effekseer_Sync3DSetting();
 }
@@ -169,12 +177,17 @@ void Camera::SetBeforeDraw_Follow(void)
 	MATRIX mat = rot_.camera.ToMatrix();
 	//mat = MMult(mat, MGetRotZ(angles_.z));
 
-	VECTOR local = LOCAL_POS;
+
+	VECTOR local = LOCAL_CAMERA_POS;
 	local.z = zoom_.distance.z;
 
 	// 注視点の移動
-	VECTOR followPos = VAdd(follow_->GetPos(), VScale(follow_->GetRotation().GetForward(), 2.0f));
-	VECTOR targetLocalRotPos = VTransform(local, mat);
+	VECTOR forward = VScale(follow_->GetRotation().GetForward(), 2.0f);
+	VECTOR followPos = VAdd(follow_->GetPos(), forward);
+	followPos = VAdd(followPos, TARGET_LOCAL_POS);
+
+	//VECTOR targetLocalRotPos = VTransform(local, mat);
+	//pos_.target = targetLocalRotPos
 
 	// カメラの移動
 	// 相対座標を回転させて、回転後の相対座標を取得する
@@ -200,7 +213,7 @@ void Camera::SmoothRotation(void)
 	
 
 	// カメラの回転を適用してオフセットを回転
-	VECTOR rotOffset = rot_.camera.PosAxis(LOCAL_POS);
+	VECTOR rotOffset = rot_.camera.PosAxis(LOCAL_CAMERA_POS);
 
 	// プレイヤー位置に回転したオフセットを加算
 	VECTOR idealPos = VAdd(pPos, zoom_.distance);
@@ -248,8 +261,8 @@ void Camera::SetBeforeDraw_FollowZoom(void)
 	//カメラの追従、拡大・縮小処理
 	SetCameraTarget();
 
-	//// 注視点から計算した距離分、カメラ座標を離す
-	pos_.cameraPos = VAdd(pos_.target, LOCAL_POS);
+	// 注視点から計算した距離分、カメラ座標を離す
+	pos_.cameraPos = VAdd(pos_.target, LOCAL_CAMERA_POS);
 
 	// 位置制限
 	pos_.cameraPos = AsoUtility::Clamp(pos_.cameraPos, pos_.limitMin, pos_.limitMax);

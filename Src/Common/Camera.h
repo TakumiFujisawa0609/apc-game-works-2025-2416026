@@ -22,13 +22,14 @@ public:
 	};
 
 	// カメラの初期角度
-	static constexpr VECTOR DEFAULT_ANGLES =
-	{ (75.0f * (DX_PI_F / 180.0f)), 0.0f, 0.0f };
+	//static constexpr VECTOR DEFAULT_ANGLES = { (0.0f * (DX_PI_F / 180.0f)), 0.0f, 0.0f };
 
 	// カメラのローカル座標
-	static constexpr VECTOR LOCAL_POS = { 0.0, 850.0f, -850.0f };
+	static constexpr VECTOR LOCAL_CAMERA_POS = { 0.0, 400.0f, -1000.0f };
 
-	static constexpr VECTOR TARGET_LOCAL_POS = { 0.0f, 100.0f, 0.0f };
+	// 追尾位置のローカル座標
+	static constexpr VECTOR TARGET_LOCAL_POS = { 0.0f, 300.0f, 0.0f };
+
 
 	// カメラ最小描画領域
 	static constexpr float CAMERA_NEAR = 20.0f;

@@ -33,15 +33,12 @@ void AttackMotion::Update(void)
 		UpdateActive();
 	}
 
-	// “ü—Í
-	else if (attackState_ == ATTACK_STATE::INPUT)
-	{
-		UpdateInput();
-	}
 	else if (attackState_ == ATTACK_STATE::END)
 	{
 		UpdateEnd();
 	}
+
+	UpdateChangeMotion();
 }
 
 void AttackMotion::Draw(void)
@@ -74,6 +71,7 @@ void AttackMotion::_SetMotionTime(float _activeTime, float _endTime, float _atkT
 	// “ü—Í—P—\ŠÔ
 	state = static_cast<int>(ATTACK_STATE::INPUT);
 	timeActions_[state] = _inputTime;
+	timeChangeMotion_ = timeActions_[state];
 
 	// ƒ‚[ƒVƒ‡ƒ“I—¹ŠÔ
 	state = static_cast<int>(ATTACK_STATE::END);
@@ -100,8 +98,13 @@ void AttackMotion::UpdateActive(void)
 	timeAttack_ = ((timeAttack_ < 0.0f) ? timeAtkMax_ : timeAttack_);
 }
 
-void AttackMotion::UpdateInput(void)
+void AttackMotion::UpdateChangeMotion(void)
 {
+	float delta = SceneManager::GetInstance().GetDeltaTime();
+
+	// ŠÔŒ¸­
+	timeChangeMotion_ -= ((timeChangeMotion_ > 0.0f) ? delta : 0.0f);
+	
 }
 
 void AttackMotion::UpdateEnd(void)

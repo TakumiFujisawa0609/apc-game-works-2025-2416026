@@ -627,8 +627,8 @@ void Player::UpdateMotion(void)
 		}
 	}
 
-	// 入力猶予状態のときは処理終了
-	if (paramChara_.atkMotion.GetAttackState() != AttackMotion::ATTACK_STATE::INPUT) { return; }
+	// モーション状態の遷移不可のときは処理終了
+	if (!paramChara_.atkMotion.GetIsChangeMotion()) { return; }
 
 	// 攻撃終了時に再攻撃処理
 	if (paramPlayer_.actionState != ACTION_STATE::ATTACK_JUB_END &&
@@ -654,7 +654,7 @@ void Player::UpdateMotion(void)
 
 void Player::SetPosForward(void)
 {
-	int forwardNum = static_cast<int>(paramPlayer_.actionState) + 1;
+	int forwardNum = static_cast<int>(motionType_) + 1;
 	float frameRad = status_.GetMotionRadius(forwardNum);
 
 	VECTOR forward = VScale(paramChara_.dir, frameRad);

@@ -325,6 +325,7 @@ void Object::SetDamage(int _damage)
 	/*　被ダメージ処理　*/
 	
 	const float invTime = 0.1f;
+
 	// ダメージが０の時は処理終了
 	if (_damage <= 0 || paramChara_.timeInv > 0.0f) { return; }
 
@@ -383,33 +384,30 @@ float Object::WeightCalc(float weight, float weightPower, float velocity)
 	return num;
 }
 
-void Object::KnockBack(const VECTOR& _knockDir, float invTime,
-	float powerY, float powerXZ, float minPowerXZ)
+void Object::KnockBack(const VECTOR& _knockDir, float _powerY, float _powerXZ)
 {
+	// 吹っ飛ばし中は処理終了
+	if (!AsoUtility::EqualsVZero(paramChara_.knockBack)) { return; }
+
+
 	// 吹っ飛ばす方向
-	VECTOR knockVelo = _knockDir;
-
-	float power = powerXZ;
-
-	// 重さを計算に含める
+	VECTOR knockVelo = AsoUtility::VECTOR_ONE;
 	
-	knockVelo.x = _knockDir.x * power;
-	knockVelo.z = _knockDir.z * power;
-	knockVelo.y = _knockDir.y * powerY;
+	knockVelo.x *= (_knockDir.x * _powerXZ);
+	knockVelo.z *= (_knockDir.z * _powerXZ);
+
+	knockVelo.y *= (_powerY);
 
 	// 重力加算
-	//float gravity = Application::GRAVITY_ACC;
-	//knockVelo.y += gravity;
+	float gravity = Application::GRAVITY_ACC;
+	knockVelo.y += gravity;
 
 
 	// Yの加速度が負の値の時は、Y吹っ飛ばしを０にする
 	if (knockVelo.y < 0.0f) knockVelo.y = 0.0f;
 
-	// 無敵時間割り当て
-	paramChara_.timeInv = invTime;
-
 	// 移動量に加算
-	paramChara_.knockBack = VAdd(paramChara_.velocity, knockVelo);
+	paramChara_.knockBack = VAdd(paramChara_.knockBack, knockVelo);
 }
 
 bool Object::CheckActiveAttack(void) const
