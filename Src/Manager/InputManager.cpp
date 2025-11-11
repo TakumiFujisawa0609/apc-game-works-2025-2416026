@@ -37,9 +37,6 @@ InputManager::InputManager(void)
 
 void InputManager::Init(void)
 {
-	// キーボード割り当て時、コントローラ操作化
-	inputType_ = ((GetJoypadNum() > 0) ? INPUT_TYPE::CONTROLLER : INPUT_TYPE::KEYBOARD_MOUSE);
-	
 	SetInputKey(); // 入力キー登録
 
 	SetInputMouse(); // マウス入力登録
@@ -158,16 +155,15 @@ void InputManager::AddKey(unsigned int type)
 
 bool InputManager::KeyIsNewAll(void) const
 {
-	// いずれかのキーが入力しているか判定
+	/* 登録したキーが入力しているか判定 */
 
 	bool isInput = false;
 
-	char key[256];
-	GetHitKeyStateAll(key);
-	for (int i = 0; i < 256; ++i)
+	for (auto& [type, key] : keys_)
 	{
-		if (key[i] == 1)
+		if (KeyIsNew(key.keyType))
 		{
+			// 入力が確認されたらtrueで終了
 			isInput = true;
 			break;
 		}
@@ -524,6 +520,27 @@ bool InputManager::PadIsBtnTrgUp(int _padNum, int button) const
 
 	bool ret = (padInfos_[_padNum].isTrgUp[button]);
 	return ret;
+}
+
+bool InputManager::PadIsAlgKeyNewAll(PAD_NO _padNum) const
+{
+	/* いずれかのパッドの */
+	bool ret = false;
+
+	const int padNum = static_cast<int>(_padNum);
+	const int max = static_cast<int>(JOYPAD_ALGKEY::MAX);
+
+	for (int i = 0; i < max; i++)
+	{
+		if (padInfos_[padNum].isNewAlgKey[i])
+		{
+			// 対象のパッドのアナログキーが入力されているときtrue
+			ret = true;
+			break;
+		}
+	}
+	
+	return false;
 }
 
 bool InputManager::PadIsAlgKeyNew(PAD_NO _padNum, JOYPAD_ALGKEY _algKey)const

@@ -201,10 +201,9 @@ void AnimationController::Update(void)
 void AnimationController::DrawDebug(void)
 {
 #ifdef _DEBUG
-	auto& anim = animations_.at(playType_);
-
+	
 	// アニメーションの描画
-	DrawFormatString(0,64,0xFF0000,"animTime:%.2f",anim.step);
+	DrawFormatString(0,64,0xFF0000,"animTime:%.2f", animations_.at(playType_).step);
 #endif // _DEBUG
 }
 

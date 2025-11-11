@@ -42,13 +42,9 @@ void Enemy::SetParam(void)
 
 	paramChara_.quaRot = Quaternion::Identity();
 	paramChara_.quaRotLocal = Quaternion::Identity(); // ローカル回転初期化
+	
 	paramChara_.quaRotLocal = Quaternion::Mult(paramChara_.quaRotLocal,
 		Quaternion::AngleAxis(LOCAL_ANGLE_Y, AsoUtility::AXIS_Y));
-
-	VECTOR rotLocal = VAdd(AsoUtility::AXIS_X, AsoUtility::AXIS_Z);
-
-	paramChara_.quaRotLocal = Quaternion::Mult(paramChara_.quaRotLocal,
-		Quaternion::AngleAxis(0.0f, rotLocal));
 
 	float scale = status_.GetScale();
 	paramChara_.scale = { scale * (1.0f - SCALE_DIFF),
@@ -111,7 +107,7 @@ void Enemy::UpdateState(void)
 	else if (paramEnemy_.actionState == ACTION_STATE::MOVE) { UpdateStateMove(); }
 
 	// 攻撃状態
-	//else if (IsAttackState()) { UpdateStateAtk(); }
+	else if (IsAttackState()) { UpdateStateAtk(); }
 
 	// 吹っ飛ばし状態
 	else  if (paramEnemy_.actionState == ACTION_STATE::KNOCK) { UpdateStateKnock(); }
@@ -152,7 +148,7 @@ void Enemy::UpdateStateMove(void)
 		// 一定時間プレイヤーが攻撃範囲内進入時、攻撃状態化
 		if (paramEnemy_.timeAtkInterval <= 0.0f)
 		{
-			//ChangeActionState(ACTION_STATE::ATTACK_ACTIVE);
+			ChangeActionState(ACTION_STATE::ATTACK);
 		}
 	}
 
@@ -163,6 +159,11 @@ void Enemy::UpdateStateMove(void)
 	if (AsoUtility::EqualsVZero(paramChara_.knockBack))
 	{
 		Move();
+
+		if (AsoUtility::EqualsVZero(paramChara_.velocity))
+		{
+			ChangeActionState(ACTION_STATE::IDLE);
+		}
 	}
 }
 void Enemy::UpdateStateKnock(void)
@@ -175,41 +176,66 @@ void Enemy::UpdateStateKnock(void)
 }
 void Enemy::UpdateStateAtk(void)
 {
+	paramChara_.atkMotion.Update();
 
+	// 攻撃有効
+	if (paramChara_.atkMotion.GetIsActionAttack())
+	{
+
+	}
+	if (paramChara_.atkMotion.GetAttackState() == AttackMotion::ATTACK_STATE::NONE/* &&
+		paramChara_.atkMotion.GetTimeAttack() < 0.0f*/)
+	{
+		paramEnemy_.timeAtkInterval = status_.GetAtkInterval();
+		paramEnemy_.isAttack = false;
+		ChangeActionState(ACTION_STATE::IDLE);
+	}
 }
 
 void Enemy::ChangeActionState(ACTION_STATE state)
 {
 	paramEnemy_.actionState = state;
+	ANIM_STATE animState = ANIM_STATE::NONE;
+	bool isLoop = false;
+
 
 	if (state == ACTION_STATE::SPAWN)
 	{
+		animState = ANIM_STATE::SPAWN;
+
+		// 無敵時間をランダムで割り当て
 		paramChara_.timeInv = SPAWN_TIME + GetRand(SPAWN_TIME_RANGE);
-		ChangeAnimState(ANIM_STATE::SPAWN, false);
 	}
 
 	else if (state == ACTION_STATE::IDLE)
 	{
-		ChangeAnimState(ANIM_STATE::IDLE);
+		animState = ANIM_STATE::IDLE;
+		isLoop = true;
 	}
 
-	else if (state == ACTION_STATE::ATTACK_START)
+	else if (state == ACTION_STATE::MOVE)
 	{
-		ChangeAnimState(ANIM_STATE::ATTACK, false);
+		animState = ANIM_STATE::WALK;
+		isLoop = true;
+	}
+
+	else if (state == ACTION_STATE::ATTACK)
+	{
+		const float ACTIVE_TIME = 1.0f;
+		const float END_TIME = 1.0f;
+		const float ATTACK_TIME = 0.75f;
+		animState = ANIM_STATE::ATTACK;
+		paramChara_.atkMotion.SetMotion(ACTIVE_TIME, END_TIME, ATTACK_TIME, false);
 	}
 
 	else if (state == ACTION_STATE::KNOCK)
 	{
-		// ダメージ演出
-		if (paramChara_.hp > 0)
-		{
-			ChangeAnimState(ANIM_STATE::HIT_2, false);
-		}
-		else
-		{
-			ChangeAnimState(ANIM_STATE::DEATH, false);
-		}
+		// HPによってダメージ演出を変える
+		animState = ((paramChara_.hp > 0) ? ANIM_STATE::HIT_2 : ANIM_STATE::DEATH);
 	}
+
+	// アニメーション再生
+	ChangeAnimState(animState, isLoop);
 }
 
 
@@ -222,7 +248,7 @@ void Enemy::DrawPost(void)
 		anim_->IsEnd() && paramChara_.hp <= 0) { return; }
 
 
-	COLOR_F color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	UtilityCommon::Color color = { 255, 255, 255, 1.0f };
 
 	if (scene.GetIsDebugMode())
 	{
@@ -235,17 +261,41 @@ void Enemy::DrawPost(void)
 		if (paramChara_.timeInv > 0.0f && paramEnemy_.animState != ANIM_STATE::DEATH)
 		{
 			// 赤に描画
-			color = { 75, 0, 0, 25 };
+			color = { 175, 0, 0, 25 };
+		}
+
+		if (SceneManager::GetInstance().GetIsDebugMode())
+		{
+			color = { 255,0,0 };
+
+			// 正面座標
+			if (paramChara_.atkMotion.GetIsActionAttack())
+			{
+				float forwardRad = status_.GetAtkRange();
+				DrawSphere3D(paramChara_.posForward, forwardRad,
+					16, UtilityCommon::SetColor(color), 0xffffff, false);
+			}
 		}
 	}
-
-	MV1SetDifColorScale(paramChara_.handle, color);
 }
 
 
 void Enemy::DamageProc(void)
 {
 	ChangeActionState(ACTION_STATE::KNOCK);
+}
+
+bool Enemy::GetIsCollisionActive(void)
+{
+	bool ret = true;
+
+	// 無効時・HP0時・生成状態時、当たり判定無効
+	if (!GetIsActive() || GetCurHp() <= 0 ||
+		paramEnemy_.actionState == ACTION_STATE::SPAWN)
+	{
+		ret = false;
+	}
+	return ret;
 }
 
 void Enemy::LookPlayerPos(void)
@@ -441,18 +491,19 @@ void Enemy::AnimState(void)
 		if (paramEnemy_.actionState == ACTION_STATE::MOVE &&
 			paramChara_.timeInv <= 0.0f)
 		{
-			ChangeAnimState(ANIM_STATE::WALK);
+			//ChangeAnimState(ANIM_STATE::WALK);
 		}
 		else
 		{
-			ChangeAnimState(ANIM_STATE::IDLE);
+			//ChangeAnimState(ANIM_STATE::IDLE);
 		}
 	}
 }
 
 bool Enemy::IsAttackState(void)
 {
-	return (paramEnemy_.actionState == ACTION_STATE::ATTACK_START ||
+	return (paramEnemy_.actionState == ACTION_STATE::ATTACK ||
+			paramEnemy_.actionState == ACTION_STATE::ATTACK_START ||
 			paramEnemy_.actionState == ACTION_STATE::ATTACK_ACTIVE ||
 			paramEnemy_.actionState == ACTION_STATE::ATTACK_END);
 }

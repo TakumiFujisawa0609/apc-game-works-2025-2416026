@@ -47,7 +47,7 @@ void TitleScene::Init(void)
 	state_ = TITLE_STATE::START_GAME;
 	isViewInfo_ = false; // 遊び方表示
 
-	SoundManager::GetInstance().Play(SoundManager::SRC::BGM_TITLE, true);
+	//SoundManager::GetInstance().Play(SoundManager::SRC::BGM_TITLE, true);
 
 	selectScale_ = 0.35f;
 	isPvActive_ = false;
@@ -125,6 +125,7 @@ void TitleScene::Update(void)
 	// 状態割り当て
 	state_ = static_cast<TITLE_STATE>(state);
 
+	return;
 
 	pvTime_ += delta;
 	if (pvTime_ > 60.0f || CheckHitKey(KEY_INPUT_TAB))
@@ -136,7 +137,7 @@ void TitleScene::Update(void)
 			// 最初から再生
 			SeekMovieToGraph(pv_, 0);
 			PlayMovieToGraph(pv_);
-			SoundManager::GetInstance().Stop(SoundManager::SRC::BGM_TITLE);
+			//SoundManager::GetInstance().Stop(SoundManager::SRC::BGM_TITLE);
 		}
 	}
 	if (isPvActive_)
@@ -147,7 +148,7 @@ void TitleScene::Update(void)
 			PauseMovieToGraph(pv_);
 			isPvActive_ = false;
 			pvTime_ = 0.0f;
-			SoundManager::GetInstance().Play(SoundManager::SRC::BGM_TITLE, true);
+			//SoundManager::GetInstance().Play(SoundManager::SRC::BGM_TITLE, true);
 		}
 	}
 }
@@ -184,6 +185,7 @@ void TitleScene::Draw(void)
 	}
 
 #ifdef _DEBUG
+	/*
 	std::string text = "TitleState:";
 	switch (state_)
 	{
@@ -202,7 +204,7 @@ void TitleScene::Draw(void)
 
 	// タイトル状態
 	DrawString(0, 64, text.c_str(), 0xFF0000);
-
+	*/
 #endif
 }
 

@@ -54,8 +54,9 @@ void Camera::SetBeforeDraw(void)
 		case Camera::MODE::FIXEX_POINT:
 		{
 #ifdef _DEBUG
+			/*
 			SetBeforeDraw_FixexPoint();
-			DebugMove();
+			DebugMove();*/
 #endif
 		}
 		break;
@@ -84,15 +85,17 @@ void Camera::SetBeforeDraw(void)
 		SetCameraPositionAndAngle(pos_.cameraPos, rot_.camera.x, rot_.camera.y, 0.0f);
 	}
 
-	// 追尾位置
+	
 #ifdef _DEBUG
+	/*
 	if (follow_ != nullptr)
 	{
+		// カメラ追尾位置描画
 		VECTOR forward = VScale(follow_->GetRotation().GetForward(), 2.0f);
 		VECTOR followPos = VAdd(follow_->GetPos(), forward);
 		followPos = VAdd(followPos, TARGET_LOCAL_POS);
 		DrawSphere3D(followPos, 10.0f, 10, GetColor(255, 0, 0), GetColor(255, 0, 0), true);
-	}
+	}*/
 
 #endif
 	// DXライブラリのカメラとEffekseerのカメラを同期する
@@ -234,19 +237,18 @@ void Camera::_UpdateCameraRot(void)
 	float rotPow = (AsoUtility::Deg2Rad(2.5f));
 	VECTOR rotInput = {};
 
-	if (GetJoypadNum() == 0)
-	{
-		//if (input.KeyIsNew(KEY_INPUT_UP)) { rotInput.x += rotPow; }
+	//if (input.KeyIsNew(KEY_INPUT_UP)) { rotInput.x += rotPow; }
 		//if (input.KeyIsNew(KEY_INPUT_DOWN)) { rotInput.x -= rotPow; }
-		if (input.KeyIsNew(KEY_INPUT_LEFT)) { rotInput.y += rotPow; }
-		if (input.KeyIsNew(KEY_INPUT_RIGHT)) { rotInput.y -= rotPow; }
-	}
-	else
+	if (input.KeyIsNew(KEY_INPUT_LEFT)) { rotInput.y += rotPow; }
+	if (input.KeyIsNew(KEY_INPUT_RIGHT)) { rotInput.y -= rotPow; }
+
+	if (input.PadIsAlgKeyNew(InputManager::PAD_NO::PAD1, InputManager::JOYPAD_ALGKEY::RIGHT))
 	{
 		VECTOR dir = input.GetAlgKeyDirXZ(InputManager::PAD_NO::PAD1, InputManager::JOYPAD_ALGKEY::RIGHT);
 		rotInput.y += (dir.x * rotPow);
 		//rotInput.x += (dir.y * rotPow);
 	}
+	
 
 	if (!AsoUtility::EqualsVZero(rotInput))
 	{
@@ -276,7 +278,7 @@ void Camera::SetBeforeDraw_FollowZoom(void)
 void Camera::DrawDebug(void)
 {
 #ifdef _DEBUG
-	
+	/*
 	DrawFormatString(0, 16, 0xFFFFFF, "camera Pos(%.1f, %.1f, %.1f), QuaRot(%.1f, %.1f ,%.1f ,%.1f)"
 					 , pos_.cameraPos.x, pos_.cameraPos.y, pos_.cameraPos.z,
 					 rot_.camera.w, AsoUtility::Rad2Deg(rot_.camera.x),AsoUtility::Rad2Deg(rot_.camera.y),AsoUtility::Rad2Deg(rot_.camera.z));
@@ -285,7 +287,7 @@ void Camera::DrawDebug(void)
 					 rot_.target.w, AsoUtility::Rad2Deg(rot_.target.x), AsoUtility::Rad2Deg(rot_.target.y), AsoUtility::Rad2Deg(rot_.target.z));
 
 	//DrawFormatString(0, 112, 0xFFFFFF, "zoom Pow(%.1f, %.1f, %.1f)", zoomPow.x, zoomPow.y, zoomPow.z);
-	
+	*/
 #endif
 }
 

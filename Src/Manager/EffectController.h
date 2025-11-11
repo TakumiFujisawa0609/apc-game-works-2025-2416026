@@ -2,6 +2,7 @@
 #include <DxLib.h>
 #include <vector>
 #include <map>
+#include "../Utility/AsoUtility.h"
 
 
 class EffectController
@@ -39,8 +40,10 @@ public:
 	/// @brief エフェクト種別変更関数
 	/// @param _type エフェクトの種類
 	/// @param _pos 位置
+	/// @param _angle 回転
 	/// @param _scale スケール
-	void SetEffect(EFFECT_TYPE _type, const VECTOR& _pos, const VECTOR& _scale);
+	void SetEffect(EFFECT_TYPE _type, const VECTOR& _pos,
+				   const VECTOR& _angle = AsoUtility::VECTOR_ZERO, const VECTOR& _scale = AsoUtility::VECTOR_ONE);
 
 
 	//void CreateEffect(EFFECT_TYPE _type);

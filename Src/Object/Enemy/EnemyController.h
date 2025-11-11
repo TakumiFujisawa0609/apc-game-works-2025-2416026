@@ -45,6 +45,7 @@ public:
 
 
 	int GetListCnt(void) { return listCnt_; };
+	int GetEnemyCnt(void) { return enemyCnt_; };
 
 
 private:

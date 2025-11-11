@@ -49,13 +49,13 @@ void SoundManager::SetSounds(void)
 	SetSound(SRC::SE_SWORD_JUB, PATH_SE_SWORD_JUB, Sound::TYPE::SOUND_2D, VOLUME_JUB);
 	SetSound(SRC::SE_SWORD_STRONG, PATH_SE_SWORD_STRONG, Sound::TYPE::SOUND_2D, VOLUME_STRONG);
 
-	SetSound(SRC::SE_KNOCK, PATH_SE_KNOCK, Sound::TYPE::SOUND_2D, VOLUME_KNOCK);
+	//SetSound(SRC::SE_KNOCK, PATH_SE_KNOCK, Sound::TYPE::SOUND_2D, VOLUME_KNOCK);
 
 
 	//　BGM
 
-	SetSound(SRC::BGM_TITLE, PATH_BGM_TITLE, Sound::TYPE::SOUND_2D, VOLUME_TITLE);
-	SetSound(SRC::BGM_GAME, PATH_BGM_GAME, Sound::TYPE::SOUND_2D, VOLUME_GAME);
+	//SetSound(SRC::BGM_TITLE, PATH_BGM_TITLE, Sound::TYPE::SOUND_2D, VOLUME_TITLE);
+	//SetSound(SRC::BGM_GAME, PATH_BGM_GAME, Sound::TYPE::SOUND_2D, VOLUME_GAME);
 
 }
 void SoundManager::SetSound(SoundManager::SRC _src, const std::string& path, Sound::TYPE type, float maxVolume)
@@ -97,9 +97,9 @@ void SoundManager::Destroy(void)
 bool SoundManager::Play(SRC _src, bool _isLoop, bool _isPitch, float _pitchRange, bool _isForce)
 {
 	/* 2D音声を再生 */
-	const auto& lPair = sounds_.find(_src);
+	const auto& findSound = sounds_.find(_src);
 
-	if (lPair == sounds_.end())
+	if (findSound == sounds_.end())
 	{
 #ifdef _DEBUG
 		assert("\n2D再生する音声が割り当てられていません\n(；_；)\n"); // 例外スロー
@@ -108,15 +108,15 @@ bool SoundManager::Play(SRC _src, bool _isLoop, bool _isPitch, float _pitchRange
 	}
 
 
-	if (!lPair->second.IsLoad())
+	if (!findSound->second.IsLoad())
 	{
 		// 読み込み処理
-		lPair->second.Load();
+		findSound->second.Load();
 	}
 
 	// 2Dサウンド再生処理
 	Sound::TIMES times = ((_isLoop) ? Sound::TIMES::LOOP : Sound::TIMES::ONCE);
-	return lPair->second.Play(times, _isPitch, _pitchRange,_isForce);
+	return findSound->second.Play(times, _isPitch, _pitchRange,_isForce);
 }
 bool SoundManager::Play(SRC _src, bool _isLoop, VECTOR _pos, float _radius)
 {
@@ -156,7 +156,7 @@ void SoundManager::Stop(SRC _src)
 #endif
 		return;
 	}
-
+	
 	// 指定の音声を停止
 	return listPair->second.Stop();
 }

@@ -279,6 +279,10 @@ public:
 	/// <param name="button">コントローラ番号</param>
 	bool PadIsBtnTrgUp(int _padNum, int button) const;
 
+	/// @brief いずれかのコントローラのスティックが
+	/// @param _padNum コントローラの対象
+	bool PadIsAlgKeyNewAll(PAD_NO _padNum)const;
+
 	/// @brief コントローラのスティックの入力判定
 	/// @param _padNum コントローラの対象
 	/// @param _algKey スティックの種類
@@ -339,12 +343,6 @@ public:
 	/// <param name=""></param>
 	/// <returns></returns>
 	bool PadAnyInput(void)const;
-
-	/// @brief 入力状態割り当て
-	void SetInputType(INPUT_TYPE _type) { inputType_ = _type; };
-
-	/// @brief 入力状態取得
-	INPUT_TYPE GetInputType(void)const { return inputType_; };
 	
 
 #pragma endregion
@@ -357,9 +355,6 @@ private:
 
 	// アナログキーの最大値
 	static constexpr float ALGKEY_VAL_MAX = 1000.0f;
-
-	// 入力状態
-	INPUT_TYPE inputType_;
 
 
 #pragma region キーボードのメンバ変数

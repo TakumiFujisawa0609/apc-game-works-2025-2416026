@@ -241,9 +241,6 @@ protected:
 
 	StatusPlayer& status_;
 
-	// 入力種類
-	INPUT_TYPE inputType_;
-
 	// 入力するキーの種類
 	std::unordered_map<INPUT_TYPE, unsigned int> inputKey_;
 
@@ -273,13 +270,6 @@ protected:
 
 	/// @brief 移動処理
 	void Move(void)override;
-
-	/// <summary>
-	/// ダッシュ処理
-	/// </summary>
-	/// <param name="_acc">加速度</param>
-	/// <param name="_max">最大速度</param>
-	void DashProc(float& _acc, float& _max);
 
 	/// @brief プレイヤーの初期化処理
 	void InitPost(void)override;
@@ -318,6 +308,7 @@ private:
 
 	bool IsActionStrong(void);
 
+	/// @brief 攻撃状態か否か
 	bool IsActionAttack(void);
 
 	/// @brief行動可能か否か判定

@@ -1,5 +1,6 @@
 #pragma once
 #include "./SceneBase.h"
+#include "../Utility/UtilityCommon.h"
 #include <DxLib.h>
 
 class Player;
@@ -58,6 +59,10 @@ public:
 	const EnemyController& GetEnemyController(void) { return *enemys_; };
 
 private:
+
+	static constexpr float FOG_START = 1000.0f;
+	static constexpr float FOG_END = 2500.0f;
+	static constexpr UtilityCommon::Color FOG_COLOR = {85, 85, 85, 1};
 
 	// ÉQÅ[ÉÄèÛë‘
 	GAME_STATE gameState_;

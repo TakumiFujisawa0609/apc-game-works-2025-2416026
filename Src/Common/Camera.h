@@ -35,7 +35,7 @@ public:
 	static constexpr float CAMERA_NEAR = 20.0f;
 
 	// カメラ最大描画領域
-	static constexpr float CAMERA_FAR = 5000.0f;
+	static constexpr float CAMERA_FAR = 10000.0f;
 
 
 	// 最大ズームインローカル座標

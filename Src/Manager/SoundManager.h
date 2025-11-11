@@ -170,14 +170,10 @@ private:
 	float volumeMaster_;
 
 
-	/// <summary>
-	/// デフォルトコントラクタ
-	/// </summary>
+	/// @brief デフォルトコントラクタ
 	SoundManager(void) = default;
 
-	/// <summary>
-	/// デフォルトデストラクタ
-	/// </summary>
+	/// @brief デフォルトデストラクタ
 	~SoundManager(void) = default;
 
 	/// @brief コピーコンストラクタ対策

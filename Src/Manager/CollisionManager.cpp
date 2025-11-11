@@ -101,16 +101,16 @@ void CollisionManager::Update(void)
 	CollisionPlayerToEnemy();
 
 	// キャラクター同士の当たり判定
-	CollisionChara();
+	//CollisionChara();
 
 	// 地面当たり判定
-	CollisionsGround();
+	//CollisionsGround();
 
 	// 壁当たり判定
-	CollisionsWall();
+	//CollisionsWall();
 
 	// ダメージ領域当たり判定
-	CollisionsStageDamage();
+	//CollisionsStageDamage();
 }
 
 void CollisionManager::DrawDebug(void)
@@ -298,7 +298,7 @@ void CollisionManager::CollisionPlayerToEnemy(void)
 		for (auto& enemy : enemyList)
 		{
 			// 無効状態・HP0の時、スキップ
-			if (!enemy->GetIsActive() || enemy->GetCurHp() <= 0) { continue; }
+			if (!enemy->GetIsCollisionActive()) { continue; }
 
 			pBody = player_->GetFramePos(COLLISION_TYPE::BODY);
 			pRad = player_->GetRadius(COLLISION_TYPE::BODY);
@@ -312,7 +312,7 @@ void CollisionManager::CollisionPlayerToEnemy(void)
 				//enemy->SetPos(UtilityCollision::CollisionReflectXZ(ePos.y, eBody, eRad, pBody, pRad));
 			}
 
-			// プレイヤー攻撃時の被ダメージ処理
+			// プレイヤーの攻撃時の敵の被ダメージ処理
 			if (player_->CheckActiveAttack())
 			{
 				enemy->UpdateModelFrames();
@@ -324,12 +324,29 @@ void CollisionManager::CollisionPlayerToEnemy(void)
 
 				if (UtilityCollision::IsHitSphereToSphere(pBody, pRad, eBody, eRad))
 				{
-					EnemyDamageProc(*enemy);
+					const float KNOCK_XZ = 0.05f;
+					const float KNOCK_Y = 1.25f;
+					enemy->SetDamage();
+					enemy->KnockBack(player_->GetDir(), KNOCK_Y, KNOCK_XZ);
+				}
+			}
+
+			// 敵の攻撃時のプレイヤーの被ダメージ処理
+			if (enemy->CheckActiveAttack())
+			{
+				eBody = enemy->GetPosForward();
+				eRad = enemy->GetRadiusAttack();
+				pBody = player_->GetFramePos(Object::COLLISION_TYPE::BODY);
+				pRad = player_->GetRadius(COLLISION_TYPE::BODY);
+				if (UtilityCollision::IsHitSphereToSphere(eBody, eRad, pBody, pRad))
+				{
+					player_->SetDamage();
 				}
 			}
 		}
 	}
 }
+
 void CollisionManager::CollisionEnemyToEnemy(void)
 {
 	int listSize = enemys_->GetListCnt();
@@ -363,13 +380,11 @@ void CollisionManager::CollisionEnemyToEnemy(void)
 		}
 	}
 }
+
+
 void CollisionManager::EnemyDamageProc(Enemy& _enemy, int _damage)
 {
-	// 被ダメージ処理
-	_enemy.SetDamage(_damage);
-	_enemy.KnockBack(player_->GetDir(), 2.5f, 0.05f);
-	// 
-	// 
+	
 }
 
 void CollisionManager::CollisionsGround(void)

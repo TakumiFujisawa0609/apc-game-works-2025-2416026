@@ -57,10 +57,7 @@ void EnemyController::Update(void)
 		}
 	}
 
-	if (cnt <= 0)
-	{
-		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::CLEAR);
-	}
+	enemyCnt_ = cnt;
 }
 
 void EnemyController::Draw(void)
@@ -94,6 +91,7 @@ void EnemyController::Draw(void)
 void EnemyController::DrawDebug(void)
 {
 #ifdef _DEBUG
+	/*
 	if (!SceneManager::GetInstance().GetIsDebugMode()) { return; }
 
 	int y = 136;
@@ -106,14 +104,15 @@ void EnemyController::DrawDebug(void)
 
 			enemy->DrawDebug();
 
-			DrawFormatString(0, y, 0xff0000, "enemy: pos(%.2f,%.2f,%.2f), state(%d), anim(%d), hp(%d), inv(%.2f)\n",
+			DrawFormatString(0, y, 0xff0000, "enemy: pos(%.2f,%.2f,%.2f), atkParam(%d), state(%d), anim(%d), hp(%d), inv(%.2f)\n",
 				enemy->GetPos().x, enemy->GetPos().y, enemy->GetPos().z,
+				enemy->GetActionMotion().GetAttackState(),
 				enemy->GetActionState(), enemy->GetAnimState(),
 				enemy->GetCurHp(), enemy->GetTimeInv());
 
 			y += 16;
 		}
-	}
+	}*/
 #endif
 }
 

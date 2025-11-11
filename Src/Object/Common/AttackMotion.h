@@ -11,13 +11,12 @@ public:
 	{
 		NONE = -1, // 攻撃していない
 		ACTIVE,    // 攻撃有効
-		INPUT,     // 入力受付時間
 		END,       // モーション終了
 		MAX
 	};
 
 	// ダメージ有効時間
-	static constexpr float DAMAGE_ACTIVE_TIME = 0.0225f;
+	static constexpr float DAMAGE_ACTIVE_TIME = 0.05f;
 
 
 	AttackMotion(void);
@@ -38,6 +37,7 @@ public:
 
 	float GetTimeAction(void) { return curTimeAction_; };
 
+	/// @brief 攻撃をしているか否か
 	bool GetIsActionAttack(void)const;
 
 

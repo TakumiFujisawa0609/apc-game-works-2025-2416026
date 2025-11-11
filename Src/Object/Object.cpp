@@ -25,7 +25,7 @@ Object::Object(void)
 
 	paramChara_.quaRot = Quaternion::Identity();
 	paramChara_.quaRotLocal = Quaternion::Identity();
-
+	
 	paramChara_.quaRotLocal = Quaternion::Mult(paramChara_.quaRotLocal,
 		Quaternion::AngleAxis(AsoUtility::Deg2Rad(0.0f), AsoUtility::AXIS_X));
 
@@ -34,7 +34,7 @@ Object::Object(void)
 
 	paramChara_.quaRotLocal = Quaternion::Mult(paramChara_.quaRotLocal,
 		Quaternion::AngleAxis(AsoUtility::Deg2Rad(0.0f), AsoUtility::AXIS_Z));
-
+		
 	
 	paramChara_.timeInv = 0.0f;
 	paramChara_.isGround = true;
@@ -384,23 +384,26 @@ float Object::WeightCalc(float weight, float weightPower, float velocity)
 	return num;
 }
 
-void Object::KnockBack(const VECTOR& _knockDir, float _powerY, float _powerXZ)
+void Object::KnockBack(const VECTOR& _knockDirXZ, float _powerY, float _powerXZ)
 {
-	// 吹っ飛ばし中は処理終了
-	if (!AsoUtility::EqualsVZero(paramChara_.knockBack)) { return; }
+	// 吹っ飛ばし中は加速度初期化
+	if (!AsoUtility::EqualsVZero(paramChara_.knockBack))
+	{
+		paramChara_.knockBack = AsoUtility::VECTOR_ZERO;
+		paramChara_.velocity = AsoUtility::VECTOR_ZERO;
+	}
 
 
 	// 吹っ飛ばす方向
 	VECTOR knockVelo = AsoUtility::VECTOR_ONE;
 	
-	knockVelo.x *= (_knockDir.x * _powerXZ);
-	knockVelo.z *= (_knockDir.z * _powerXZ);
+	knockVelo.x *= (_knockDirXZ.x * _powerXZ);
+	knockVelo.z *= (_knockDirXZ.z * _powerXZ);
 
 	knockVelo.y *= (_powerY);
 
 	// 重力加算
-	float gravity = Application::GRAVITY_ACC;
-	knockVelo.y += gravity;
+	knockVelo.y += Application::GRAVITY_ACC;
 
 
 	// Yの加速度が負の値の時は、Y吹っ飛ばしを０にする
@@ -474,6 +477,7 @@ void Object::Rotation(bool isRevert)
 
 	// 進行方向にプレイヤーを向かせる
 	Quaternion rot = Quaternion::LookRotation(velo);
+
 	paramChara_.quaRotLocal = rot;
 }
 

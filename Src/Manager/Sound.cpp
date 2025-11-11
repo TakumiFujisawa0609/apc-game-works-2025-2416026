@@ -6,6 +6,7 @@ Sound::Sound(void)
 {
 	sound_.handle = -1;
 	sound_.type = TYPE::NONE;
+	sound_.path = "";
 	sound_.maxVolume = 255;
 
 	sound_.isPlay = false;
@@ -47,16 +48,12 @@ void Sound::Load(void)
 	if (sound_.type == TYPE::NONE) return;
 
 
-	// 3Dサウンドのときはtrue
-	unsigned int is3D = ((sound_.type == TYPE::SOUND_3D) ?
-		TRUE :
-		FALSE);
-
-	// 3Dサウンドのフラグ割り当て
-	SetCreate3DSoundFlag(is3D);
+	// 3Dサウンド時に、3Dサウンドのフラグ割り当て
+	SetCreate3DSoundFlag((sound_.type == TYPE::SOUND_3D));
 
 	// 音声ハンドル割り当て
 	sound_.handle = LoadSoundMem(sound_.path.c_str());
+	
 }
 
 void Sound::Release(void)

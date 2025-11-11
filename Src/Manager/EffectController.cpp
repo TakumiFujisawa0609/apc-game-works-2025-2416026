@@ -70,29 +70,31 @@ void EffectController::StopEffect(EFFECT_TYPE type)
 	StopEffekseer3DEffect(effects_[type]->playId);
 }
 
-void EffectController::SetEffect(EFFECT_TYPE _type, const VECTOR& _pos, const VECTOR& _scale)
+void EffectController::SetEffect(EFFECT_TYPE _type, const VECTOR& _pos, const VECTOR& _angle, const VECTOR& _scale)
 {
 	// 既存のエフェクトを削除
 	if (!GetIsEffectAlive(_type)) { return; }
 	
 	ResourceManager& res = ResourceManager::GetInstance();
 	Effect effect;
+
 	effect.pos = _pos;
 	effect.type = _type;
 	effect.scale = _scale;
+	effect.angle = _angle;
 	
 
 	switch (_type)
 	{
 		case EFFECT_TYPE::SWORD_SLASH:
 		{
-			effect.playId = res.LoadHandleId(ResourceManager::SRC::EFFECT_SWORD_SLASH);
+			effect.handle = res.LoadHandleId(ResourceManager::SRC::EFFECT_SWORD_SLASH);
 		}
 		break;
 
 		case EffectController::EFFECT_TYPE::SPAWN_SKELETON:
 		{
-			effect.playId = res.LoadHandleId(ResourceManager::SRC::EFFECT_SWORD_SLASH);
+			effect.handle = res.LoadHandleId(ResourceManager::SRC::EFFECT_SWORD_SLASH);
 		}
 		break;
 
@@ -100,7 +102,7 @@ void EffectController::SetEffect(EFFECT_TYPE _type, const VECTOR& _pos, const VE
 		default:
 		{
 			// エフェクトなしの場合は何もしない
-			effect.playId = -1;
+			effect.handle = -1;
 		}
 		break;
 	}

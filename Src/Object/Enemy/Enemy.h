@@ -36,6 +36,7 @@ public:
 		MOVE,     // ˆÚ“®ó‘Ô
 		KNOCK,    // ‚Á”ò‚Î‚µó‘Ô
 		DEAD,	  // €–Só‘Ô
+		ATTACK,
 		ATTACK_START, 
 		ATTACK_ACTIVE,
 		ATTACK_END,
@@ -66,6 +67,13 @@ public:
 	ACTION_STATE GetActionState(void)const { return paramEnemy_.actionState; };
 	
 	ANIM_STATE GetAnimState(void)const { return paramEnemy_.animState; };
+
+	/// @brief “–‚½‚è”»’è‚ª—LŒø’†‚©”Û‚©
+	bool GetIsCollisionActive(void);
+
+	/// @brief UŒ‚”ÍˆÍæ“¾
+	float GetRadiusAttack(void) { return status_.GetAtkRange(); }
+
 
 protected:
 

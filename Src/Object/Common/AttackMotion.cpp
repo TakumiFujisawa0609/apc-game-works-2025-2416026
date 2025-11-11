@@ -5,19 +5,21 @@
 #include "../../Common/Perform.h"
 
 
-AttackMotion::AttackMotion(void)
+AttackMotion::AttackMotion(void) :
+	attackState_(ATTACK_STATE::NONE),
+	curTimeAction_(0.0f), timeAttack_(0.0f),
+	timeChangeMotion_(0.0f),
+	isConti_(false)
 {
-	attackState_ = ATTACK_STATE::NONE;
-	curTimeAction_ = timeAttack_ = 0.0f;
-	for (float time : timeActions_) { time = 0.0f; }
-	isConti_ = false;
+	for (float& time : timeActions_) { time = 0.0f; }
 }
 
 void AttackMotion::Init(void)
 {
 	attackState_ = ATTACK_STATE::NONE;
 	curTimeAction_ = timeAttack_ = 0.0f;
-	for (float time : timeActions_) { time = 0.0f; }
+	timeChangeMotion_ = 0.0f;
+	for (float& time : timeActions_) { time = 0.0f; }
 }
 
 void AttackMotion::Update(void)
@@ -68,14 +70,12 @@ void AttackMotion::_SetMotionTime(float _activeTime, float _endTime, float _atkT
 	state = static_cast<int>(ATTACK_STATE::ACTIVE);
 	timeActions_[state] = _activeTime;
 
-	// 入力猶予時間
-	state = static_cast<int>(ATTACK_STATE::INPUT);
-	timeActions_[state] = _inputTime;
-	timeChangeMotion_ = timeActions_[state];
-
 	// モーション終了時間
 	state = static_cast<int>(ATTACK_STATE::END);
 	timeActions_[state] = _endTime;
+
+	// 入力猶予時間
+	timeChangeMotion_ = _inputTime;
 
 	// 攻撃間隔
 	timeAtkMax_ = _atkTime;
@@ -120,7 +120,7 @@ void AttackMotion::ChangeAction(void)
 
 	if (curTimeAction_ < 0.0f)
 	{
-		// 状態を進め、終了時に無効状態化
+		// 状態を進めて、終了時に無効状態化
 		int state = static_cast<int>(attackState_) + 1;
 		state = ((state == static_cast<int>(ATTACK_STATE::MAX)) ? -1 : state);
 

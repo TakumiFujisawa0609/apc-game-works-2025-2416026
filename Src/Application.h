@@ -23,14 +23,11 @@ public:
 	static constexpr int SCREEN_HALF_Y = (SCREEN_SIZE_Y / 2);
 
 
-	// 重力最大値(default:9.81f)
-	static constexpr float GRAVITY_MAX = 9.5f;
+	// 重力最大値(default:9.8f)
+	static constexpr float GRAVITY_MAX = 3.25f;
 
 	// 重力増加値(default:0.25f)
-	static constexpr float GRAVITY_ACC = 0.2f;
-
-	// 重力増加値の軽さでの減少値
-	static constexpr float GRAVITY_DEC = 0.125f;
+	static constexpr float GRAVITY_ACC = 0.135f;
 
 
 	/// @brief 明示的にインスタンス生成処理

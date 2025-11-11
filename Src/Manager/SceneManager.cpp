@@ -144,7 +144,8 @@ void SceneManager::Draw(void)
 	curScene_->Draw();
 
 	//fader_->Draw(); // フェーダ描画
-//#ifdef _DEBUG
+#ifdef _DEBUG
+	/*
 	if (isDebugMode_)
 	{
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 50);
@@ -170,8 +171,8 @@ void SceneManager::Draw(void)
 			0x00ff00, true);
 		
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND,0);
-	}
-//#endif
+	}*/
+#endif
 }
 
 void SceneManager::DrawDebug(void)

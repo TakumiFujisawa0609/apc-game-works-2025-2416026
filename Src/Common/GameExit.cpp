@@ -43,8 +43,9 @@ void GameExit::Init(void)
 void GameExit::Update(void)
 {
 	/*　更新処理　*/
-	SoundManager& sound = SoundManager::GetInstance();
-	SceneManager& scene = SceneManager::GetInstance();
+	SoundManager* sound = &SoundManager::GetInstance();
+	SceneManager* scene = &SceneManager::GetInstance();
+	if (!sound || !scene) { return; }
 
 	if (isActiveMenu_)
 	{
@@ -64,7 +65,7 @@ void GameExit::Update(void)
 			{
 				isActiveMenu_ = false;
 
-				switch (scene.GetSceneId())
+				switch (scene->GetSceneId())
 				{
 					case SceneManager::SCENE_ID::TITLE:
 					{
@@ -76,7 +77,7 @@ void GameExit::Update(void)
 					case SceneManager::SCENE_ID::GAME:
 					{
 						// タイトルに戻る
-						scene.ChangeScene(SceneManager::SCENE_ID::TITLE);
+						scene->ChangeScene(SceneManager::SCENE_ID::TITLE);
 					}
 					break;
 				}
@@ -89,7 +90,7 @@ void GameExit::Update(void)
 		}
 	}
 
-	if (IsActive())
+	if (IsActive() && sound)
 	{
 		if (isActiveMenu_)
 		{
@@ -97,7 +98,7 @@ void GameExit::Update(void)
 			isActiveMenu_ = false;
 
 			// 音量を通常に戻す
-			sound.SetVolumeMaster(SoundManager::VOLUME_MASTER_MAX);
+			sound->SetVolumeMaster(SoundManager::VOLUME_MASTER_MAX);
 		}
 		else
 		{
@@ -108,7 +109,7 @@ void GameExit::Update(void)
 			select_ = SELECT::NO;
 
 			// 音量を半減
-			sound.SetVolumeMaster(sound.GetVolumeMaster() / 2);
+			sound->SetVolumeMaster(sound->GetVolumeMaster() / 2);
 		}
 	}
 }
@@ -208,10 +209,11 @@ void GameExit::Release(void)
 bool GameExit::IsActive(void)
 {
 	bool ret = false;
-	InputManager& input = InputManager::GetInstance();
+	InputManager* input = &InputManager::GetInstance();
+	if (!input) { return false; }
 
-	if (input.KeyIsTrgDown(KEY_INPUT_ESCAPE) ||
-		input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::BACK))
+	if (input->KeyIsTrgDown(KEY_INPUT_ESCAPE) ||
+		input->PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::BACK))
 	{
 		ret = true;
 	}
@@ -222,16 +224,17 @@ bool GameExit::IsActive(void)
 bool GameExit::IsSelect(void)
 {
 	bool ret = false;
-	InputManager& input = InputManager::GetInstance();
+	InputManager* input = &InputManager::GetInstance();
+	if (!input) { return false; }
 
-	if (input.PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::LEFT)  ||
-		input.PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::D_PAD) ||
-		input.PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) ||
+	if (input->PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::LEFT)  ||
+		input->PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::D_PAD) ||
+		input->PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) ||
 
-		input.KeyIsTrgDown(KEY_INPUT_W) || input.KeyIsTrgDown(KEY_INPUT_UP) || input.KeyIsTrgDown(KEY_INPUT_O) ||
-		input.KeyIsTrgDown(KEY_INPUT_S) || input.KeyIsTrgDown(KEY_INPUT_DOWN) || input.KeyIsTrgDown(KEY_INPUT_L) ||
-		input.KeyIsTrgDown(KEY_INPUT_A) || input.KeyIsTrgDown(KEY_INPUT_LEFT) || input.KeyIsTrgDown(KEY_INPUT_K) ||
-		input.KeyIsTrgDown(KEY_INPUT_D) || input.KeyIsTrgDown(KEY_INPUT_RIGHT) || input.KeyIsTrgDown(KEY_INPUT_SEMICOLON))
+		input->KeyIsTrgDown(KEY_INPUT_W) || input->KeyIsTrgDown(KEY_INPUT_UP) ||
+		input->KeyIsTrgDown(KEY_INPUT_S) || input->KeyIsTrgDown(KEY_INPUT_DOWN) ||
+		input->KeyIsTrgDown(KEY_INPUT_A) || input->KeyIsTrgDown(KEY_INPUT_LEFT) ||
+		input->KeyIsTrgDown(KEY_INPUT_D) || input->KeyIsTrgDown(KEY_INPUT_RIGHT))
 	{
 		ret = true;
 	}
@@ -242,15 +245,16 @@ bool GameExit::IsSelect(void)
 bool GameExit::IsCheck(void)
 {
 	bool ret = false;
-	InputManager& input = InputManager::GetInstance();
+	InputManager* input = &InputManager::GetInstance();
+	if (!input) { return false; }
 
-	if (input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::START) ||
-		input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::BACK)  ||
-		input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::RIGHT) ||
-		input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::DOWN)  ||
+	if (input->PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::START) ||
+		input->PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::BACK)  ||
+		input->PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::RIGHT) ||
+		input->PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::DOWN)  ||
 
-		input.KeyIsTrgDown(KEY_INPUT_SPACE) ||
-		input.KeyIsTrgDown(KEY_INPUT_RETURN))
+		input->KeyIsTrgDown(KEY_INPUT_SPACE) ||
+		input->KeyIsTrgDown(KEY_INPUT_RETURN))
 	{
 		ret = true;
 	}

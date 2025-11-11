@@ -51,8 +51,18 @@ void GameScene::Init(void)
 	// 初期化処理
 	ReInit();
 
+
+	// フォグ有効化
+	SetFogEnable(true);
+
+	// フォグの色割り当て
+	SetFogColor(FOG_COLOR.r, FOG_COLOR.g, FOG_COLOR.b);
+
+	// フォグの開始距離
+	SetFogStartEnd(FOG_START, FOG_END);
+
 	// BGM再生
-	SoundManager::GetInstance().Play(SoundManager::SRC::BGM_GAME,true, true);
+	//SoundManager::GetInstance().Play(SoundManager::SRC::BGM_GAME,true, true);
 }
 void GameScene::ReInit(void)
 {
@@ -155,13 +165,13 @@ void GameScene::Draw(void)
 
 	enemys_->DrawDebug();
 	 
-#ifdef _DEBUG
-
-	CollisionManager::GetInstance().DrawDebug();
-
 	player_->DrawDebug();
 
-	SceneManager::GetInstance().DrawDebug();
+#ifdef _DEBUG
+	/*
+	CollisionManager::GetInstance().DrawDebug();
+
+	SceneManager::GetInstance().DrawDebug();*/
 #endif
 }
 
@@ -204,4 +214,16 @@ void GameScene::GameIdleProc(void)
 
 	// 敵マネージャ更新
 	enemys_->Update();
+
+	if (enemys_->GetEnemyCnt() <= 0)
+	{
+		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::CLEAR);
+	}
+	else if (player_->GetCurHp() <= 0)
+	{
+		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::TITLE);
+		//SceneManager::ChangeScene(SceneManager::SCENE_ID::GAMEOVER);
+	}
+
+	
 }

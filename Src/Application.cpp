@@ -49,10 +49,10 @@ void Application::Init(void)
 
 	// ウィンドウの状態の設定
 #ifdef _DEBUG
-	ChangeWindowMode(true);
+	ChangeWindowMode(false);
 #else
 	// リリース時、フルスクリーン
-	ChangeWindowMode(false);
+	ChangeWindowMode(true);
 #endif
 
 	// DX_LIB_11の使用
@@ -182,7 +182,7 @@ void Application::Draw(void)
 
 	SetDrawScreen(DX_SCREEN_BACK);
 
-	ClearDrawScreen(); // 描画した画像を解放
+ 	ClearDrawScreen(); // 描画した画像を解放
 
 	// シーン描画
 	scene.Draw();

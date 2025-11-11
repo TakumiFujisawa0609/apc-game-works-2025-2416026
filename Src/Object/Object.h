@@ -61,18 +61,9 @@ public:
 	// ゲームオーバー縦吹っ飛ばし量
 	static constexpr float KNOCK_GAMEOVER_Y = 30.0f;
 
-	// つかまれ状態の最低時間
-	static constexpr float CAUGHT_TIME = 0.5f;
-
-	// つかまれ状態の重量変化する時間
-	static constexpr float WEIGHT_CAUGHT_TIME = 5.0f;
-
 
 	// 殴る状態の無敵時間
 	static constexpr float TIME_INV_PUNCH = 0.3f;
-
-	// 投げられ状態の無敵時間
-	static constexpr float TIME_INV_THROWN = 0.2f;
 
 	// ゲームオーバー状態の無敵時間
 	static constexpr float TIME_INV_GAMEOVER = 1.0f;
@@ -204,28 +195,9 @@ protected:
 	// 開始重量
 	static constexpr float WEIGHT_START = 1.0f;
 
-	// 移動の重量変化する倍率
-	static constexpr float WEIGHT_POW_MOVE = 20.0f;
-
-	// ジャンプの重量変化する倍率
-	static constexpr float WEIGHT_POW_JUMP = 15.0f;
-
-	// 重力加算の重量変化する倍率
-	static constexpr float WEIGHT_POW_GRAVITY = -1.0f;
-
-
-	// 重量の変化する間隔
-	static constexpr float WEIGHT_DELTA = 0.01f;
-
-	// Y軸の加速度の下限値
-	static constexpr float VELOCITY_Y_MIN = -7.5f;
-
 
 	// 初期ジャンプ力
 	static constexpr float START_JUMP_POWER = 12.5f;
-
-	// 捕まれキャンセル時のジャンプ力
-	static constexpr float JUMP_CAUGHT = 15.0f;
 
 	// 加速度上昇値
 	static constexpr float SPEED_ACC_POWER = 6.5f;
@@ -433,7 +405,7 @@ public:
 	float GetRadius(COLLISION_TYPE _type);
 
 	virtual float GetRadiusForward(void)const { return paramChara_.radiusForward; };
-	
+
 
 	/// @brief キャラモデルハンドル取得
 	int GetHandle(void) const { return paramChara_.handle; };
