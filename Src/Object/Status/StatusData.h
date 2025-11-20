@@ -38,61 +38,36 @@ public:
 	const char* PATH_WEAPON = "WeaponData.csv";
 
 
-	/// <summary>
-	/// インスタンス生成処理
-	/// </summary>
+	/// @brief インスタンス生成処理
 	static void CreateInstance(void);
 
-	/// <summary>
-	/// インスタンス取得処理
-	/// </summary>
+	/// @brief インスタンス取得処理
 	static StatusData& GetInstance(void);
 
-	/// <summary>
-	/// インスタンス削除処理
-	/// </summary>
+	/// @brief インスタンス削除処理
 	static void Destroy(void);
 
-	/// <summary>
-	/// 初回読み込み処理
-	/// </summary>
+	/// @brief 初回読み込み処理
 	void Load(void);
 
-	/// <summary>
-	/// 描画処理(デバッグ)
-	/// </summary>
-	void DrawDebug(void);
-
-	/// <summary>
-	/// .csvファイル書き出し処理
-	/// </summary>
-	/// <returns>正常動作できたか否か</returns>
+	/// @brief .csvファイル書き出し処理
+	/// @returns 正常動作できたか否か
 	void SaveCSV(void);
 
 	
-	/// <summary>
-	/// プレイヤーステータス参照
-	/// </summary>
+	/// @brief プレイヤーステータス参照
 	StatusPlayer& GetPlayerStatus(void)const { return *player_; };
 
-	/// <summary>
-	/// 敵ステータス参照
-	/// </summary>
+	/// @brief 敵ステータス参照
 	StatusEnemy& GetEnemyStatus(int target)const { return *enemy_.at(target - 1).get(); };
 
-	/// <summary>
-	/// 敵ステータスマップ参照
-	/// </summary>
+	/// @brief 敵ステータスマップ参照
 	const EnemyMap& GetEnemyStatusMap(void)const { return enemy_; };
 
-	/// <summary>
-	/// 武器ステータス参照
-	/// </summary>
+	/// @brief 武器ステータス参照
 	const StatusWeapon& GetWeaponStatus(int target)const { return *weapon_.at(target).get(); };
 
-	/// <summary>
-	/// ブキステータスマップ参照
-	/// </summary>
+	/// @brief 武器ステータスマップ参照
 	const WeaponMap& GetWeaponStatus(void)const { return weapon_; };
 
 	
@@ -116,15 +91,19 @@ private:
 	std::map<int, std::unique_ptr<StatusWeapon>> weapon_;
 
 	
-	// デフォルトコンストラクタ
+	/// @brief デフォルトコンストラクタ
 	StatusData(void);
 
-	// デストラクタ
+	/// @brief デフォルトデストラクタ
 	~StatusData(void) = default;
 
-	// コピーコンストラクタ
-	StatusData(const StatusData& other) = default;
+	// コピーコンストラクタ対策
+	StatusData(const StatusData&) = delete;
+	StatusData& operator=(const StatusData&) = delete;
+	StatusData(StatusData&&) = delete;
+	StatusData& operator=(StatusData&&) = delete;
 
+	// 各csvファイル読み込み
 	void LoadPlayerStatus(void);
 	void LoadPlayerMotion(void);
 	void LoadEnemy(void);

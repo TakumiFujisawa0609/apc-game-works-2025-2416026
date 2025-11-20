@@ -215,7 +215,7 @@ void GameScene::GameIdleProc(void)
 	// 敵マネージャ更新
 	enemys_->Update();
 
-	if (enemys_->GetEnemyCnt() <= 0)
+	if (enemys_->GetIsActiveBoss() && enemys_->GetIsDefeatBoss())
 	{
 		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::CLEAR);
 	}

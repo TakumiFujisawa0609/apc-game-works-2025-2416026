@@ -155,12 +155,6 @@ public:
 	/// @brief 行動状態
 	void ChangeActionState(ACTION_STATE state);
 
-	/// @breif パリィ増加倍率割り当て
-	void SetParryMag(float mag) { paramPlayer_.parryMag = mag; };
-
-	/// @brief パリィ時間割り当て
-	void SetParryTime(float time) { paramPlayer_.parryTime = time; };
-
 	void SetDodgeMag(float mag) { paramPlayer_.dodgeMag = mag; };
 
 	void SetDodgeTime(float time) { paramPlayer_.dodgeTime = time; };
@@ -173,10 +167,6 @@ public:
 
 
 	ACTION_STATE GetActionType(void) { return paramPlayer_.actionState; };
-
-	float GetParryMag(void) { return paramPlayer_.parryMag; };
-
-	float GetParryTime(void) { return paramPlayer_.parryTime; };
 
 	float GetDodgeMag(void) { return paramPlayer_.dodgeMag; };
 
@@ -204,12 +194,6 @@ protected:
 
 		// 弱攻撃回数
 		int jubCnt;
-
-		// パリィ時間
-		float parryTime;
-
-		// パリィ倍率
-		float parryMag;
 
 		// 回避時間
 		float dodgeTime;

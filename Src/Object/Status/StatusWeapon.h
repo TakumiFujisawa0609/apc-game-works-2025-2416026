@@ -24,7 +24,6 @@ public:
 		SPEED,        // 移動速度上昇倍率
 		DURABILITY,   // 耐久値
 		ATTACK_RANGE, // 攻撃範囲
-		PARRY_TIME,   // パリィ有効時間
 		ANIM_SPEED_ATTACK, // 攻撃アニメーション速度
 
 		MAX,
@@ -37,16 +36,15 @@ public:
 
 	void LoadParam(const std::array<std::string, static_cast<int>(PARAM::MAX)>& _loadString)
 	{
-		name_ = _loadString[0];
-		handlePath_ = _loadString[1];
+		name_ = _loadString[static_cast<int>(PARAM::NAME)];
+		handlePath_ = _loadString[static_cast<int>(PARAM::HANDLE_PATH)];
 
-		UtilityCommon::ChangeString(_loadString[2], power_, 0);
-		UtilityCommon::ChangeString(_loadString[3], difence_, 0);
-		UtilityCommon::ChangeString(_loadString[4], speed_, 1.0f);
-		UtilityCommon::ChangeString(_loadString[5], durability_, 0);
-		UtilityCommon::ChangeString(_loadString[6], attackRange_, 0.0f);
-		UtilityCommon::ChangeString(_loadString[7], parryTime_, 0.0f);
-		UtilityCommon::ChangeString(_loadString[8], animSpeedAtk_, 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::POWER)], power_, 0);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::DIFENCE)], difence_, 0);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::SPEED)], speed_, 1.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::DURABILITY)], durability_, 0);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ATTACK_RANGE)], attackRange_, 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::ANIM_SPEED_ATTACK)], animSpeedAtk_, 0.0f);
 	};
 
 
@@ -63,8 +61,6 @@ public:
 	int GetDurability(void) { return durability_; };
 
 	float GetAttackRange(void) { return attackRange_; };
-
-	float GetParryTime(void) { return parryTime_; };
 
 	float GetAnimSpeedAtk(void) { return animSpeedAtk_; };
 
@@ -84,8 +80,6 @@ private:
 	int durability_;
 
 	float attackRange_;
-
-	float parryTime_;
 
 	float animSpeedAtk_;
 };

@@ -15,6 +15,7 @@ public:
 		NONE = -1,
 		SPAWN_SKELETON, // 魔法陣
 		SWORD_SLASH,
+		SWORD_HIT,
 	};
 
 	/// @brief デフォルトコンストラクタ
@@ -29,9 +30,6 @@ public:
 
 	/// @brief 更新処理
 	void Update(void);
-
-	/// @brief 描画処理
-	void Draw(void);
 
 	/// @brief エフェクト停止処理
 	void StopEffect(EFFECT_TYPE type);
@@ -68,4 +66,6 @@ private:
 
 
 	bool GetIsEffectAlive(EFFECT_TYPE type);
+
+	void UpdateEffect(EFFECT_TYPE _type, Effect& _effect);
 };

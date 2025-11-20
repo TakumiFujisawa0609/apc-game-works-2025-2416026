@@ -5,6 +5,7 @@
 #include <vector>
 #include <DxLib.h>
 class Enemy;
+class EnemyBoss;
 class Player;
 
 using ENEMY_TYPE = StatusEnemy::TYPE;
@@ -43,18 +44,23 @@ public:
 
 	Enemy& GetEnemy(int _listNum, int num) { return *GetEnemys(_listNum).at(num); }
 
+	EnemyBoss& GetEnemyBoss(void) { return *enemyBoss_; }
+
 
 	int GetListCnt(void) { return listCnt_; };
-	int GetEnemyCnt(void) { return enemyCnt_; };
-
+	
+	bool GetIsActiveBoss(void) { return (enemyBoss_ != nullptr);  };
+	bool GetIsDefeatBoss(void);
+	
 
 private:
 
 	// ¶¬•ûŒü
-	static constexpr float SPAWN_ROT_Y = (180.0f * AsoUtility::DEG2RAD);
+	static constexpr float SPAWN_ROT_Y = (0.0f * AsoUtility::DEG2RAD);
 
 	// ‰~ó¶¬‚Ì•ªŠ„”
 	static constexpr int SPAWN_CIRCLE_SPLIT = 8;
+
 	// ¶¬ˆÊ’u’†‰›‚Ì“G‚ğœ‚­Aˆê“x‚É¶¬‚³‚ê‚é”
 	static constexpr int SPAWN_MAX = (3 * SPAWN_CIRCLE_SPLIT) - 1;
 
@@ -65,7 +71,11 @@ private:
 	Player* player_;
 
 	EnemysMap enemys_;
+	EnemyBoss* enemyBoss_;
 	
+
+	void EnemyBossSpawn(void);
+
 	void EnemysSpawn(ENEMY_TYPE _type, const VECTOR& _posField);
 
 	/// @brief “G¶¬ˆ—

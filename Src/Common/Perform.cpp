@@ -158,7 +158,7 @@ bool Perform::ProcSlow(void)
     type_ = ((timeSlow_ > 0.0f) ? TYPE::NONE : type_);
 
     // 遅延タイマーが有効・一定の間隔で、true
-    return (timeSlow_ > 0 && (slowCnt % termSlow_) == 0);
+    return (timeSlow_ > 0.0f && (slowCnt % termSlow_) == 0);
 }
 
 void Perform::ProcShakeSmooth(void)

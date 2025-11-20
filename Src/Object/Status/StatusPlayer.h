@@ -24,7 +24,6 @@ public:
 		DASH_MULT, // ダッシュ時の増加倍率
 		WEAPON_NUM,      // 武器番号
 		TIME_INVINCIBLE, // 無敵時間
-		TIME_PARRY,		 // パリィ時間
 		TIME_EVASION,    // 回避時間
 		COMBO_MAG, 	     // コンボ倍率
 
@@ -55,7 +54,7 @@ public:
 		TIME_ACTIVE,
 		TIME_INPUT,
 		TIME_END,
-		TIME_ATTACK,
+		TIME_ATK_TIMING,
 		SPEED,  // モーションアニメーション速度
 		RADIUS, // 半径
 
@@ -82,7 +81,6 @@ public:
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::DASH_MULT)], dashMult_, 1.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::WEAPON_NUM)], weaponId_, 0);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::TIME_INVINCIBLE)], timeInv_, 0.0f);
-		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::TIME_PARRY)], timeParry_, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::TIME_EVASION)], timeEvasion_, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(PARAM::COMBO_MAG)], comboMag_, 0.0f);
 
@@ -99,7 +97,7 @@ public:
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(MOTION_PARAM::TIME_ACTIVE)], motion.timeActive, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(MOTION_PARAM::TIME_INPUT)], motion.timeInput, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(MOTION_PARAM::TIME_END)], motion.timeEnd, 0.0f);
-		UtilityCommon::ChangeString(_loadString[static_cast<int>(MOTION_PARAM::TIME_ATTACK)], motion.timeAttack, 0.0f);
+		UtilityCommon::ChangeString(_loadString[static_cast<int>(MOTION_PARAM::TIME_ATK_TIMING)], motion.timeAtkTiming, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(MOTION_PARAM::SPEED)], motion.animSpeed, 0.0f);
 		UtilityCommon::ChangeString(_loadString[static_cast<int>(MOTION_PARAM::RADIUS)], motion.radius, 0.0f);
 		motion_.emplace(_type, motion);
@@ -134,11 +132,6 @@ public:
 	float GetTimeInvicible(void)const { return timeInv_; }
 
 	/// <summary>
-	/// パリィ時間
-	/// </summary>
-	float GetTimeParry(void)const { return timeParry_; }
-
-	/// <summary>
 	/// 回避時間
 	/// </summary>
 	float GetTimeEvasion(void)const { return timeEvasion_; }
@@ -169,8 +162,8 @@ public:
 	float GetMotionEnd(int _type) { return motion_[static_cast<MOTION_TYPE>(_type)].timeEnd; }
 
 	// 攻撃時間
-	float GetMotionAtk(MOTION_TYPE _type) { return motion_[_type].timeAttack; }
-	float GetMotionAtk(int _type) { return motion_[static_cast<MOTION_TYPE>(_type)].timeAttack; }
+	float GetMotionAtk(MOTION_TYPE _type) { return motion_[_type].timeAtkTiming; }
+	float GetMotionAtk(int _type) { return motion_[static_cast<MOTION_TYPE>(_type)].timeAtkTiming; }
 
 
 	// アニメーション速度
@@ -206,8 +199,6 @@ private:
 
 	float dashMult_;
 
-	float timeParry_;
-
 	float timeEvasion_;
 
 	// 回避時間
@@ -235,7 +226,7 @@ private:
 
 		float timeEnd;
 
-		float timeAttack;
+		float timeAtkTiming;
 
 		float animSpeed;
 

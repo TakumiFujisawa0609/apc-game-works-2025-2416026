@@ -9,7 +9,7 @@
 #include "../Object/Player/Player.h"
 #include "../Object/Enemy/EnemyController.h"
 #include "../Object/Enemy/Enemy.h"
-#include "../Object/Enemy/EnemyWarrior.h"
+#include "../Object/Enemy/EnemyBoss.h"
 #include "../Manager/ResourceManager.h"
 #include "../Manager/Resource.h"
 #include "../Manager/SceneManager.h"
@@ -100,6 +100,9 @@ void CollisionManager::Update(void)
 	// プレイヤーと敵の当たり判定
 	CollisionPlayerToEnemy();
 
+	// プレイヤーとボスの当たり判定
+	CollisionPlayerToBoss();
+
 	// キャラクター同士の当たり判定
 	//CollisionChara();
 
@@ -108,9 +111,6 @@ void CollisionManager::Update(void)
 
 	// 壁当たり判定
 	//CollisionsWall();
-
-	// ダメージ領域当たり判定
-	//CollisionsStageDamage();
 }
 
 void CollisionManager::DrawDebug(void)
@@ -288,6 +288,7 @@ void CollisionManager::CollisionPlayerToEnemy(void)
 
 	VECTOR pBody, eBody, pPos, ePos = AsoUtility::VECTOR_ZERO;
 	float pRad, eRad = 0.0f;
+	int power = 0;
 	pPos = player_->GetPos();
 
 	// 敵未割当時、処理終了
@@ -319,15 +320,23 @@ void CollisionManager::CollisionPlayerToEnemy(void)
 
 				pBody = player_->GetPosForward();
 				pRad = player_->GetRadiusAttack(player_->GetMotionType());
+				power = player_->GetPower();
 				eBody = enemy->GetFramePos(Object::COLLISION_TYPE::BODY);
 				eRad = enemy->GetRadius(COLLISION_TYPE::BODY);
 
 				if (UtilityCollision::IsHitSphereToSphere(pBody, pRad, eBody, eRad))
 				{
-					const float KNOCK_XZ = 0.05f;
-					const float KNOCK_Y = 1.25f;
-					enemy->SetDamage();
-					enemy->KnockBack(player_->GetDir(), KNOCK_Y, KNOCK_XZ);
+					enemy->SetDamage(power);
+
+					if (!enemy->GetIsElite())
+					{
+						const float KNOCK_XZ = 0.05f;
+						const float KNOCK_Y = 1.25f;
+						enemy->KnockBack(player_->GetDir(), KNOCK_Y, KNOCK_XZ);
+					}
+					/*SceneManager::GetInstance().GetEffects().
+						SetEffect(EffectController::EFFECT_TYPE::SWORD_HIT,
+							eBody, AsoUtility::VECTOR_ZERO, {50.0f, 50.0f,50.0f});*/
 				}
 			}
 
@@ -336,13 +345,78 @@ void CollisionManager::CollisionPlayerToEnemy(void)
 			{
 				eBody = enemy->GetPosForward();
 				eRad = enemy->GetRadiusAttack();
+				power = enemy->GetPower();
 				pBody = player_->GetFramePos(Object::COLLISION_TYPE::BODY);
 				pRad = player_->GetRadius(COLLISION_TYPE::BODY);
 				if (UtilityCollision::IsHitSphereToSphere(eBody, eRad, pBody, pRad))
 				{
-					player_->SetDamage();
+					player_->SetDamage(power);
 				}
 			}
+		}
+	}
+}
+
+void CollisionManager::CollisionPlayerToBoss(void)
+{
+	/*　プレイヤーと敵の当たり判定　*/
+
+	VECTOR pBody, eBody, pPos, ePos = AsoUtility::VECTOR_ZERO;
+	float pRad, eRad = 0.0f;
+	int power = 0;
+	pPos = player_->GetPos();
+	EnemyBoss& boss = enemys_->GetEnemyBoss();
+
+	// 敵未割当時、処理終了
+
+		// 無効状態・HP0の時、スキップ
+	if (!boss.GetIsCollisionActive()) { return; }
+
+	pBody = player_->GetFramePos(COLLISION_TYPE::BODY);
+	pRad = player_->GetRadius(COLLISION_TYPE::BODY);
+	eBody = boss.GetFramePos(COLLISION_TYPE::BODY);
+	eRad = boss.GetRadius(COLLISION_TYPE::BODY);
+	ePos = boss.GetPos();
+
+	if (UtilityCollision::IsHitSphereToSphere(pBody, pRad, eBody, eRad))
+	{
+		// プレイヤーの位置と反発
+		//enemy->SetPos(UtilityCollision::CollisionReflectXZ(ePos.y, eBody, eRad, pBody, pRad));
+	}
+
+	// プレイヤーの攻撃時の敵の被ダメージ処理
+	if (player_->CheckActiveAttack())
+	{
+		boss.UpdateModelFrames();
+
+		pBody = player_->GetPosForward();
+		pRad = player_->GetRadiusAttack(player_->GetMotionType());
+		power = player_->GetPower();
+		eBody = boss.GetFramePos(Object::COLLISION_TYPE::BODY);
+		eRad = boss.GetRadius(COLLISION_TYPE::BODY);
+
+		if (UtilityCollision::IsHitSphereToSphere(pBody, pRad, eBody, eRad))
+		{
+			boss.SetDamage(power);
+
+			/*SceneManager::GetInstance().GetEffects().
+				SetEffect(EffectController::EFFECT_TYPE::SWORD_HIT,
+					eBody, AsoUtility::VECTOR_ZERO, {50.0f, 50.0f,50.0f});*/
+		}
+	}
+
+	// 敵の攻撃時のプレイヤーの被ダメージ処理
+	if (boss.CheckActiveAttack())
+	{
+		eBody = boss.GetPosForward();
+		eRad  = boss.GetRadiusAttack();
+		power = boss.GetPower();
+		pBody = player_->GetFramePos(Object::COLLISION_TYPE::BODY);
+		pRad  = player_->GetRadius(COLLISION_TYPE::BODY);
+
+		if (UtilityCollision::IsHitSphereToSphere(eBody, eRad, pBody, pRad))
+		{
+			player_->SetDamage(power);
 		}
 	}
 }
@@ -358,7 +432,7 @@ void CollisionManager::CollisionEnemyToEnemy(void)
 	
 	for (int list = 0; list < size; list++)
 	{
-		size = enemys_->GetEnemys(list).size();
+		size = static_cast<int>(enemys_->GetEnemys(list).size());
 		for (int y = 0; y < size; y++)
 		{
 			for (int x = y; x < size; x++)
@@ -638,77 +712,6 @@ bool CollisionManager::CheckWallCollision(COL_TYPE type, const VECTOR& topPos, c
 	return ret;
 }
 
-
-void CollisionManager::CollisionsStageDamage(void)
-{
-	/*　ダメージ領域の当たり判定処理　*/
-	/*
-	EffectController& effect = EffectController::GetInstance();
-	SoundManager& sound = SoundManager::GetInstance();
-
-	// ダメージ領域が未割当時、処理を終了
-	if (stageDamageHandle_ == -1) return;
-
-	// オフセット
-	float offset;
-
-	// 当たり判定位置
-	VECTOR topPos, bottomPos = AsoUtility::VECTOR_ZERO;
-
-	// 当たり判定用ポリゴン
-	MV1_COLL_RESULT_POLY_DIM result;
-
-
-	for (auto& colChara : colChara_)
-	{
-		//　ダメージ領域の当たり判定
-
-		CharaBase& chara   = *colChara.second;
-		CollisionBase& col = chara.GetCollision();
-
-		// 当たり判定の位置
-		topPos    = col.GetColPos(COL_NUM::BODY_TOP);
-		bottomPos = col.GetColPos(COL_NUM::BODY_BOTTOM);
-		offset    = col.GetColOffset(COL_NUM::BODY_BOTTOM);
-
-		// 当たり判定が無いとき・ゲームオーバー時、スキップ
-		if (!chara.GetIsHit() || chara.GetActionState() == ACTION_STATE::GAME_OVER) continue;
-
-
-		// プレイヤーとダメージ領域の当たり判定
-		if (CheckStageDamageCollision(&chara, topPos, bottomPos, &result, offset))
-		{
-			// 衝突した位置の法線ベクトル
-			VECTOR normVec = AsoUtility::VECTOR_ZERO;
-
-			// 衝突したポリゴンの数
-			int num = result.HitNum;
-
-			for (int i = 0; i < num; i++)
-			{
-				auto d = result.Dim[i];
-
-				// 衝突した法線ベクトルを取得
-				normVec = d.Normal;
-
-				// 思いっきり上に吹っ飛ばす
-				chara.KnockBack(normVec, CharaBase::TIME_INV_GAMEOVER,
-								CharaBase::KNOCK_GAMEOVER_Y, CharaBase::KNOCK_GAMEOVER_XZ);
-
-				// ゲームオーバー化
-				chara.SetActionState(ACTION_STATE::GAME_OVER);
-
-				// 撃破SE再生
-				sound.Play(SoundManager::SRC::SE_KNOCK, Sound::TIMES::ONCE);
-
-				//エフェクト再生
-				effect.ChangeEffect(EffectController::EFFECT_TYPE::COTTON_KNOCK, chara.GetPrePos());
-				effect.Update();
-				
-			}
-		}
-	}*/
-}
 
 /*
 bool CollisionManager::CheckStageDamageCollision(CharaBase* chara, const VECTOR& topPos, const VECTOR& bottomPos,

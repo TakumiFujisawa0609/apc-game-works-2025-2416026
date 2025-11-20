@@ -10,8 +10,9 @@
 #include "../../Utility/AsoUtility.h"
 #include "../../Common/Quaternion.h"
 
-Enemy::Enemy(StatusEnemy::TYPE type, Player& player, bool _isElite)
-	:status_(StatusData::GetInstance().GetEnemyStatus(static_cast<int>(type))),
+Enemy::Enemy(StatusEnemy::TYPE type, Player& player, bool _isElite):
+	Object::Object(),
+	status_(StatusData::GetInstance().GetEnemyStatus(static_cast<int>(type))),
 	player_(player)
 {
 	paramEnemy_.isElite = _isElite;
@@ -85,6 +86,19 @@ void Enemy::Update(void)
 
 		// 攻撃範囲判定
 		SearchAttackField();
+
+		if (paramEnemy_.isAttack)
+		{
+			// 攻撃間隔減少
+			float delta = SceneManager::GetInstance().GetDeltaTime();
+			paramEnemy_.timeAtkInterval -= ((paramEnemy_.timeAtkInterval > 0.0f) ? delta : 0.0f);
+
+			// 一定時間プレイヤーが攻撃範囲内進入時、攻撃状態化
+			if (paramEnemy_.timeAtkInterval <= 0.0f)
+			{
+				ChangeActionState(ACTION_STATE::ATTACK);
+			}
+		}
 	}
 
 	//UpdateAnim();
@@ -107,7 +121,7 @@ void Enemy::UpdateState(void)
 	else if (paramEnemy_.actionState == ACTION_STATE::MOVE) { UpdateStateMove(); }
 
 	// 攻撃状態
-	else if (IsAttackState()) { UpdateStateAtk(); }
+	else if (paramEnemy_.actionState == ACTION_STATE::ATTACK) { UpdateStateAtk(); }
 
 	// 吹っ飛ばし状態
 	else  if (paramEnemy_.actionState == ACTION_STATE::KNOCK) { UpdateStateKnock(); }
@@ -125,32 +139,33 @@ void Enemy::UpdateStateSpawn(void)
 }
 void Enemy::UpdateStateIdle(void)
 {
-	if (paramEnemy_.isHearing)
+	// 探索有効+攻撃範囲外の時、移動
+	if (paramEnemy_.isHearing && !paramEnemy_.isAttack)
 	{
-		ChangeActionState(ACTION_STATE::MOVE);
+		animStateTime_ += SceneManager::GetInstance().GetDeltaTime();
+		
+		if (animStateTime_ > 0.5f)
+		{
+			animStateTime_ = 0.0f;
+			ChangeActionState(ACTION_STATE::MOVE);
+		}
 	}
 }
 void Enemy::UpdateStateMove(void)
 {
-	if (!paramEnemy_.isHearing) { ChangeActionState(ACTION_STATE::IDLE); }
+	if (!paramEnemy_.isHearing)
+	{ 
+		animStateTime_ += SceneManager::GetInstance().GetDeltaTime();
 
-	//if (paramEnemy_.isAttack) { ChangeActionState(ACTION_STATE::ATTACK_ACTIVE); }
+		if (animStateTime_ > 0.5f)
+		{
+			animStateTime_ = 0.0f;
+			ChangeActionState(ACTION_STATE::IDLE);
+		}
+	}
 
 	// 無敵中・撃破時・移動アニメーション以外のとき、処理終了
 	if (paramChara_.timeInv > 0.0f || paramChara_.hp <= 0) { return; }
-
-	if (paramEnemy_.isAttack)
-	{
-		// 攻撃間隔減少
-		float delta = SceneManager::GetInstance().GetDeltaTime();
-		paramEnemy_.timeAtkInterval -= ((paramEnemy_.timeAtkInterval > 0.0f) ? delta : 0.0f);
-
-		// 一定時間プレイヤーが攻撃範囲内進入時、攻撃状態化
-		if (paramEnemy_.timeAtkInterval <= 0.0f)
-		{
-			ChangeActionState(ACTION_STATE::ATTACK);
-		}
-	}
 
 	// プレイヤー追従
 	LookPlayerPos();
@@ -158,7 +173,10 @@ void Enemy::UpdateStateMove(void)
 	// 吹っ飛ばされていないとき、移動
 	if (AsoUtility::EqualsVZero(paramChara_.knockBack))
 	{
-		Move();
+		if (!paramEnemy_.isAttack)
+		{
+			Move();
+		}
 
 		if (AsoUtility::EqualsVZero(paramChara_.velocity))
 		{
@@ -178,13 +196,10 @@ void Enemy::UpdateStateAtk(void)
 {
 	paramChara_.atkMotion.Update();
 
-	// 攻撃有効
-	if (paramChara_.atkMotion.GetIsActionAttack())
-	{
+	LookPlayerPos();
 
-	}
-	if (paramChara_.atkMotion.GetAttackState() == AttackMotion::ATTACK_STATE::NONE/* &&
-		paramChara_.atkMotion.GetTimeAttack() < 0.0f*/)
+	if (paramChara_.atkMotion.GetAttackState() == AttackMotion::ATTACK_STATE::END &&
+		paramChara_.atkMotion.GetIsChangeMotion())
 	{
 		paramEnemy_.timeAtkInterval = status_.GetAtkInterval();
 		paramEnemy_.isAttack = false;
@@ -223,7 +238,9 @@ void Enemy::ChangeActionState(ACTION_STATE state)
 	{
 		const float ACTIVE_TIME = 1.0f;
 		const float END_TIME = 1.0f;
-		const float ATTACK_TIME = 0.75f;
+		const float ATTACK_TIME = 1.25f;
+
+		// 攻撃モーション有効化
 		animState = ANIM_STATE::ATTACK;
 		paramChara_.atkMotion.SetMotion(ACTIVE_TIME, END_TIME, ATTACK_TIME, false);
 	}
@@ -253,8 +270,10 @@ void Enemy::DrawPost(void)
 	if (scene.GetIsDebugMode())
 	{
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
-		DrawSearchRange();
+		//DrawSearchRange();
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
 		DrawAttackRange();
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
@@ -282,6 +301,7 @@ void Enemy::DrawPost(void)
 
 void Enemy::DamageProc(void)
 {
+	if (paramEnemy_.isElite) { return; }
 	ChangeActionState(ACTION_STATE::KNOCK);
 }
 
@@ -334,6 +354,9 @@ void Enemy::UpdatePost(void)
 
 void Enemy::Move(void)
 {
+	// 攻撃可能時は移動無効化
+	if (paramEnemy_.isAttack) { return; }
+
 	VECTOR pos = VAdd(paramChara_.pos, paramChara_.posLocal);
 
 	// Z軸の移動速度
@@ -390,11 +413,12 @@ void Enemy::SearchAttackField(void)
 	// (-1.0)：２つのベクトルは逆方向
 	float dot = VDot(eDir, dirPlayerFromEnemy);
 	float angle = acosf(dot);
-
-	const float colRad = AsoUtility::Deg2Rad(paramEnemy_.atkRange);
+	
+	float distance = VSize(diff);
+	const float colRad = AsoUtility::Deg2Rad(50.0f);
 
 	// 視野左右内に入っている
-	paramEnemy_.isAttack = (angle <= colRad);
+	paramEnemy_.isAttack = (angle <= colRad && (distance <= paramEnemy_.atkRange / 2));
 }
 
 void Enemy::DrawSearchRange(void)
@@ -450,19 +474,15 @@ void Enemy::DrawAttackRange(void)
 	MATRIX leftMat = MMult(mat, MGetRotY(AsoUtility::Deg2Rad(-searchAngle)));
 	VECTOR left = VTransform(AsoUtility::DIR_FORWARD, leftMat);
 
-	// 右側方向
+	// 方向
 	MATRIX rightMat = MMult(mat, MGetRotY(AsoUtility::Deg2Rad(searchAngle)));
 	VECTOR right = VTransform(AsoUtility::DIR_FORWARD, rightMat);
 
 
-	// 正面の位置
-	VECTOR forwardPos = VAdd(pos, VScale(forward, paramEnemy_.atkRange));
-
-	// 左の位置
-	VECTOR leftPos = VAdd(pos, VScale(left, paramEnemy_.atkRange));
-
-	// 右の位置
-	VECTOR rightPos = VAdd(pos, VScale(right, paramEnemy_.atkRange));
+	// 攻撃範囲の位置
+	VECTOR forwardPos = VAdd(pos, VScale(forward, paramEnemy_.atkRange / 2));
+	VECTOR leftPos = VAdd(pos, VScale(left, paramEnemy_.atkRange / 2));
+	VECTOR rightPos = VAdd(pos, VScale(right, paramEnemy_.atkRange / 2));
 
 	// 描画処理
 	DrawTriangle3D(pos, leftPos, forwardPos, color, true);
@@ -484,18 +504,6 @@ void Enemy::AnimState(void)
 		{
 			paramChara_.hp = 0;
 			paramChara_.isActive = false;
-		}
-	}
-	else
-	{
-		if (paramEnemy_.actionState == ACTION_STATE::MOVE &&
-			paramChara_.timeInv <= 0.0f)
-		{
-			//ChangeAnimState(ANIM_STATE::WALK);
-		}
-		else
-		{
-			//ChangeAnimState(ANIM_STATE::IDLE);
 		}
 	}
 }

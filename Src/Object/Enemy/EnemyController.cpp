@@ -6,7 +6,8 @@
 #include "../Status/StatusData.h"
 #include "../Object.h"
 #include "./Enemy.h"
-#include "./EnemyWarrior.h"
+#include "./EnemySkeleton.h"
+#include "./EnemyBoss.h"
 #include "../Player/Player.h"
 #include "../,./../../Utility/AsoUtility.h"
 #include "../,./../../Application.h"
@@ -16,7 +17,8 @@
 
 EnemyController::EnemyController(Player& player) :
 	enemyCnt_(0),listCnt_(0),
-	player_(&player)
+	player_(&player),
+	enemyBoss_(nullptr)
 {
 	enemys_.clear();
 }
@@ -25,7 +27,9 @@ void EnemyController::Init(void)
 {
 	enemys_.clear();
 
-	EnemysSpawn(ENEMY_TYPE::SKELETON_WARRIOR, { 0.0f, 0.0f, 250.0f });
+	EnemysSpawn(ENEMY_TYPE::SKELETON, { 0.0f, 0.0f, 250.0f });
+
+	EnemyBossSpawn();
 }
 
 void EnemyController::Update(void)
@@ -57,35 +61,48 @@ void EnemyController::Update(void)
 		}
 	}
 
+
+	if (enemyBoss_ != nullptr)
+	{
+		enemyBoss_->Update();
+	}
+
 	enemyCnt_ = cnt;
 }
 
 void EnemyController::Draw(void)
 {
-	if (enemys_.empty()) return;
-
-	// 敵の数
-	int cnt = 0;
-
-
-	for (auto& [num, enemylist] : enemys_)
+	if (enemyBoss_ != nullptr)
 	{
-		// 敵リストが空の時、スキップ
-		if (enemylist.empty()) { continue; }
-
-		for (auto& enemy : enemylist)
-		{
-			// 敵無効時、処理終了
-			if (!enemy->GetIsActive()) { continue; }
-
-			// 敵の数増加
-			cnt++;
-
-			enemy->Draw();
-		}
+		enemyBoss_->DrawMagicCircle();
+		enemyBoss_->Draw();
 	}
 
-	DrawFormatString(Application::SCREEN_HALF_X, 0, 0xffffff, "敵の数：残り%d体", cnt);
+
+	if (!enemys_.empty())
+	{
+		// 敵の数
+		int cnt = 0;
+
+		for (auto& [num, enemylist] : enemys_)
+		{
+			// 敵リストが空の時、スキップ
+			if (enemylist.empty()) { continue; }
+
+			for (auto& enemy : enemylist)
+			{
+				// 敵無効時、処理終了
+				if (!enemy->GetIsActive()) { continue; }
+
+				// 敵の数増加
+				cnt++;
+
+				enemy->Draw();
+			}
+		}
+
+		DrawFormatString(Application::SCREEN_HALF_X, 0, 0xffffff, "敵の数：残り%d体", cnt);
+	}
 }
 
 void EnemyController::DrawDebug(void)
@@ -118,18 +135,45 @@ void EnemyController::DrawDebug(void)
 
 void EnemyController::Release(void)
 {
-	if (enemys_.empty()) { return; }
-
-	// 敵解放処理
-	for (auto& [num, enemylist] : enemys_)
+	if (enemyBoss_ != nullptr)
 	{
-		for (auto& enemy : enemylist)
-		{
-			enemy->Release();
-			delete enemy;
-		}
+		enemyBoss_->Release();
+		delete enemyBoss_;
 	}
-	enemys_.clear();
+
+	if (!enemys_.empty())
+	{
+
+		// 敵解放処理
+		for (auto& [num, enemylist] : enemys_)
+		{
+			for (auto& enemy : enemylist)
+			{
+				enemy->Release();
+				delete enemy;
+			}
+		}
+		enemys_.clear();
+	}
+}
+
+bool EnemyController::GetIsDefeatBoss(void)
+{
+	// ボスが存在しないとき、false
+	if (!GetIsActiveBoss()) { return false; }
+
+	return (enemyBoss_->GetCurHp() <= 0);
+}
+
+void EnemyController::EnemyBossSpawn(void)
+{
+	if (enemyBoss_) { return; }
+
+	enemyBoss_ = new EnemyBoss(*player_);
+
+	// 敵を初期化して返す
+	enemyBoss_->Load();
+	enemyBoss_->Init(EnemyBoss::SPAWN_POS, SPAWN_ROT_Y);
 }
 
 void EnemyController::EnemysSpawn(ENEMY_TYPE _type, const VECTOR& _posField)
@@ -177,9 +221,6 @@ void EnemyController::EnemysSpawn(ENEMY_TYPE _type, const VECTOR& _posField)
 	{
 		rot = Quaternion::Identity();
 
-		// リスト数増加
-		listCnt++;
-
 		// 生成最大数
 		spawnMax = (SPAWN_CIRCLE_SPLIT * i);
 		for (int circle = 0; circle < spawnMax; circle++)
@@ -198,25 +239,25 @@ void EnemyController::EnemysSpawn(ENEMY_TYPE _type, const VECTOR& _posField)
 			if (cnt > SPAWN_MAX) { break; }
 		}
 	}
-	// リスト数取得
-	listCnt_ = listCnt;
 
 	// リスト格納
-	enemys_.emplace(listCnt_, list);
+	enemys_.emplace(++listCnt_, list);
 }
 
 Enemy& EnemyController::EnemySpawn(ENEMY_TYPE type, const VECTOR& _pos)
 {
 	Enemy* enemy = nullptr;
 	
-	if (type == ENEMY_TYPE::SKELETON_WARRIOR)
+	if (type == ENEMY_TYPE::SKELETON)
 	{
-		enemy = new EnemyWarrior(*player_);
+		enemy = new EnemySkeleton(*player_);
 	}
-	if (type == ENEMY_TYPE::SKELETON_MAGE)
+	else if (type == ENEMY_TYPE::SKELETON_WARRIOR)
 	{
-		
+
 	}
+
+	else { return *enemy; }
 
 	// 敵の数
 	enemyCnt_++;

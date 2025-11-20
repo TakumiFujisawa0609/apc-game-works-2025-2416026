@@ -123,6 +123,8 @@ public:
 	// 対象方向の回転
 	void ToAngleAxis(float* angle, VECTOR* axis);
 
+	static bool EqualsQuaZero(const Quaternion& _qua1);
+
 private:
 
 	// 基本ベクトルを取得

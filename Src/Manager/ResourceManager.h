@@ -11,8 +11,6 @@ public:
 	/// @brief リソース識別列挙
 	enum SRC
 	{
-		/*　3Dモデルリソース　*/
-
 		NONE = -1,
 
 		// プレイヤー
@@ -20,19 +18,19 @@ public:
 
 		// 敵
 		MODEL_ENEMY,
-		MODEL_SKELETON_WARRIOR,
-		MODEL_SKELETON_MAGE,
+		MODEL_SKELETON,
+		MODEL_SKELETON_WARRIOR = 4,
+		MODEL_SKELETON_BOSS,
 
 		// 武器
 		MODEL_WEAPON,
 		MODEL_SWORD,
 
-		/*　エフェクトリソース　*/
-
-		/*　画像リソース　*/
+		// 画像リソース
 		IMAGE_PAD,
+		IMAGE_SPAWNCIRCLE,
 
-		/*　アニメーションリソース　*/
+		// アニメーションリソース
 		ANIM_JUB_1_SWORD,
 		ANIM_JUB_2_SWORD,
 		ANIM_JUB_3_SWORD,
@@ -41,8 +39,10 @@ public:
 		ANIM_STRONG_2_SWORD,
 		ANIM_STRONG_3_SWORD,
 
+		//　エフェクトリソース
 		EFFECT_SPAWN_SKELETON,
 		EFFECT_SWORD_SLASH,
+		EFFECT_SWORD_HIT,
 	};
 
 

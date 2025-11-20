@@ -19,47 +19,10 @@ void EffectController::Init(void)
 
 void EffectController::Update(void)
 {
-	float delta = SceneManager::GetInstance().GetDeltaTime();
-
-	for (auto [type, effects] : effects_)
+	for (auto& [type, effects] : effects_)
 	{
-		Effect effect = *effects;
-
-		if (!GetIsEffectAlive(type)) continue;
-
-		effect.playId = PlayEffekseer3DEffect(effect.handle);
-
-		//エフェクトの大きさ
-		SetScalePlayingEffekseer3DEffect(effect.playId,
-										 effect.scale.x,
-										 effect.scale.y,
-										 effect.scale.z);
-
-		//エフェクトの回転
-		SetRotationPlayingEffekseer3DEffect(effect.playId,
-											effect.angle.x,
-											effect.angle.y,
-											effect.angle.z);
-
-		//エフェクトの位置
-		SetPosPlayingEffekseer3DEffect(effect.playId,
-									   effect.pos.x,
-									   effect.pos.y,
-									   effect.pos.z);
-
-		effect.aliveTime -= delta;
-
-		// エフェクト停止
-		if (effect.aliveTime < 0.0f)
-		{
-			StopEffect(type);
-		}
+		UpdateEffect(type, *effects);
 	}
-}
-
-void EffectController::Draw(void)
-{
-	
 }
 
 void EffectController::StopEffect(EFFECT_TYPE type)
@@ -76,25 +39,25 @@ void EffectController::SetEffect(EFFECT_TYPE _type, const VECTOR& _pos, const VE
 	if (!GetIsEffectAlive(_type)) { return; }
 	
 	ResourceManager& res = ResourceManager::GetInstance();
-	Effect effect;
+	Effect* effect = new Effect();
 
-	effect.pos = _pos;
-	effect.type = _type;
-	effect.scale = _scale;
-	effect.angle = _angle;
+	effect->pos = _pos;
+	effect->type = _type;
+	effect->scale = _scale;
+	effect->angle = _angle;
 	
 
 	switch (_type)
 	{
 		case EFFECT_TYPE::SWORD_SLASH:
 		{
-			effect.handle = res.LoadHandleId(ResourceManager::SRC::EFFECT_SWORD_SLASH);
+			effect->handle = res.LoadHandleId(ResourceManager::SRC::EFFECT_SWORD_SLASH);
 		}
 		break;
 
-		case EffectController::EFFECT_TYPE::SPAWN_SKELETON:
+		case EFFECT_TYPE::SPAWN_SKELETON:
 		{
-			effect.handle = res.LoadHandleId(ResourceManager::SRC::EFFECT_SWORD_SLASH);
+			effect->handle = res.LoadHandleId(ResourceManager::SRC::EFFECT_SPAWN_SKELETON);
 		}
 		break;
 
@@ -102,14 +65,51 @@ void EffectController::SetEffect(EFFECT_TYPE _type, const VECTOR& _pos, const VE
 		default:
 		{
 			// エフェクトなしの場合は何もしない
-			effect.handle = -1;
+			return;
 		}
 		break;
 	}
+
+	// エフェクト格納
+	effects_.emplace(_type, effect);
 }
 
 bool EffectController::GetIsEffectAlive(EFFECT_TYPE type)
 {
 	return (effects_[type]->aliveTime > 0.0f &&
 			effects_[type]->handle != -1);
+}
+
+void EffectController::UpdateEffect(EFFECT_TYPE _type, Effect& _effect)
+{
+	// エフェクト終了時、処理終了
+	if (!GetIsEffectAlive(_type)) { return; }
+
+	// エフェクト再生
+	_effect.playId = PlayEffekseer3DEffect(_effect.handle);
+
+	// 再生したエフェクトのパラメータ割り当て
+	SetScalePlayingEffekseer3DEffect(_effect.playId,
+		_effect.scale.x,
+		_effect.scale.y,
+		_effect.scale.z);
+
+	SetRotationPlayingEffekseer3DEffect(_effect.playId,
+		_effect.angle.x,
+		_effect.angle.y,
+		_effect.angle.z);
+
+	SetPosPlayingEffekseer3DEffect(_effect.playId,
+		_effect.pos.x,
+		_effect.pos.y,
+		_effect.pos.z);
+
+	// 生存時間更新
+	_effect.aliveTime -= SceneManager::GetInstance().GetDeltaTime();
+
+	// エフェクト停止
+	if (_effect.aliveTime < 0.0f)
+	{
+		StopEffect(_type);
+	}
 }

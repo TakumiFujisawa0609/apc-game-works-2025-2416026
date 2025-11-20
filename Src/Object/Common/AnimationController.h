@@ -26,6 +26,7 @@ public:
 		bool isLoadPath = false; // パスで読み込んでいるか否か
 	};
 
+	static constexpr float DEFAULT_BLENDTIME = 0.175f;
 
 	/// @brief コンストラクタ
 	/// @param _modelId アニメーション対象
@@ -56,7 +57,7 @@ public:
 	/// @param _type アニメーションの種類
 	/// @param _isLoop ループするか否か @hint default = true
 	/// @param _blendTime アニメーション遷移時間
-	void Play(int _type, bool _isLoop = true, float _blendTime = 0.175f);
+	void Play(int _type, bool _isLoop = true, float _blendTime = DEFAULT_BLENDTIME);
 
 	/// @brief 更新処理
 	void Update(void);

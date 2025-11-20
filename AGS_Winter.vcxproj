@@ -154,7 +154,8 @@
     <ClInclude Include="Src\Object\Common\AttackMotion.h" />
     <ClInclude Include="Src\Object\Enemy\Enemy.h" />
     <ClInclude Include="Src\Object\Enemy\EnemyController.h" />
-    <ClInclude Include="Src\Object\Enemy\EnemyWarrior.h" />
+    <ClInclude Include="Src\Object\Enemy\EnemyBoss.h" />
+    <ClInclude Include="Src\Object\Enemy\EnemySkeleton.h" />
     <ClInclude Include="Src\Object\Object.h" />
     <ClInclude Include="Src\Object\Player\Player.h" />
     <ClInclude Include="Src\Object\Status\StatusData.h" />
@@ -195,7 +196,8 @@
     <ClCompile Include="Src\Object\Common\AttackMotion.cpp" />
     <ClCompile Include="Src\Object\Enemy\Enemy.cpp" />
     <ClCompile Include="Src\Object\Enemy\EnemyController.cpp" />
-    <ClCompile Include="Src\Object\Enemy\EnemyWarrior.cpp" />
+    <ClCompile Include="Src\Object\Enemy\EnemyBoss.cpp" />
+    <ClCompile Include="Src\Object\Enemy\EnemySkeleton.cpp" />
     <ClCompile Include="Src\Object\Object.cpp" />
     <ClCompile Include="Src\Object\Player\Player.cpp" />
     <ClCompile Include="Src\Object\Status\StatusData.cpp" />

@@ -80,6 +80,9 @@ void ResourceManager::SetResource(void)
 		resourcesMap_.emplace(static_cast<SRC>(src), res);
 	}
 
+	// 画像
+	res = Resource(Resource::LOAD_TYPE::IMAGE, PATH_IMAGE + "SpawnSkeleton.png");
+	resourcesMap_.emplace(SRC::IMAGE_SPAWNCIRCLE, res);
 
 	// アニメーション
 	res = Resource(Resource::LOAD_TYPE::ANIM, PATH_ANIM + "SwordAnim1.mv1");
@@ -107,8 +110,14 @@ void ResourceManager::SetResource(void)
 
 
 	// エフェクト
-	res = Resource(Resource::LOAD_TYPE::EFFECT, PATH_EFFECT + "EffectSkeleton.efkefc");
+	res = Resource(Resource::LOAD_TYPE::EFFECT, PATH_EFFECT + "SpawnSkeleton.efkefc");
 	resourcesMap_.emplace(SRC::EFFECT_SPAWN_SKELETON, res);
+
+	res = Resource(Resource::LOAD_TYPE::EFFECT, PATH_EFFECT + "SwordSlash.efkefc");
+	resourcesMap_.emplace(SRC::EFFECT_SWORD_SLASH, res);
+
+	res = Resource(Resource::LOAD_TYPE::EFFECT, PATH_EFFECT + "SwordSlash.efkefc");
+	resourcesMap_.emplace(SRC::EFFECT_SWORD_SLASH, res);
 }
 
 

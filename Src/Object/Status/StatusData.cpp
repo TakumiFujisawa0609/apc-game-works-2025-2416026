@@ -320,13 +320,6 @@ void StatusData::LoadWeapon(void)
 }
 
 
-void StatusData::DrawDebug(void)
-{
-	
-}
-
-
-
 void StatusData::SaveCSV(void)
 {
 	/* CSV‘‚«‚İˆ— */

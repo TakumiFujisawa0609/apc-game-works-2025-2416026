@@ -160,6 +160,9 @@ private:
 	/// @brief 敵とプレイヤーの当たり判定 
 	void CollisionPlayerToEnemy(void);
 
+	/// @brief ボス敵とプレイヤーの当たり判定 
+	void CollisionPlayerToBoss(void);
+
 	/// @brief 敵と敵の当たり判定
 	void CollisionEnemyToEnemy(void);
 

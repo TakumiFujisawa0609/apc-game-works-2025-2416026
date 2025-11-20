@@ -1,6 +1,5 @@
 敵名,ハンドルパス,敵の種類,モデルのスケール,半径,HP,攻撃力,移動速度,移動加速度,攻撃間隔,攻撃範囲,索敵範囲,生成時アニメーション速度,待機アニメーション速度,攻撃アニメーション速度,移動アニメーション速度,弱被ダメージアニメーション速度,強被ダメージアニメーション速度,撃破時アニメーション
-スケルトンウォリアー,Enemy/Skeleton/Skeleton_Warrior.mv1,SKELETON_WARRIOR,100,100,8,3,2,0.5,2,300,1000,40,30,30,30,35,40,30
-強スケルトンウォリアー,Enemy/Skeleton/Skeleton_Warrior.mv1,SKELETON_WARRIOR,100,100,13,3,2,0.5,2,400,1100,40,30,30,30,35,40,30
-強スケルトンメイジ,Enemy/Skeleton/Skeleton_Mage.mv1,SKELETON_MAGE,100,100,8,1,0.5,0.1,2,1300,1300,40,30,30,30,35,40,30
-スケルトンメイジ,Enemy/Skeleton/Skeleton_Mage.mv1,SKELETON_MAGE,100,100,8,1,0.5,0.1,2,1250,1250,40,30,30,30,35,40,30
-ボス,Enemy/Skeleton/Skeleton_Warrior.mv1,SKELETON_WARRIOR,100,100,20,3,1.5,0.5,1.5,325,1000,40,30,30,30,35,40,30
+スケルトン,Enemy/Skeleton.mv1,SKELETON,100,100,8,3,2,0.5,2,600,1000,40,30,30,30,35,40,30
+強スケルトン,Enemy/Skeleton.mv1,SKELETON_ELITE,125,125,13,3,2,0.5,2,675,1100,40,30,30,30,35,40,30
+スケルトンウォリアー,Enemy/SkeletonWarrior.mv1,SKELETON_WARRIOR,100,100,10,3,2,0.1,2,675,1300,40,30,30,30,35,40,30
+スケルトンボス,Enemy/SkeletonBoss.mv1,SKELETON_BOSS,200,200,20,5,2,0.5,1.5,850,1750,25,25,25,25,35,40,30

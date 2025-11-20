@@ -51,10 +51,10 @@ void Player::SetParam(void)
 											   Quaternion::AngleAxis(LOCAL_ANGLE_Y, AsoUtility::AXIS_Y));
 
 	VECTOR rotLocal = VAdd(AsoUtility::AXIS_X, AsoUtility::AXIS_Z);
-	/*
+	
 	paramChara_.quaRotLocal = Quaternion::Mult(paramChara_.quaRotLocal,
 											   Quaternion::AngleAxis(0.0f, rotLocal));
-*/
+
 	// ’…’n”»’è
 	paramChara_.isGround = false;
 
@@ -74,7 +74,6 @@ void Player::SetParam(void)
 
 	paramChara_.isActive = true;
 	paramChara_.velocity = AsoUtility::VECTOR_ZERO;
-	Rotation(true);
 }
 void Player::InitAnim(void)
 {

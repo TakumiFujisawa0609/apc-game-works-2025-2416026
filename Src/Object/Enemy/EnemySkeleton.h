@@ -4,11 +4,11 @@
 #include <map>
 class Player;
 
-class EnemyWarrior : public Enemy
+class EnemySkeleton : public Enemy
 {
 public:
 
-	enum class WARRIER_ANIM
+	enum class SKELETON_ANIM
 	{
 		NONE = 0,
 		ATTACK = 10,
@@ -22,24 +22,23 @@ public:
 		MAX,
 	};
 
-	EnemyWarrior(Player& player);
+	EnemySkeleton(Player& player);
 
-	~EnemyWarrior(void) = default;
+	~EnemySkeleton(void) = default;
 
 
 protected:
-
-	void SetParam(void)override;
 
 	/// @brief ÉtÉåÅ[ÉÄèâä˙âª
 	void InitModelFrame(void)override;
 
 	void InitAnim(void)override;
 
-	void ChangeAnimState(ANIM_STATE _state, bool isLoop = true)override;
+	void ChangeAnimState(ANIM_STATE _state, bool isLoop = true,
+						 float _blendTime = AnimationController::DEFAULT_BLENDTIME)override;
 
 
 private:
 
-	void SetAnimSpeed(WARRIER_ANIM _type, STATUS_ANIM_TYPE _speedType);
+	void SetAnimSpeed(SKELETON_ANIM _type, STATUS_ANIM_TYPE _speedType);
 };

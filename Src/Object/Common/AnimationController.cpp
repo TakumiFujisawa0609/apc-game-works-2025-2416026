@@ -4,17 +4,13 @@
 #include <cassert>
 #include "../../Manager/SceneManager.h"
 
-AnimationController::AnimationController(int _modelId)
+AnimationController::AnimationController(int _modelId):
+	modelId_(_modelId),
+	playType_(-1), prePlayType_(-1),
+	blendTime_(0.0f), curBlendTime_(-1),
+	isLoop_(false)
 {
 	animations_.clear();
-
-	modelId_ = _modelId;
-
-	playType_ = prePlayType_ = -1;
-
-	blendTime_ = curBlendTime_ = 0.0f;
-
-	isLoop_	  = false;
 }
 
 AnimationController::~AnimationController(void)

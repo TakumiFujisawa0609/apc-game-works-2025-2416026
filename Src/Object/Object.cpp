@@ -33,11 +33,11 @@ Object::Object(void)
 		Quaternion::AngleAxis(AsoUtility::Deg2Rad(0.0f), AsoUtility::AXIS_Y));
 
 	paramChara_.quaRotLocal = Quaternion::Mult(paramChara_.quaRotLocal,
-		Quaternion::AngleAxis(AsoUtility::Deg2Rad(0.0f), AsoUtility::AXIS_Z));
-		
+		Quaternion::AngleAxis(AsoUtility::Deg2Rad(0.0f), AsoUtility::AXIS_Z));	
 	
 	paramChara_.timeInv = 0.0f;
 	paramChara_.isGround = true;
+	paramChara_.frames.clear();
 
 	anim_ = nullptr;
 	//collision_ = nullptr;
@@ -460,24 +460,23 @@ float Object::_Move(const float* _curVelo, float _movePow, float _maxVelo)
 void Object::Rotation(bool isRevert)
 {
 	/*　回転処理　*/
-	VECTOR velo = GetPosDelta();
+	VECTOR velo = {};
+	velo = GetPosDelta();
 
 	// Y軸は無効
 	velo.y = 0.0f;
 
 	// 静止時は処理を終了
 
-	if (velo.x == AsoUtility::VECTOR_ZERO.x &&
-		velo.z == AsoUtility::VECTOR_ZERO.z ||
+	if (AsoUtility::EqualsVZero(velo) ||
 		paramChara_.pos.x == paramChara_.prePos.x &&
-		paramChara_.pos.z == paramChara_.prePos.z) return;
+		paramChara_.pos.z == paramChara_.prePos.z) { return; }
 
 	// 反転フラグ有効時向きを反転
 	velo = ((!isRevert) ? VScale(velo, -1) : velo);
 
 	// 進行方向にプレイヤーを向かせる
 	Quaternion rot = Quaternion::LookRotation(velo);
-
 	paramChara_.quaRotLocal = rot;
 }
 

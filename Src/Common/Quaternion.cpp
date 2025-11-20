@@ -696,6 +696,16 @@ void Quaternion::ToAngleAxis(float* angle, VECTOR* axis)
 
 }
 
+bool Quaternion::EqualsQuaZero(const Quaternion& _qua1)
+{
+    const Quaternion qua2 = Quaternion::Identity();
+    if (_qua1.w == qua2.w && _qua1.x == qua2.x && _qua1.y == qua2.y && _qua1.z == qua2.z)
+    {
+        return true;
+    }
+    return false;
+}
+
 Quaternion Quaternion::operator*(float& f) {
     return Quaternion(w * f, x * f, y * f, z * f);
 }

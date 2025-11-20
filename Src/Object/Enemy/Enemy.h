@@ -1,6 +1,7 @@
 #pragma once
 #include "../Object.h"
 #include "../Status/StatusEnemy.h"
+#include "../Common/AnimationController.h"
 #include <string>
 class StatusEnemy;
 class Player;
@@ -53,7 +54,7 @@ public:
 	static constexpr float SPAWN_TIME_RANGE = 0.5f;
 
 	
-	Enemy(StatusEnemy::TYPE type, Player& players, bool _isElite = false);
+	Enemy(StatusEnemy::TYPE type, Player& players, bool _isElite);
 
 	/// @brief デフォルトデストラクタ
 	virtual ~Enemy(void) = default;
@@ -73,6 +74,8 @@ public:
 
 	/// @brief 攻撃範囲取得
 	float GetRadiusAttack(void) { return status_.GetAtkRange(); }
+
+	bool GetIsElite(void) { return paramEnemy_.isElite; };
 
 
 protected:
@@ -116,7 +119,7 @@ protected:
 	Player& player_;
 
 
-	void SetParam(void) override;
+	void SetParam(void) override final;
 
 	/// @brief 初回読み込み処理
 	void LoadPost(void)override;
@@ -159,7 +162,9 @@ protected:
 	/// @brief アニメーション遷移処理
 	/// @param _state 状態
 	/// @param _isLoop ループ判定
-	virtual void ChangeAnimState(ANIM_STATE _state, bool _isLoop = true) = 0;
+	/// @param _blendTime ブレンド時間
+	virtual void ChangeAnimState(ANIM_STATE _state, bool _isLoop = true,
+								 float _blendTime = AnimationController::DEFAULT_BLENDTIME) = 0;
 
 	// アニメーション状態遷移処理
 	void AnimState(void);
@@ -171,6 +176,9 @@ protected:
 	void Move(void)override;
 
 private:
+
+	float animStateTime_;
+
 
 	// 初期行動状態
 	static constexpr ACTION_STATE ACTION_STATE_START = ACTION_STATE::SPAWN;

@@ -49,10 +49,11 @@ void Application::Init(void)
 
 	// ウィンドウの状態の設定
 #ifdef _DEBUG
-	ChangeWindowMode(false);
+	ChangeWindowMode(true);
 #else
 	// リリース時、フルスクリーン
 	ChangeWindowMode(true);
+	//ChangeWindowMode(false);
 #endif
 
 	// DX_LIB_11の使用

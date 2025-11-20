@@ -21,7 +21,7 @@ public:
 	static unsigned int SetColor(float _r, float _g, float _b);
 
 
-	/// @brief 文字列→int型変換
+	/// @brief 文字列→int型変換																							
 	/// @param _text 対象のテキスト
 	/// @param _target 数値割り当て先
 	/// @param _minNum 最小値
