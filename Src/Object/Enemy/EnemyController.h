@@ -12,8 +12,8 @@ using ENEMY_TYPE = StatusEnemy::TYPE;
 
 class EnemyController
 {
-	using EnemyList = std::vector<Enemy*>;
-	using EnemysMap = std::map<int, EnemyList>;
+	using Enemys = std::vector<Enemy*>;
+	using EnemyList = std::vector<Enemys>;
 
 public:
 
@@ -36,18 +36,15 @@ public:
 	void Release(void);
 
 
-	const EnemysMap& GetEnemyLists(void)const { return enemys_; };
+	const EnemyList& GetEnemyLists(void)const { return enemys_; };
 
 	/// @brief 敵リスト取得
 	/// @param _listNum リスト番号
-	const EnemyList& GetEnemys(int _listNum)const { return enemys_.at(_listNum); };
+	const Enemys& GetEnemys(int _listNum)const { return enemys_.at(_listNum); };
 
 	Enemy& GetEnemy(int _listNum, int num) { return *GetEnemys(_listNum).at(num); }
 
 	EnemyBoss& GetEnemyBoss(void) { return *enemyBoss_; }
-
-
-	int GetListCnt(void) { return listCnt_; };
 	
 	bool GetIsActiveBoss(void) { return (enemyBoss_ != nullptr);  };
 	bool GetIsDefeatBoss(void);
@@ -64,13 +61,10 @@ private:
 	// 生成位置中央の敵を除く、一度に生成される数
 	static constexpr int SPAWN_MAX = (3 * SPAWN_CIRCLE_SPLIT) - 1;
 
-	// 敵の数
-	int enemyCnt_;
-	int listCnt_;
-
+	int temp;
 	Player* player_;
 
-	EnemysMap enemys_;
+	EnemyList enemys_;
 	EnemyBoss* enemyBoss_;
 	
 

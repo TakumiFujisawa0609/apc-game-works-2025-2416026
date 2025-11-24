@@ -81,8 +81,15 @@ void ResourceManager::SetResource(void)
 	}
 
 	// 画像
+	res = Resource(Resource::LOAD_TYPE::IMAGE, PATH_IMAGE + "Title.png");
+	resourcesMap_.emplace(SRC::IMG_TITLE, res);
+
+	res = Resource(Resource::LOAD_TYPE::IMAGE, PATH_IMAGE + "GameClear.png");
+	resourcesMap_.emplace(SRC::IMG_CLEAR, res);
+
 	res = Resource(Resource::LOAD_TYPE::IMAGE, PATH_IMAGE + "SpawnSkeleton.png");
-	resourcesMap_.emplace(SRC::IMAGE_SPAWNCIRCLE, res);
+	resourcesMap_.emplace(SRC::IMG_SPAWNCIRCLE, res);
+
 
 	// アニメーション
 	res = Resource(Resource::LOAD_TYPE::ANIM, PATH_ANIM + "SwordAnim1.mv1");

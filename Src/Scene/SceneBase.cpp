@@ -7,8 +7,6 @@
 
 SceneBase::SceneBase(void)
 {
-	//ƒ^ƒCƒgƒ‹‰æ‘œ
-	backImage_ = -1;
 }
 
 bool SceneBase::IsLoad(void)

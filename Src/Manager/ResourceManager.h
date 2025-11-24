@@ -27,8 +27,10 @@ public:
 		MODEL_SWORD,
 
 		// 画像リソース
-		IMAGE_PAD,
-		IMAGE_SPAWNCIRCLE,
+		IMG_TITLE,
+		IMG_CLEAR,
+		IMG_PAD,
+		IMG_SPAWNCIRCLE,
 
 		// アニメーションリソース
 		ANIM_JUB_1_SWORD,

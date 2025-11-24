@@ -42,6 +42,8 @@ void Player::SetParam(void)
 	// s“®ó‘Ô
 	paramPlayer_.actionState = ACTION_STATE::IDLE;
 
+	paramChara_.pos = AsoUtility::VECTOR_ZERO;
+	paramChara_.prePos = AsoUtility::VECTOR_ZERO;
 	paramChara_.posLocal = LOCAL_POS;
 
 	// Šp“x‰Šú‰»
@@ -72,7 +74,6 @@ void Player::SetParam(void)
 	paramPlayer_.weaponId = status_.GetWeaponId();
 	paramPlayer_.luck = status_.GetLuck();
 
-	paramChara_.isActive = true;
 	paramChara_.velocity = AsoUtility::VECTOR_ZERO;
 }
 void Player::InitAnim(void)
@@ -623,6 +624,7 @@ void Player::UpdateMotion(void)
 		// ‹­UŒ‚
 		else if (IsInputAtkStrong())
 		{
+			if (paramPlayer_.jubCnt != 0) { return; }
 			// s“®ó‘Ô‘JˆÚ
 			ChangeActionState(ACTION_STATE::ATTACK_STRONG);
 		}

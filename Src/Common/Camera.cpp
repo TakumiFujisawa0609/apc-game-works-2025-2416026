@@ -33,7 +33,7 @@ void Camera::Init(MODE mode, const VECTOR& pos, float angleY, Player* player)
 {
 	mode_ = mode;
 
-	pos_.cameraPos = pos;
+	pos_.camera = pos;
 
 	follow_ = player;
 
@@ -82,7 +82,7 @@ void Camera::SetBeforeDraw(void)
 	if (mode_ != MODE::FOLLOW)
 	{
 		//カメラセット
-		SetCameraPositionAndAngle(pos_.cameraPos, rot_.camera.x, rot_.camera.y, 0.0f);
+		SetCameraPositionAndAngle(pos_.camera, rot_.camera.x, rot_.camera.y, 0.0f);
 	}
 
 	
@@ -110,31 +110,31 @@ void Camera::DebugMove(void)
 
 	if (input.KeyIsNew(KEY_INPUT_UP))
 	{
-		if (input.KeyIsNew(KEY_INPUT_LSHIFT)) { pos_.cameraPos.y += move; }
+		if (input.KeyIsNew(KEY_INPUT_LSHIFT)) { pos_.camera.y += move; }
 
 		else if (input.KeyIsNew(KEY_INPUT_RSHIFT)) { rot_.camera.x += AsoUtility::Deg2Rad(rot); }
 
-		else { pos_.cameraPos.z += move; }
+		else { pos_.camera.z += move; }
 	}
 	if (input.KeyIsNew(KEY_INPUT_DOWN))
 	{
-		if (input.KeyIsNew(KEY_INPUT_LSHIFT)) { pos_.cameraPos.y -= move; }
+		if (input.KeyIsNew(KEY_INPUT_LSHIFT)) { pos_.camera.y -= move; }
 
 		else if (input.KeyIsNew(KEY_INPUT_LCONTROL)) { rot_.camera.x -= AsoUtility::Deg2Rad(rot); }
 
-		else { pos_.cameraPos.z -= move; }
+		else { pos_.camera.z -= move; }
 	}
 	if (input.KeyIsNew(KEY_INPUT_RIGHT))
 	{
 		if (input.KeyIsNew(KEY_INPUT_LCONTROL)) { rot_.camera.y += AsoUtility::Deg2Rad(rot); }
 
-		else { pos_.cameraPos.x += move; }
+		else { pos_.camera.x += move; }
 	}
 	if (input.KeyIsNew(KEY_INPUT_LEFT))
 	{
 		if (input.KeyIsNew(KEY_INPUT_LCONTROL)) { rot_.camera.y -= AsoUtility::Deg2Rad(rot); }
 
-		else { pos_.cameraPos.x -= move; }
+		else { pos_.camera.x -= move; }
 	}
 }
 
@@ -142,7 +142,7 @@ void Camera::SetBeforeDraw_FixexPoint(void)
 {
 	// 定点カメラ
 	SetCameraPositionAndAngle(
-		pos_.cameraPos,
+		pos_.camera,
 		rot_.camera.ToEuler().x,
 		rot_.camera.ToEuler().y,
 		rot_.camera.ToEuler().z
@@ -153,26 +153,9 @@ void Camera::SetBeforeDraw_Follow(void)
 {
 	/*　追尾カメラ　*/
 
-	_UpdateCameraRot();
-
 	// 回転処理
+	_UpdateCameraRot();
 	SmoothRotation();
-
-	/*
-	if (follow_ == nullptr) return;
-	
-	float offset = 100.0f;
-	VECTOR pPos = follow_->GetPos();
-	VECTOR forward = rot_.camera.GetForward();
-	VECTOR target = VAdd(pos_.cameraPos, VScale(forward, offset));
-	VECTOR up = rot_.camera.GetUp();
-
-	// カメラ地点割り当て
-	SetCameraPositionAndTargetAndUpVec(pos_.cameraPos, target, up);
-	*/
-
-
-
 
 
 	// カメラの移動
@@ -197,11 +180,11 @@ void Camera::SetBeforeDraw_Follow(void)
 	VECTOR cameraLocalRotPos = VTransform(local, mat);
 
 	// 相対座標からワールド座標に直して、カメラ座標とする
-	pos_.cameraPos = VAdd(followPos, cameraLocalRotPos);
+	pos_.camera = VAdd(followPos, cameraLocalRotPos);
 
 	// カメラの設定(位置と注視点による制御)
 	SetCameraPositionAndTargetAndUpVec(
-		pos_.cameraPos,
+		pos_.camera,
 		followPos,
 		rot_.camera.GetUp()
 	);
@@ -223,7 +206,7 @@ void Camera::SmoothRotation(void)
 
 	// 現在位置を理想位置に滑らかに移動
 	//pos_.cameraPos = VAdd(pos_.cameraPos, VScale(VSub(idealPos, pos_.cameraPos), smoothPow));
-	pos_.cameraPos = VAdd(pos_.cameraPos, VSub(idealPos, pos_.cameraPos));
+	pos_.camera = VAdd(pos_.camera, VSub(idealPos, pos_.camera));
 
 	// カメラを滑らかに補間
 	//rot_.camera = Quaternion::Slerp(rot_.camera, rot_.target,smoothPow);
@@ -264,10 +247,10 @@ void Camera::SetBeforeDraw_FollowZoom(void)
 	SetCameraTarget();
 
 	// 注視点から計算した距離分、カメラ座標を離す
-	pos_.cameraPos = VAdd(pos_.target, LOCAL_CAMERA_POS);
+	pos_.camera = VAdd(pos_.target, LOCAL_CAMERA_POS);
 
 	// 位置制限
-	pos_.cameraPos = AsoUtility::Clamp(pos_.cameraPos, pos_.limitMin, pos_.limitMax);
+	pos_.camera = AsoUtility::Clamp(pos_.camera, pos_.limitMin, pos_.limitMax);
 
 	// ズーム倍率割り当て
 	_SetZoomDiff(pos_.target);
@@ -314,7 +297,7 @@ void Camera::SetCameraPos(const VECTOR& pos, const VECTOR& angle,
 	mode_ = cameraMode;
 
 	// 位置割り当て
-	pos_.cameraPos = pos;
+	pos_.camera = pos;
 
 	// 角度割り当て
 	rot_.camera = Quaternion::Euler(angle);
@@ -338,7 +321,7 @@ void Camera::SetCameraMode(MODE mode, const VECTOR& pos)
 	// モード割り当て
 	mode_ = mode;
 
-	pos_.cameraPos = pos;
+	pos_.camera = pos;
 }
 
 void Camera::SetTrackingTarget(VECTOR* target)
@@ -384,6 +367,41 @@ void Camera::SetPosLimit(const VECTOR& _min, const VECTOR& _max)
 {
 	pos_.limitMin = _min;
 	pos_.limitMax = _max;
+}
+
+bool Camera::GetIsCameraClip(const VECTOR& _target)
+{
+	VECTOR targetPos = VGet(_target.x, 0.0f, _target.z);
+	VECTOR cameraPos = VGet(pos_.camera.x, 0.0f, pos_.camera.z);
+
+	// カメラの向いている方向
+	VECTOR cameraDir = VNorm(rot_.camera.GetForward());
+
+	// カメラから見た対象の方向
+	VECTOR diff = VSub(targetPos, cameraPos);
+	VECTOR dirTargetFromCamera = VNorm(diff);
+
+
+	// 内積を使ってベクトルの比較を行う
+	// (+1.0)：２つのベクトルは同じ方向
+	// (0.0)：２つのベクトルは直交
+	// (-1.0)：２つのベクトルは逆方向
+	float dot = VDot(cameraDir, dirTargetFromCamera);
+	float angle = acosf(dot);
+
+
+	const float viewAngle = 67.5f;
+	const float viewRad = AsoUtility::Deg2Rad(viewAngle);
+
+	// 追尾対象との距離
+	VECTOR vec = VSub(targetPos, cameraPos);
+	float distance = ((vec.x * vec.x) + (vec.z * vec.z)) / 2;
+	distance *= ((distance < 0) ? -1.0f : 1.0);
+	const float DISTANCE = 2000.0f;
+
+	// 視野左右内に入っている
+	return (distance <= (DISTANCE * DISTANCE)
+			&& (angle <= viewRad));
 }
 
 

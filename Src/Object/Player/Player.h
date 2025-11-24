@@ -145,7 +145,7 @@ public:
 
 
 	/// @brief デバッグ表示
-	void DrawDebug(void);
+	void DrawDebug(void)override final;
 	
 
 	/// @brief 被ダメージ処理
@@ -216,6 +216,7 @@ protected:
 		// ダッシュフラグ
 		bool isDash;
 
+		// 各アニメーション速度
 		std::unordered_map<ANIM_STATE, float> animSpeed;
 	};
 	ParamPlayer paramPlayer_;

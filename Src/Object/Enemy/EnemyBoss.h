@@ -29,6 +29,15 @@ public:
 
 	void DrawMagicCircle(void);
 
+	void SetIsSpawnCircle(bool _flag);
+
+	float GetSpawnCircleRadius(void) { return circleRadius_; };
+
+	const VECTOR& GetSpawnCirclePos(void) { return circlePos_; };
+
+	bool GetIsSpawnCircle(void) { return isSpawnCircle_; };
+
+
 protected:
 
 	/// @brief ÉtÉåÅ[ÉÄèâä˙âª
@@ -38,21 +47,29 @@ protected:
 
 	void InitPost(void)override final;
 
+	void UpdateStateSpawn(void)override final;
+
 	void ChangeAnimState(ANIM_STATE _state, bool isLoop = true,
 						 float _blendTime = AnimationController::DEFAULT_BLENDTIME)override;
 
 
 private:
 
-	void SetAnimSpeed(BOSS_ANIM _type, STATUS_ANIM_TYPE _speedType);
-
 	static constexpr int SPAWN_SIZE_HALF = (1024 / 2);
 
-	static constexpr COLOR_U8 SPAWN_CIRCLE_COLOR = {0,255,0,255};
+	static constexpr COLOR_U8 SPAWN_CIRCLE_COLOR = {255, 0, 0, 255};
 
 	static constexpr VECTOR CIRCLE_POS_OFFSET = { 0.0f, 0.0f,  1000.0f };
 
+	float spawnTime_;
+
 	VERTEX3D circleVertex_[4];
 	int circleImage_;
+	bool isSpawnCircle_;
+	VECTOR circlePos_;
+	float circleRadius_;
 
+	void InitSpawnCircle(void);
+
+	void SetAnimSpeed(BOSS_ANIM _type, STATUS_ANIM_TYPE _speedType);
 };

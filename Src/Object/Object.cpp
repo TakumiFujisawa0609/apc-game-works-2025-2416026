@@ -18,10 +18,10 @@ Object::Object(void)
 	paramChara_.handle = -1;
 	paramChara_.velocity = AsoUtility::VECTOR_ZERO;
 
-	paramChara_.pos = paramChara_.posLocal = AsoUtility::VECTOR_ZERO;
-	paramChara_.prePos = AsoUtility::VECTOR_ZERO;
+	paramChara_.pos = paramChara_.prePos = AsoUtility::VECTOR_ZERO;
+	paramChara_.posLocal = AsoUtility::VECTOR_ZERO;
 	paramChara_.posForward = AsoUtility::VECTOR_ZERO;
-	paramChara_.isActive = false;	
+	paramChara_.isView = true;	
 
 	paramChara_.quaRot = Quaternion::Identity();
 	paramChara_.quaRotLocal = Quaternion::Identity();
@@ -106,19 +106,23 @@ void Object::Update(void)
 {
 	float delta = SceneManager::GetInstance().GetDeltaTime();
 
-	if (!paramChara_.isActive) { return; }
+	// 無敵時間減少
+	paramChara_.timeInv -= ((paramChara_.timeInv > 0.0f) ? delta : 0.0f);
+
+	if (paramChara_.timeInv > 0.0f) { return; }
+
 
 	// 現在位置割り当て
-	paramChara_.prePos = paramChara_.pos;
+	if (!AsoUtility::Equals(paramChara_.prePos, paramChara_.pos))
+	{
+		paramChara_.prePos = paramChara_.pos;
+	}
 
 	// Y座標がマイナス時、0にする
 	if (paramChara_.pos.y < 0.0f)
 	{
 		paramChara_.pos.y = paramChara_.prePos.y = 0.0f;
 	}
-
-	// 無敵時間減少
-	paramChara_.timeInv -= ((paramChara_.timeInv > 0.0f) ? delta : 0.0f);
 
 	if (IsUpdateFrame())
 	{
@@ -141,10 +145,6 @@ void Object::Update(void)
 void Object::Draw(void)
 {
 	/*　描画処理　*/
-
-	// 無効状態時、処理終了
-	if (!paramChara_.isActive) { return; }
-
 
 	// モデル描画処理
 	MV1DrawModel(paramChara_.handle);
@@ -460,7 +460,7 @@ float Object::_Move(const float* _curVelo, float _movePow, float _maxVelo)
 void Object::Rotation(bool isRevert)
 {
 	/*　回転処理　*/
-	VECTOR velo = {};
+	VECTOR velo = AsoUtility::VECTOR_ZERO;
 	velo = GetPosDelta();
 
 	// Y軸は無効
@@ -469,8 +469,7 @@ void Object::Rotation(bool isRevert)
 	// 静止時は処理を終了
 
 	if (AsoUtility::EqualsVZero(velo) ||
-		paramChara_.pos.x == paramChara_.prePos.x &&
-		paramChara_.pos.z == paramChara_.prePos.z) { return; }
+		AsoUtility::EqualsVZero(paramChara_.dir)) { return; }
 
 	// 反転フラグ有効時向きを反転
 	velo = ((!isRevert) ? VScale(velo, -1) : velo);

@@ -294,7 +294,7 @@ void CollisionManager::CollisionPlayerToEnemy(void)
 	// 敵未割当時、処理終了
 	if (enemys_->GetEnemyLists().empty()) { return; }
 
-	for (auto& [type, enemyList] : enemys_->GetEnemyLists())
+	for (auto& enemyList : enemys_->GetEnemyLists())
 	{
 		for (auto& enemy : enemyList)
 		{
@@ -367,22 +367,40 @@ void CollisionManager::CollisionPlayerToBoss(void)
 	pPos = player_->GetPos();
 	EnemyBoss& boss = enemys_->GetEnemyBoss();
 
-	// 敵未割当時、処理終了
-
-		// 無効状態・HP0の時、スキップ
-	if (!boss.GetIsCollisionActive()) { return; }
-
 	pBody = player_->GetFramePos(COLLISION_TYPE::BODY);
 	pRad = player_->GetRadius(COLLISION_TYPE::BODY);
-	eBody = boss.GetFramePos(COLLISION_TYPE::BODY);
-	eRad = boss.GetRadius(COLLISION_TYPE::BODY);
-	ePos = boss.GetPos();
+
+	if (boss.GetIsSpawnCircle())
+	{
+		eRad = boss.GetSpawnCircleRadius();
+		ePos = boss.GetSpawnCirclePos();
+	}
+	else
+	{
+		eBody = boss.GetFramePos(COLLISION_TYPE::BODY);
+		ePos = boss.GetPos();
+		eRad = boss.GetRadius(COLLISION_TYPE::BODY);
+	}
 
 	if (UtilityCollision::IsHitSphereToSphere(pBody, pRad, eBody, eRad))
 	{
 		// プレイヤーの位置と反発
 		//enemy->SetPos(UtilityCollision::CollisionReflectXZ(ePos.y, eBody, eRad, pBody, pRad));
 	}
+
+	if (boss.GetIsSpawnCircle())
+	{
+		if (UtilityCollision::IsHitSphereToSphere(pPos, pRad, ePos, eRad))
+		{
+			// 魔法陣無効化
+			boss.SetIsSpawnCircle(false);
+		}
+		return;
+	}
+
+	// 敵未割当時、処理終了
+	// 無効状態・HP0の時、スキップ
+	if (!boss.GetIsCollisionActive()) { return; }
 
 	// プレイヤーの攻撃時の敵の被ダメージ処理
 	if (player_->CheckActiveAttack())
@@ -423,16 +441,16 @@ void CollisionManager::CollisionPlayerToBoss(void)
 
 void CollisionManager::CollisionEnemyToEnemy(void)
 {
-	int listSize = enemys_->GetListCnt();
-	int size = 0;
-	
-	VECTOR pos1, pos2;
+	int listSize = static_cast<int>(enemys_->GetEnemyLists().size());
+
+	VECTOR pos1 = AsoUtility::VECTOR_ZERO, pos2 = AsoUtility::VECTOR_ZERO;
 	float eRad1 = 0.0f, eRad2 = 0.0f;
 
 	
-	for (int list = 0; list < size; list++)
+	for (int list = 0; list < listSize; list++)
 	{
-		size = static_cast<int>(enemys_->GetEnemys(list).size());
+		int size = static_cast<int>(enemys_->GetEnemys(list).size());
+
 		for (int y = 0; y < size; y++)
 		{
 			for (int x = y; x < size; x++)

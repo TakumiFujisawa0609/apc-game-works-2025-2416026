@@ -1,5 +1,6 @@
 #include "Enemy.h"
 #include <DxLib.h>
+#include <unordered_map>
 #include "../Object.h"
 #include "../Player/Player.h"
 #include "../Common/AnimationController.h"
@@ -42,10 +43,10 @@ void Enemy::SetParam(void)
 	paramEnemy_.atkRange = status_.GetAtkRange();
 
 	paramChara_.quaRot = Quaternion::Identity();
+	paramChara_.quaRot = Quaternion::AngleAxis(LOCAL_ANGLE_Y, AsoUtility::AXIS_Y);
+
 	paramChara_.quaRotLocal = Quaternion::Identity(); // ローカル回転初期化
-	
-	paramChara_.quaRotLocal = Quaternion::Mult(paramChara_.quaRotLocal,
-		Quaternion::AngleAxis(LOCAL_ANGLE_Y, AsoUtility::AXIS_Y));
+	paramChara_.quaRotLocal = Quaternion::AngleAxis(LOCAL_ANGLE_Y, AsoUtility::AXIS_Y);
 
 	float scale = status_.GetScale();
 	paramChara_.scale = { scale * (1.0f - SCALE_DIFF),
@@ -60,7 +61,7 @@ void Enemy::SetParam(void)
 
 	paramEnemy_.timeAtkInterval = status_.GetAtkInterval();
 	paramEnemy_.isHearing = false;
-	paramChara_.isActive = true;
+	paramChara_.isView = true;
 
 }
 void Enemy::InitPost(void)
@@ -72,13 +73,15 @@ void Enemy::InitPost(void)
 
 void Enemy::Update(void)
 {
+	if (!paramChara_.isView) { return; }
+
 	Object::Update();
 
 	// HP０で死亡状態アニメーション終了とき、処理終了
 	if (paramEnemy_.animState == ANIM_STATE::DEATH &&
 		anim_->IsEnd() && paramChara_.hp <= 0) { return; }
 
-	if (paramChara_.isActive &&
+	if (paramChara_.isView &&
 		paramEnemy_.actionState != ACTION_STATE::SPAWN)
 	{
 		// 索敵範囲判定
@@ -240,6 +243,8 @@ void Enemy::ChangeActionState(ACTION_STATE state)
 		const float END_TIME = 1.0f;
 		const float ATTACK_TIME = 1.25f;
 
+		isLoop = true;
+
 		// 攻撃モーション有効化
 		animState = ANIM_STATE::ATTACK;
 		paramChara_.atkMotion.SetMotion(ACTIVE_TIME, END_TIME, ATTACK_TIME, false);
@@ -264,18 +269,16 @@ void Enemy::DrawPost(void)
 	if (paramEnemy_.animState == ANIM_STATE::DEATH &&
 		anim_->IsEnd() && paramChara_.hp <= 0) { return; }
 
-
-	UtilityCommon::Color color = { 255, 255, 255, 1.0f };
-
+#ifdef _DEBUG
 	if (scene.GetIsDebugMode())
 	{
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
+		UtilityCommon::Color color = { 255, 255, 255 };
+
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 25);
 		//DrawSearchRange();
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
 		DrawAttackRange();
-		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
 		if (paramChara_.timeInv > 0.0f && paramEnemy_.animState != ANIM_STATE::DEATH)
 		{
@@ -296,6 +299,7 @@ void Enemy::DrawPost(void)
 			}
 		}
 	}
+#endif
 }
 
 
@@ -309,8 +313,8 @@ bool Enemy::GetIsCollisionActive(void)
 {
 	bool ret = true;
 
-	// 無効時・HP0時・生成状態時、当たり判定無効
-	if (!GetIsActive() || GetCurHp() <= 0 ||
+	// カメラ外・HP0時・生成状態時、当たり判定無効
+	if (!GetIsView() || GetCurHp() <= 0 ||
 		paramEnemy_.actionState == ACTION_STATE::SPAWN)
 	{
 		ret = false;
@@ -413,7 +417,7 @@ void Enemy::SearchAttackField(void)
 	// (-1.0)：２つのベクトルは逆方向
 	float dot = VDot(eDir, dirPlayerFromEnemy);
 	float angle = acosf(dot);
-	
+
 	float distance = VSize(diff);
 	const float colRad = AsoUtility::Deg2Rad(50.0f);
 
@@ -503,7 +507,7 @@ void Enemy::AnimState(void)
 		if (anim_->IsEnd())
 		{
 			paramChara_.hp = 0;
-			paramChara_.isActive = false;
+			paramChara_.isView = false;
 		}
 	}
 }
@@ -519,7 +523,8 @@ bool Enemy::IsAttackState(void)
 bool Enemy::IsUpdateFrame(void)
 {
 	bool ret = false;
-	if (paramChara_.isActive)
+	// カメラ内の時のみtrue
+	if (paramChara_.isView)
 	{
 		ret = true;
 	}

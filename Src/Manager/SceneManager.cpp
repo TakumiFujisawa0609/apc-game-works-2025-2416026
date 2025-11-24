@@ -113,6 +113,8 @@ void SceneManager::Update(void)
 	// 演出処理
 	perform_->Update();
 
+	effects_->Update();
+
 	// 停止演出時、処理終了
 	if (perform_->GetPerformStop()) { return; }
 
@@ -126,10 +128,12 @@ void SceneManager::Update(void)
 	curScene_->Update(); // 現在のシーン更新処理
 
 	// デバッグモード有効化処理
+#ifdef _DEBUG
 	if (input.KeyIsTrgDown(KEY_INPUT_TAB))
 	{
 		isDebugMode_ = ((!isDebugMode_) ? true : false);
 	}
+#endif
 }
 
 void SceneManager::Draw(void)
@@ -196,6 +200,8 @@ void SceneManager::Destroy(void)
 		curScene_->Release();
 		delete curScene_;
 	}
+
+	delete effects_;
 
 	camera_->Release();
 	delete camera_;

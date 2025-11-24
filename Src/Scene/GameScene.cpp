@@ -23,11 +23,10 @@
 #pragma endregion
 
 
-GameScene::GameScene(void)
+GameScene::GameScene(void):
+	SceneBase::SceneBase(),
+	gameState_(GAME_STATE::NONE)
 {
-	/*　デフォルトコンストラクタ　*/
-	gameState_ = GAME_STATE::NONE;
-
 	Load();
 }
 
@@ -97,7 +96,7 @@ void GameScene::Update(void)
 		
 	if (InputManager::GetInstance().KeyIsTrgDown(KEY_INPUT_SPACE))
 	{
-		SceneManager::GetInstance().GetPerform().SetHitStop(1.0f);
+		//SceneManager::GetInstance().GetPerform().SetHitStop(1.0f);
 	}
 
 	// ステージ更新処理
@@ -143,7 +142,9 @@ void GameScene::Draw(void)
 				0x00aa00, 0x0, true);
 
 	// グリッド線描画
+#ifdef _DEBUG
 	SceneManager::GetInstance().DrawGrid();
+#endif
 
 	// Effekseerにより再生中のエフェクトを更新する
 	UpdateEffekseer3D();

@@ -40,4 +40,6 @@ public:
 private:
 
 	STATE_CLEAR state_;
+
+	int clearHandle_;
 };

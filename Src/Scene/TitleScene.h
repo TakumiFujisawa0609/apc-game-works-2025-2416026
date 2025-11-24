@@ -99,7 +99,6 @@ private:
 	static constexpr float ARROW_SCALE = 0.75f;
 	static constexpr float ARROW_PERFORM_TIME = 1.0f;
 
-
 	// タイトル状態
 	TITLE_STATE state_;
 
@@ -114,6 +113,7 @@ private:
 	float pvTime_;
 	float isPvActive_;
 
+	int titleImage_;
 
 	// コントローラ画像
 	int padImage_;

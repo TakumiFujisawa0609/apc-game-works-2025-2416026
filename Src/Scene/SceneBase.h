@@ -40,11 +40,6 @@ public:
 
 protected:
 
-
-	// ”wŒi
-	int backImage_;
-
-
 	/// @brief Œˆ’èŽž‚Ì“ü—Í”»’è
 	bool IsCheck(void);
 

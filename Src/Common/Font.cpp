@@ -70,7 +70,7 @@ void Font::Init(void)
 bool Font::AddFont(const std::string& fontId, const std::string& internalFontName, const std::string& fontPath,
 	int fontSize, int fontWeight, int fontType)
 {
-	int fontFileSize = FileRead_size(fontPath.c_str());
+	int fontFileSize = static_cast<int>(FileRead_size(fontPath.c_str()));
 	int fontFileHandle = FileRead_open(fontPath.c_str());
 
 	//ÉtÉHÉìÉgì«Ç›çûÇ›é∏îs

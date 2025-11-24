@@ -12,21 +12,22 @@
 #include "../Utility/AsoUtility.h"
 
 
-TitleScene::TitleScene(void)
+TitleScene::TitleScene(void) :
+	SceneBase::SceneBase(),
+	titleImage_(-1),
+	state_(TITLE_STATE::START_GAME),
+	info_(INFO_TYPE::PLAY_PAD)
 {
-	state_ = TITLE_STATE::START_GAME;
-
-	info_ = INFO_TYPE::PLAY_PAD;
+	Load();
 }
 
 void TitleScene::Load(void)
 {
-	
+	//タイトル画像
+	titleImage_ = ResourceManager::GetInstance().LoadHandleId(ResourceManager::SRC::IMG_TITLE);
+
 	/*
 	pv_ = resMng_.LoadHandleId(ResourceManager::SRC::MOVIE_PV);
-
-	//タイトル画像
-	titleImage_ = resMng_.LoadHandleId(ResourceManager::SRC::IMAGE_TITLE);
 
 	// パッド画像
 	padImage_ = resMng_.LoadHandleId(ResourceManager::SRC::IMAGE_PAD);
@@ -44,7 +45,7 @@ void TitleScene::Load(void)
 
 void TitleScene::Init(void)
 {
-	state_ = TITLE_STATE::START_GAME;
+ 	state_ = TITLE_STATE::START_GAME;
 	isViewInfo_ = false; // 遊び方表示
 
 	//SoundManager::GetInstance().Play(SoundManager::SRC::BGM_TITLE, true);
@@ -157,8 +158,10 @@ void TitleScene::Draw(void)
 {
 	Font& font = Font::GetInstance();
 
-	// タイトルロゴ描画
-	DrawGraph(0, 0, backImage_, true);
+	// タイトル描画
+	const Vector2 TITLE_POS = {Application::SCREEN_HALF_X, 300};
+	DrawRotaGraph(TITLE_POS.x, TITLE_POS.y,
+				  2.0, 0.0, titleImage_, true);
 
 	//フォントの描画
 	DrawFont();

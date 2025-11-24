@@ -177,7 +177,8 @@ protected:
 		// 地面にいるか否か
 		bool isGround;
 
-		bool isActive;
+		// カメラ描画判定
+		bool isView;
 		
 		// 無敵時間
 		float timeInv;
@@ -359,7 +360,7 @@ public:
 	/// <param name="flag">着地している否か</param>
 	void SetIsGround(bool flag) { if (paramChara_.isGround != flag) { paramChara_.isGround = flag; } };
 
-	void SetIsActive(bool flag) { paramChara_.isActive = flag; };
+	void SetIsView(bool flag) { paramChara_.isView = flag; };
 
 
 	/// @brief 現在位置取得
@@ -426,7 +427,7 @@ public:
 	/// @brief 地面にあるか否か
 	bool GetIsGround(void) const { return paramChara_.isGround; };
 
-	bool GetIsActive(void) const { return paramChara_.isActive; };
+	bool GetIsView(void) const { return paramChara_.isView; };
 
 	const VECTOR& GetKnockVelo(void) { return paramChara_.knockBack; };
 

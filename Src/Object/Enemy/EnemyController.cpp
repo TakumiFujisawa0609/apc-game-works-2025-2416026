@@ -9,6 +9,7 @@
 #include "./EnemySkeleton.h"
 #include "./EnemyBoss.h"
 #include "../Player/Player.h"
+#include "../../Common/Camera.h"
 #include "../,./../../Utility/AsoUtility.h"
 #include "../,./../../Application.h"
 #include "../,./../../Manager/SceneManager.h"
@@ -16,7 +17,6 @@
 
 
 EnemyController::EnemyController(Player& player) :
-	enemyCnt_(0),listCnt_(0),
 	player_(&player),
 	enemyBoss_(nullptr)
 {
@@ -36,27 +36,22 @@ void EnemyController::Update(void)
 {
 	if (enemys_.empty()) return;
 
-	int cnt = enemyCnt_;
-	
-	for (auto& [num, enemyList] : enemys_)
+	bool isView = false;
+	temp = 0;
+	for (auto& enemyList : enemys_)
 	{
 		// 敵リストが空の時、スキップ
 		if (enemyList.empty()) { continue; }
 
 		for (auto& enemy : enemyList)
 		{
-			if (enemy->GetCurHp() <= 0 && enemy->GetIsAnimEnd())
-			{
-				if (enemy->GetAnimState() == Enemy::ANIM_STATE::DEATH ||
-					enemy->GetAnimState() == Enemy::ANIM_STATE::HIT_2)
-				{
-					cnt--;
-				}
-			}
+			isView = (SceneManager::GetInstance().GetCamera().GetIsCameraClip(enemy->GetFramePos(Object::COLLISION_TYPE::BOTTOM)) &&
+					  SceneManager::GetInstance().GetCamera().GetIsCameraClip(enemy->GetFramePos(Object::COLLISION_TYPE::HEAD)));
+			enemy->SetIsView(isView);
 
-			// 敵無効時、スキップ
-			if (!enemy->GetIsActive()) { continue; }
+			if (!isView) { continue; }
 
+			temp++;
 			enemy->Update();
 		}
 	}
@@ -66,8 +61,6 @@ void EnemyController::Update(void)
 	{
 		enemyBoss_->Update();
 	}
-
-	enemyCnt_ = cnt;
 }
 
 void EnemyController::Draw(void)
@@ -76,45 +69,40 @@ void EnemyController::Draw(void)
 	{
 		enemyBoss_->DrawMagicCircle();
 		enemyBoss_->Draw();
+		DrawFormatString(Application::SCREEN_HALF_X, 0, 0xffffff, "ボスのHP：%d", enemyBoss_->GetCurHp());
 	}
 
 
 	if (!enemys_.empty())
 	{
-		// 敵の数
-		int cnt = 0;
-
-		for (auto& [num, enemylist] : enemys_)
+		for (auto& enemyList : enemys_)
 		{
 			// 敵リストが空の時、スキップ
-			if (enemylist.empty()) { continue; }
+			if (enemyList.empty()) { continue; }
 
-			for (auto& enemy : enemylist)
+			for (auto& enemy : enemyList)
 			{
-				// 敵無効時、処理終了
-				if (!enemy->GetIsActive()) { continue; }
-
-				// 敵の数増加
-				cnt++;
+				// 敵がカメラ外の時、スキップ
+				if (!enemy->GetIsView()) { continue; }
 
 				enemy->Draw();
 			}
 		}
-
-		DrawFormatString(Application::SCREEN_HALF_X, 0, 0xffffff, "敵の数：残り%d体", cnt);
 	}
 }
 
 void EnemyController::DrawDebug(void)
 {
 #ifdef _DEBUG
-	/*
+	
 	if (!SceneManager::GetInstance().GetIsDebugMode()) { return; }
 
+	DrawFormatString(0, 100, 0xff0000, "enemyCnt:%d", temp);
 	int y = 136;
-	for (auto& [num, enemylist] : enemys_)
+
+	for (auto& enemyList : enemys_)
 	{
-		for (auto& enemy : enemylist)
+		for (auto& enemy : enemyList)
 		{
 			//if (!enemy->GetIsActive()) continue;
 			if (enemy->GetAnimState() == Enemy::ANIM_STATE::DEATH) { continue; }
@@ -129,7 +117,7 @@ void EnemyController::DrawDebug(void)
 
 			y += 16;
 		}
-	}*/
+	}
 #endif
 }
 
@@ -145,9 +133,9 @@ void EnemyController::Release(void)
 	{
 
 		// 敵解放処理
-		for (auto& [num, enemylist] : enemys_)
+		for (auto& enemyList : enemys_)
 		{
-			for (auto& enemy : enemylist)
+			for (auto& enemy : enemyList)
 			{
 				enemy->Release();
 				delete enemy;
@@ -193,7 +181,7 @@ void EnemyController::EnemysSpawn(ENEMY_TYPE _type, const VECTOR& _posField)
 
 
 	// 中央の敵を生成
-	EnemyList list;
+	Enemys list;
 	list.push_back(&EnemySpawn(_type, spawnPos));
 
 	// エフェクト生成
@@ -241,7 +229,7 @@ void EnemyController::EnemysSpawn(ENEMY_TYPE _type, const VECTOR& _posField)
 	}
 
 	// リスト格納
-	enemys_.emplace(++listCnt_, list);
+	enemys_.push_back(list);
 }
 
 Enemy& EnemyController::EnemySpawn(ENEMY_TYPE type, const VECTOR& _pos)
@@ -258,9 +246,6 @@ Enemy& EnemyController::EnemySpawn(ENEMY_TYPE type, const VECTOR& _pos)
 	}
 
 	else { return *enemy; }
-
-	// 敵の数
-	enemyCnt_++;
 
 	// 敵を初期化して返す
 	enemy->Load();

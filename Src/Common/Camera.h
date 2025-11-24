@@ -95,7 +95,7 @@ public:
 	/// カメラ位置取得
 	/// </summary>
 	/// <returns>現在カメラ位置</returns>
-	const VECTOR& GetPos(void) const { return pos_.cameraPos;  };
+	const VECTOR& GetPos(void) const { return pos_.camera;  };
 
 	/// <summary>
 	/// カメラ位置割り当て
@@ -127,10 +127,12 @@ public:
 	/// @brief カメラ移動制限割り当て
 	void SetPosLimit(const VECTOR& _min, const VECTOR& _max);
 
-	const VECTOR& GetCameraPos(void) const { return pos_.cameraPos; }
+	const VECTOR& GetCameraPos(void) const { return pos_.camera; }
 
 	const VECTOR& GetCameraAngles(void)const { return rot_.camera.ToEuler(); }
 	const Quaternion& GetCameraRot(void)const { return rot_.camera; }
+
+	bool GetIsCameraClip(const VECTOR& _target);
 
 private:
 
@@ -152,7 +154,7 @@ private:
 
 	struct Pos
 	{
-		VECTOR cameraPos;	// カメラ位置
+		VECTOR camera;	// カメラ位置
 
 		VECTOR target; // カメラ注視点
 		VECTOR playerPos; // プレイヤー位置

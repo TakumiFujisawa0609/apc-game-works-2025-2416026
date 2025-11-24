@@ -151,7 +151,7 @@ void AnimationController::Update(void)
 	
 
 	// 停止時に処理終了
-	if (isStop_) return;
+	if (isStop_) { return; }
 
 	// 再生中のアニメーション
 	if (playType_ != -1)

@@ -9,12 +9,15 @@
 #include "../Application.h"
 
 
-GameClearScene::GameClearScene(void)
+GameClearScene::GameClearScene(void):
+	SceneBase::SceneBase()
 {
+	Load();
 }
 
 void GameClearScene::Load(void)
 {
+	clearHandle_ = ResourceManager::GetInstance().LoadHandleId(ResourceManager::SRC::IMG_CLEAR);
 }
 
 void GameClearScene::Init(void)
@@ -67,13 +70,13 @@ void GameClearScene::Draw(void)
 	Font& font = Font::GetInstance();
 
 	// 背景描画
-	DrawGraph(0, 0, backImage_, true);
+	const Vector2 CLEAR_POS = { Application::SCREEN_HALF_X, 350 };
+	DrawRotaGraph(CLEAR_POS.x, CLEAR_POS.y,
+				  2.0, 0.0, clearHandle_, true);
 
-	
 	//フォントの描画
-	DrawFontText({ Application::SCREEN_HALF_X - 110, Application::SCREEN_HALF_Y }, 60, 0xffffff, "ゲームクリア", false);
-
-	DrawFontText({ Application::SCREEN_HALF_X - 50, Application::SCREEN_HALF_Y +  86}, 30, 0xffffff, "決定でタイトルに戻る", false);
+	const Vector2 TEXT_POS = { Application::SCREEN_HALF_X , Application::SCREEN_HALF_Y + 225 };
+	DrawFontText(TEXT_POS, 30, 0xffffff, "決定でタイトルに戻る", false);
 
 
 	/*

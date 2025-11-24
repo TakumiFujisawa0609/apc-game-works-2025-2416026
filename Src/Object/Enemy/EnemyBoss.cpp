@@ -3,14 +3,19 @@
 #include <vector>
 #include <DxLib.h>
 #include "../../Manager/ResourceManager.h"
+#include "../../Manager/SceneManager.h"
+#include "../../Manager/EffectController.h"
 #include "../Status/StatusData.h"
 #include "../Status/StatusEnemy.h"
 #include "../Common/AnimationController.h"
+#include "../../Utility/AsoUtility.h"
 #include "../Object.h"
 #include "../Player/Player.h"
 
 EnemyBoss::EnemyBoss(Player& player)
-	:Enemy(StatusEnemy::TYPE::SKELETON_BOSS, player, true)
+	:Enemy(StatusEnemy::TYPE::SKELETON_BOSS, player, true),
+	isSpawnCircle_(true), circleRadius_(0.0f),
+	circlePos_(AsoUtility::VECTOR_ZERO)
 {
 
 }
@@ -44,7 +49,6 @@ void EnemyBoss::InitModelFrame(void)
 	index = FindFrameNum(FRAME_NAME_HAND_R);
 	paramChara_.colList.emplace(COLLISION_TYPE::HAND_R, &paramChara_.frames[index]);
 }
-
 void EnemyBoss::InitAnim(void)
 {
 	SetAnimSpeed(BOSS_ANIM::SPAWN, STATUS_ANIM_TYPE::SPAWN);
@@ -70,59 +74,96 @@ void EnemyBoss::InitAnim(void)
 			//anim_->AddExternal(static_cast<int>(type), speed);
 		}
 	}
+
+	anim_->Play(static_cast<int>(BOSS_ANIM::SPAWN), false);
 }
 
 void EnemyBoss::InitPost(void)
 {
 	ChangeActionState(ACTION_STATE::SPAWN);
 
-	const VECTOR INIT_NORM = { 0.0f, 1.0f, 0.0f };
-	COLOR_U8 INIT_DIFUSECOLOR = { 255,255,255,255 };
-	COLOR_U8 INIT_SPECCOLOR = SPAWN_CIRCLE_COLOR;
-	VECTOR circlePos = VAdd(SPAWN_POS, CIRCLE_POS_OFFSET);
+	isSpawnCircle_ = true;
+
+	const float SPAWN_TIME = 3.35f;
+	spawnTime_ = SPAWN_TIME;
+
+	InitSpawnCircle();
+}
+void EnemyBoss::InitSpawnCircle(void)
+{
+	/* 魔法陣初期化 */
+
+	const VECTOR INIT_NORM = AsoUtility::DIR_UP;
+	COLOR_U8 INIT_DIFUSECOLOR = SPAWN_CIRCLE_COLOR;
+
+	circlePos_ = VAdd(SPAWN_POS, CIRCLE_POS_OFFSET);
 
 	// 左前
-	circleVertex_[0].pos = VAdd(circlePos, { -SPAWN_SIZE_HALF, 0.0f, -SPAWN_SIZE_HALF });
+	circleVertex_[0].pos = VAdd(circlePos_, { -SPAWN_SIZE_HALF, 0.0f, -SPAWN_SIZE_HALF });
 	circleVertex_[0].norm = INIT_NORM;
 	circleVertex_[0].dif = INIT_DIFUSECOLOR;
-	circleVertex_[0].spc = INIT_SPECCOLOR;
 	circleVertex_[0].u = 1.0f;
 	circleVertex_[0].v = 1.0f;
 	circleVertex_[0].su = 1.0f;
 	circleVertex_[0].sv = 1.0f;
 
 	// 左奥
-	circleVertex_[1].pos = VAdd(circlePos, { -SPAWN_SIZE_HALF, 0.0f, SPAWN_SIZE_HALF });
+	circleVertex_[1].pos = VAdd(circlePos_, { -SPAWN_SIZE_HALF, 0.0f, SPAWN_SIZE_HALF });
 	circleVertex_[1].norm = INIT_NORM;
 	circleVertex_[1].dif = INIT_DIFUSECOLOR;
-	circleVertex_[1].spc = INIT_SPECCOLOR;
 	circleVertex_[1].u = 1.0f;
 	circleVertex_[1].v = 0.0f;
 	circleVertex_[1].su = 1.0f;
 	circleVertex_[1].sv = 0.0f;
 
 	// 右前
-	circleVertex_[2].pos = VAdd(circlePos, { SPAWN_SIZE_HALF, 0.0f, -SPAWN_SIZE_HALF});
+	circleVertex_[2].pos = VAdd(circlePos_, { SPAWN_SIZE_HALF, 0.0f, -SPAWN_SIZE_HALF });
 	circleVertex_[2].norm = INIT_NORM;
 	circleVertex_[2].dif = INIT_DIFUSECOLOR;
-	circleVertex_[2].spc = INIT_SPECCOLOR;
 	circleVertex_[2].u = 0.0f;
 	circleVertex_[2].v = 1.0f;
 	circleVertex_[2].su = 0.0f;
 	circleVertex_[2].sv = 1.0f;
 
 	// 右奥
-	circleVertex_[3].pos = VAdd(circlePos, { SPAWN_SIZE_HALF, 0.0f, SPAWN_SIZE_HALF});
+	circleVertex_[3].pos = VAdd(circlePos_, { SPAWN_SIZE_HALF, 0.0f, SPAWN_SIZE_HALF });
 	circleVertex_[3].norm = INIT_NORM;
 	circleVertex_[3].dif = INIT_DIFUSECOLOR;
-	circleVertex_[3].spc = INIT_SPECCOLOR;
 	circleVertex_[3].u = 0.0f;
 	circleVertex_[3].v = 0.0f;
 	circleVertex_[3].su = 0.0f;
 	circleVertex_[3].sv = 0.0f;
 
-	circleImage_ = ResourceManager::GetInstance().LoadHandleId(ResourceManager::IMAGE_SPAWNCIRCLE);
+	circleImage_ = ResourceManager::GetInstance().LoadHandleId(ResourceManager::IMG_SPAWNCIRCLE);
+
+	const float rad = 350.0f;
+	circleRadius_ = rad;
 }
+
+
+void EnemyBoss::UpdateStateSpawn(void)
+{
+	if (isSpawnCircle_)
+	{
+		anim_->Stop();
+		return;
+	}
+
+	if (spawnTime_ > 0.0f)
+	{
+		spawnTime_ -= SceneManager::GetInstance().GetDeltaTime();
+
+		if (spawnTime_ <= 0.0f)
+		{
+			// アニメーション再生
+			anim_->Stop(false);
+		}
+		return;
+	}
+
+	Enemy::UpdateStateSpawn();
+}
+
 void EnemyBoss::DrawMagicCircle(void)
 {
 	WORD index[6];
@@ -144,8 +185,36 @@ void EnemyBoss::DrawMagicCircle(void)
 	index[4] = 2;
 	index[5] = 1;
 
-	DrawPolygonIndexed3D(circleVertex_, 4, index, 2, circleImage_, true);
+	if (isSpawnCircle_)
+	{
+#ifdef _DEBUG
+		DrawSphere3D(circlePos_, circleRadius_, 16, 0xffff00, 0xffffff, false);
+#endif
+	}
+
+	// 魔法陣描画
+	if (paramEnemy_.actionState == ACTION_STATE::SPAWN ||
+		paramEnemy_.actionState == ACTION_STATE::NONE)
+	{
+		DrawPolygonIndexed3D(circleVertex_, 4, index, 2, circleImage_, true);
+	}
+	
 }
+
+void EnemyBoss::SetIsSpawnCircle(bool _flag)
+{
+	if (!_flag && isSpawnCircle_)
+	{
+		EffectController& effect = SceneManager::GetInstance().GetEffects();
+		effect.SetEffect(EffectController::EFFECT_TYPE::SPAWN_SKELETON,
+						 circlePos_, 2.0f, AsoUtility::VECTOR_ZERO,
+						 VGet(75.0f, 75.0f, 75.0f));
+		
+	}
+
+	isSpawnCircle_ = _flag;
+}
+
 
 void EnemyBoss::SetAnimSpeed(BOSS_ANIM _type, STATUS_ANIM_TYPE _speedType)
 {
