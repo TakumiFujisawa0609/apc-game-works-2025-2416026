@@ -71,6 +71,7 @@ void SceneManager::Load(void)
 	// ‰‰o‰Šú‰»
 	perform_ = new Perform();
 
+	//InputManager::GetInstance().SetCursorMode(InputManager::CURSOR_MODE::CONFINED_SIDE, false);
 
 	// 3D‰Šú‰»ˆ—
 	Init3D();

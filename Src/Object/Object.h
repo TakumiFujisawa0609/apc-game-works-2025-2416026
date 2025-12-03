@@ -5,6 +5,7 @@
 #include "../Manager/SoundManager.h"
 #include "./Common/AnimationController.h"
 #include "./Common/AttackMotion.h"
+#include "../Utility/AsoUtility.h"
 #include <DxLib.h>
 #include <memory>
 #include <unordered_map>
@@ -92,6 +93,15 @@ protected:
 
 	struct Frame
 	{
+		Frame(void) :
+			name(""), num(-1),
+			pos(VGet(0.0f, 0.0f, 0.0f)),
+			localMat(MGetIdent()),
+			isVisible(false)
+		{
+
+		};
+
 		// フレーム名
 		std::string name;
 
@@ -110,14 +120,22 @@ protected:
 	/// @brief プレイヤーのパラメータ
 	struct ParamChara
 	{
+		ParamChara(void) :
+			pos(AsoUtility::VECTOR_ZERO), prePos(AsoUtility::VECTOR_ZERO),
+			posForward(AsoUtility::VECTOR_ZERO), posLocal(AsoUtility::VECTOR_ZERO),
+			velocity(AsoUtility::VECTOR_ZERO), knockBack(AsoUtility::VECTOR_ZERO), dir(AsoUtility::VECTOR_ZERO), 
+			rot(AsoUtility::VECTOR_ZERO), quaRot(Quaternion::Identity()),
+			quaRotLocal(Quaternion::Identity()), 
+			scale(AsoUtility::VECTOR_ZERO),radius(0.0f),radiusForward(0.0f),
+			handle(-1), hp(0), power(0), speed(0.0f),
+			isGround(true), isView(true), timeInv(0.0f),
+			atkMotion(AttackMotion())
+		{};
 		// 位置
 		VECTOR pos;
 
 		// 前フレームの位置
 		VECTOR prePos;
-
-		// つかみ位置
-		VECTOR posChatch;
 
 		// 正面の位置
 		VECTOR posForward;
@@ -371,9 +389,6 @@ public:
 
 	/// @brief ローカル座標取得
 	const VECTOR& GetPosLocal(void) const { return paramChara_.posLocal; };
-
-	/// @brief 持ちあげ位置取得
-	VECTOR& GetPosChatch(void);
 
 	/// @brief 正面の座標取得
 	VECTOR& GetPosForward(void) { return paramChara_.posForward; };

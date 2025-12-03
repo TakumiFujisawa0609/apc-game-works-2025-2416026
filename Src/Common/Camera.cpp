@@ -1,22 +1,19 @@
 #include "Camera.h"
+#include <DxLib.h>
+#include <EffekseerForDXLib.h>
 #include "../Manager/InputManager.h"
 #include "../Scene/GameScene.h"
 #include "../Utility/AsoUtility.h"
 #include "../Object/Player/Player.h"
-#include <EffekseerForDXLib.h>
-#include <DxLib.h>
 
 
-Camera::Camera(void)
+Camera::Camera(void) :
+	pos_(AsoUtility::VECTOR_ZERO, AsoUtility::VECTOR_ZERO, AsoUtility::VECTOR_ZERO,
+		 AsoUtility::VECTOR_ZERO, AsoUtility::VECTOR_ZERO, AsoUtility::VECTOR_ZERO),
+	rot_(Quaternion::Identity(), Quaternion::Identity(), nullptr),
+	follow_(nullptr),
+	mode_(MODE::NONE)
 {
-	pos_ = {};
-	pos_.target = {};
-	rot_.camera = rot_.target = Quaternion::Identity();
-
-	follow_ = nullptr;
-
-	mode_ = MODE::NONE;
-
 	targetsPos_.clear();
 
 	Load();
@@ -25,8 +22,7 @@ Camera::Camera(void)
 
 void Camera::Load(void)
 {
-	rot_.camera = rot_.target = Quaternion::Identity();
-
+	
 }
 
 void Camera::Init(MODE mode, const VECTOR& pos, float angleY, Player* player)
@@ -39,7 +35,8 @@ void Camera::Init(MODE mode, const VECTOR& pos, float angleY, Player* player)
 
 	zoom_.distance = LOCAL_CAMERA_POS;
 
-	rot_.camera = Quaternion::Euler(0.0f, AsoUtility::Deg2Rad(angleY), 0.0f);
+	rot_.camera = rot_.target = Quaternion::Identity();
+	rot_.camera = Quaternion::AngleAxis(AsoUtility::Deg2Rad(angleY), AsoUtility::AXIS_Y);
 
 	ResetTrackingTarget();
 }
@@ -87,6 +84,7 @@ void Camera::SetBeforeDraw(void)
 
 	
 #ifdef _DEBUG
+	//DrawFormatString(0, 0, 0xffff00, "mouseDir:(%.2f, %.2f)", InputManager::GetInstance().GetMouseDir().x, InputManager::GetInstance().GetMouseDir().y);
 	/*
 	if (follow_ != nullptr)
 	{
@@ -222,8 +220,11 @@ void Camera::_UpdateCameraRot(void)
 
 	//if (input.KeyIsNew(KEY_INPUT_UP)) { rotInput.x += rotPow; }
 		//if (input.KeyIsNew(KEY_INPUT_DOWN)) { rotInput.x -= rotPow; }
-	if (input.KeyIsNew(KEY_INPUT_LEFT)) { rotInput.y += rotPow; }
-	if (input.KeyIsNew(KEY_INPUT_RIGHT)) { rotInput.y -= rotPow; }
+	/*
+	if (input.KeyIsNew(KEY_INPUT_LEFT) ||
+		input.GetMouseDir().x < 0) { rotInput.y += rotPow; }
+	if (input.KeyIsNew(KEY_INPUT_RIGHT) ||
+		input.GetMouseDir().x > 0) { rotInput.y -= rotPow; }*/
 
 	if (input.PadIsAlgKeyNew(InputManager::PAD_NO::PAD1, InputManager::JOYPAD_ALGKEY::RIGHT))
 	{

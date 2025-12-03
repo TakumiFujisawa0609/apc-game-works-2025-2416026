@@ -434,6 +434,14 @@ bool AsoUtility::Equals(const VECTOR& v1, const VECTOR& v2)
     }
     return false;
 }
+bool AsoUtility::Equals(const Vector2& v1, const Vector2& v2)
+{
+    if (v1.x == v2.x && v1.y == v2.y)
+    {
+        return true;
+    }
+    return false;
+}
 
 bool AsoUtility::EqualsVZero(const VECTOR& v1)
 {
@@ -444,6 +452,28 @@ bool AsoUtility::EqualsVZero(const VECTOR& v1)
     }
     return false;
 }
+bool AsoUtility::EqualsVZero(const Vector2& v1)
+{
+    const VECTOR& v2 = VECTOR_ZERO;
+    if (v1.x == v2.x && v1.y == v2.y)
+    {
+        return true;
+    }
+    return false;
+}
+
+bool AsoUtility::IsRange(int _num, int _min, int _max)
+{
+    // ”ÍˆÍ“à‚É‚ ‚é‚©”Û‚©
+    return (_num >= _min && _num < _max);
+}
+
+bool AsoUtility::IsRange(float _num, float _min, float _max)
+{
+    // ”ÍˆÍ“à‚É‚ ‚é‚©”Û‚©
+    return (_num >= _min && _num < _max);
+}
+
 
 VECTOR AsoUtility::Normalize(const Vector2& v)
 {

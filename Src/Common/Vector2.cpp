@@ -1,7 +1,14 @@
 #include "Vector2.h"
 
 
-#pragma region Žl‘¥‰‰ŽZ
+
+Vector2 Vector2::operator=(const Vector2& vec)
+{
+	x = vec.x;
+	y = vec.y;
+	return Vector2{ vec.x, vec.y };
+}
+
 
 Vector2 Vector2::operator+(const Vector2& vec)const
 {
@@ -46,4 +53,3 @@ void Vector2::operator/=(const Vector2& vec)
 	x /= vec.x;
 	y /= vec.y;
 }
-#pragma endregion

@@ -16,7 +16,7 @@ public:
 	enum class TITLE_STATE
 	{
 		START_GAME, // ゲームシーン遷移状態
-		INFO,       // 遊び方
+		//INFO,       // 遊び方
 		GAME_END,   //ゲーム終了
 
 		MAX, //要素数
@@ -73,16 +73,16 @@ private:
 	static constexpr int TEXT_SIZE_SELECT = 40;
 
 	// テキスト位置
-	static constexpr Vector2 TEXT_POS = { 0, 150 };
+	static constexpr Vector2 TEXT_POS = { 0, 185 };
 
 	// テキスト縦調整値
 	static constexpr int TEXT_POS_Y_OFFSET = 75;
 
 	// デフォルトのテキスト色
-	static constexpr unsigned int TEXT_COLOR_DEFAULT = 0xfefefe;
+	static constexpr unsigned int TEXT_COLOR_DEFAULT = 0x0;
 
 	// 選択時のテキスト色
-	static constexpr unsigned int TEXT_COLOR_SELECT = 0x555555;
+	static constexpr unsigned int TEXT_COLOR_SELECT = 0xffffff;
 
 	static constexpr Vector2 INFO_TEXT_POS = { 500, 250 };
 

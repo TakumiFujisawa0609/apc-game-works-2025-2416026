@@ -15,6 +15,9 @@ public:
 	// 度(deg) → ラジアン(rad)
 	static constexpr float DEG2RAD = (DX_PI_F / 180.0f);
 
+	static constexpr Vector2 VECTOR2_ZERO = { 0, 0 };
+	static constexpr Vector2 VECTOR2_ONE = { 1, 1 };
+
 	static constexpr VECTOR VECTOR_ZERO = { 0.0f, 0.0f, 0.0f };
 	static constexpr VECTOR VECTOR_ONE = { 1.0f, 1.0f, 1.0f };
 
@@ -123,7 +126,12 @@ public:
 
 	// 比較
 	static bool Equals(const VECTOR& v1, const VECTOR& v2);
+	static bool Equals(const Vector2& v1, const Vector2& v2);
 	static bool EqualsVZero(const VECTOR& v1);
+	static bool EqualsVZero(const Vector2& v1);
+
+	static bool IsRange(int _num, int _min, int _max);
+	static bool IsRange(float _num, float _min, float _max);
 
 	// 2次元ベクトル → 3次元ベクトルに正規化
 	static VECTOR Normalize(const Vector2& v);

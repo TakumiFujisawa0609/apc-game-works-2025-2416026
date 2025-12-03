@@ -102,7 +102,7 @@ bool SoundManager::Play(SRC _src, bool _isLoop, bool _isPitch, float _pitchRange
 	if (findSound == sounds_.end())
 	{
 #ifdef _DEBUG
-		assert("\n2D再生する音声が割り当てられていません\n(；_；)\n"); // 例外スロー
+		assert(false && "\n2D再生する音声が割り当てられていません\n(；_；)\n"); // 例外スロー
 #endif
 		return false;
 	}
@@ -126,7 +126,7 @@ bool SoundManager::Play(SRC _src, bool _isLoop, VECTOR _pos, float _radius)
 	if (lPair == sounds_.end())
 	{
 #ifdef _DEBUG
-		assert("\n3D再生する音声が割り当てられていません\n(；_；)\n"); // 例外スロー
+		assert(false && "\n3D再生する音声が割り当てられていません\n(；_；)\n"); // 例外スロー
 #endif
 		return false;
 	}
@@ -201,7 +201,7 @@ bool SoundManager::IsSoundStart(SRC _src)
 	if (soundlist == sounds_.end())
 	{
 #ifdef _DEBUG
-		assert("\n停止するサウンドが割り当てられていません\n(；_；)\n"); // 例外スロー
+		assert(false &&"\n停止するサウンドが割り当てられていません\n(；_；)\n"); // 例外スロー
 #endif
 		return false;
 	}
@@ -217,7 +217,7 @@ bool SoundManager::IsSoundPlay(SRC _src)
 	if (soundlist == sounds_.end())
 	{
 #ifdef _DEBUG
-		assert("\n停止するサウンドが割り当てられていません\n(；_；)\n"); // 例外スロー
+		assert(false &&"\n停止するサウンドが割り当てられていません\n(；_；)\n"); // 例外スロー
 #endif
 		return false;
 	}
@@ -233,7 +233,7 @@ bool SoundManager::IsSoundEnd(SRC _src)
 	if (soundlist == sounds_.end())
 	{
 #ifdef _DEBUG
-		assert("\n停止するサウンドが割り当てられていません\n(；_；)\n"); // 例外スロー
+		assert(false &&"\n停止するサウンドが割り当てられていません\n(；_；)\n"); // 例外スロー
 #endif
 		return false;
 	}

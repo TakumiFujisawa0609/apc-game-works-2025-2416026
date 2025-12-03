@@ -417,9 +417,9 @@ void CollisionManager::CollisionPlayerToBoss(void)
 		{
 			boss.SetDamage(power);
 
-			/*SceneManager::GetInstance().GetEffects().
+			SceneManager::GetInstance().GetEffects().
 				SetEffect(EffectController::EFFECT_TYPE::SWORD_HIT,
-					eBody, AsoUtility::VECTOR_ZERO, {50.0f, 50.0f,50.0f});*/
+					eBody, 0.0f, {50.0f, 50.0f,50.0f});
 		}
 	}
 

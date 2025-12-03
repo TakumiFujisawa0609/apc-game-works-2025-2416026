@@ -164,7 +164,7 @@ public:
 
 	/// @brief インスタンスの取得
 	/// @return 入力マネージャ
-	static InputManager& GetInstance(void);
+	static InputManager& GetInstance(void) { return *instance_; };
 
 
 	/// @brief 初期化処理
@@ -372,7 +372,6 @@ private:
 	InputManager::Mouse mouseInfoEmpty_;
 
 	Vector2 mousePos_; // マウスカーソル位置
-	int mouseInput_;   // マウスボタン入力状態	
 
 	// マウスホイール回転量
 	Mouse mouseWheel_;
@@ -397,10 +396,10 @@ private:
 	~InputManager(void) = default;
 
 	// コピーコンストラクタ対策
-	InputManager(const InputManager&) = delete;
-	InputManager& operator=(const InputManager&) = delete;
-	InputManager(InputManager&&) = delete;
-	InputManager& operator=(InputManager&&) = delete;
+	//InputManager(const InputManager&) = delete;
+	//InputManager& operator=(const InputManager&) = delete;
+	//InputManager(InputManager&&) = delete;
+	//InputManager& operator=(InputManager&&) = delete;
 
 
 	/// <summary>

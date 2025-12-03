@@ -1,12 +1,14 @@
 #include "InputManager.h" 
 #include <DxLib.h>
 #include <cassert>
+#include <unordered_map>
 #ifdef _DEBUG
 #include <string>
 #endif
+#include "../Utility/AsoUtility.h"
 
 
-InputManager* InputManager::instance_;
+InputManager* InputManager::instance_ = nullptr;
 
 void InputManager::CreateInstance(void)
 {
@@ -17,22 +19,18 @@ void InputManager::CreateInstance(void)
 	instance_->Init(); // マネージャ初期化処理
 }
 
-InputManager& InputManager::GetInstance(void)
-{
-	if (instance_ == nullptr)
-	{
-		InputManager::CreateInstance();
-#ifdef _DEBUG
-		OutputDebugString("\n入力マネージャが生成されていません。\n入力マネージャを生成しました。\n");
-#endif
-	}
-	return *instance_;
-}
 
 InputManager::InputManager(void)
 {
-	mouseInput_ = -1;
+	//keys_.clear();
+	//mouses_.clear();
 }
+/*
+InputManager::~InputManager(void)
+{
+	//keys_.clear();
+	//mouses_.clear();
+}*/
 
 
 void InputManager::Init(void)
@@ -85,29 +83,21 @@ void InputManager::SetInputMouse(void)
 void InputManager::Update(void)
 {
 	// キーボード入力判定
-	for (auto& k : keys_)
+	for (auto& [type, key] : keys_)
 	{
-		Key& key = k.second;
-
 		key.inputOld = key.inputNew;
 		key.inputNew = CheckHitKey(key.keyType);
 		key.trgDown = ( key.inputNew && !key.inputOld);
 		key.trgUp   = (!key.inputNew && key.inputOld);
 	}
 
-
-	// マウス判定
-	mouseInput_ = GetMouseInput();
-
 	//マウス座標取得
 	GetMousePoint(&mousePos_.x, &mousePos_.y);
 
 
 	// マウス入力判定
-	for (auto& m : mouses_)
+	for (auto&[type, mouse] : mouses_)
 	{
-		Mouse& mouse = m.second;
-
 		mouse.inputOld = mouse.inputNew;
 		mouse.inputNew = ((GetMouseInput() & mouse.type) != 0);
 		mouse.trgDown = ( mouse.inputNew && !mouse.inputOld);
@@ -124,10 +114,17 @@ void InputManager::Update(void)
 
 void InputManager::Destroy(void)
 {
+	if (instance_ == nullptr) { return; }
+
+	// リソース解放（インスタンスメンバにアクセス）
 	keys_.clear();	 // 入力キー配列 解放
 	mouses_.clear(); // マウス入力配列 解放
+	
+	// インスタンスポインタを先にクリアしておく
+	//InputManager* toDelete = instance_;
+	//instance_ = nullptr;
+	delete instance_;
 
-	//delete instance_; // マネージャ 削除
 }
 
 void InputManager::InitInput(void)

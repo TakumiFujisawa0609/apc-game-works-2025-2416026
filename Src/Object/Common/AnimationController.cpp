@@ -147,7 +147,6 @@ void AnimationController::Update(void)
 	// 経過時間の取得
 	float deltaTime = SceneManager::GetInstance().GetDeltaTime();
 	auto& curAnim = animations_[playType_];
-	auto& preAnim = animations_[prePlayType_];
 	
 
 	// 停止時に処理終了
@@ -171,6 +170,8 @@ void AnimationController::Update(void)
 
 	if (prePlayType_ != -1)
 	{
+		auto& preAnim = animations_[prePlayType_];
+
 		// ブレンドタイマー増加
 		curBlendTime_ += deltaTime;
 		

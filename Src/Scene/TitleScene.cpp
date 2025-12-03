@@ -83,6 +83,7 @@ void TitleScene::Update(void)
 			}
 			break;
 
+			/*
 			case TITLE_STATE::INFO:
 			{
 				// 遊び方描画フラグ変更処理
@@ -98,7 +99,7 @@ void TitleScene::Update(void)
 				// 矢印の大きさ割り当て
 				arrowScale_ = ARROW_SCALE;
 			}
-			break;
+			break;*/
 
 			case TITLE_STATE::GAME_END:
 			{
@@ -229,7 +230,8 @@ void TitleScene::DrawFont(void)
 	DrawTitleText(yOffset, "ゲームスタート", TITLE_STATE::START_GAME);
 	
 	// 操作説明テキスト
-	DrawTitleText(yOffset, "操作説明", TITLE_STATE::INFO);
+	//DrawTitleText(yOffset, "操作説明", TITLE_STATE::INFO);
+
 
 	// ゲーム終了テキスト
 	DrawTitleText(yOffset, "ゲーム終了", TITLE_STATE::GAME_END);

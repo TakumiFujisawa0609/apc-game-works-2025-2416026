@@ -342,7 +342,7 @@ void StatusData::SaveCSV(void)
 	std::ofstream outputFile(DATA_HANDLE);
 	if (!outputFile.is_open())
 	{
-		assert("\ncsvファイルが開かれませんでした。\n");
+		assert(false && w"\ncsvファイルが開かれませんでした。\n");
 	}
 
 	for (int y = 0; y < SAVE_LENGTH; ++y)

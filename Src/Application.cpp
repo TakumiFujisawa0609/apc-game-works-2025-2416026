@@ -48,12 +48,12 @@ void Application::Init(void)
 	SetGraphMode(SCREEN_SIZE_X, SCREEN_SIZE_Y, 32);
 
 	// ウィンドウの状態の設定
+	constexpr bool WINDOW_SCREEN = false;
 #ifdef _DEBUG
 	ChangeWindowMode(true);
 #else
 	// リリース時、フルスクリーン
-	ChangeWindowMode(true);
-	//ChangeWindowMode(false);
+	ChangeWindowMode(WINDOW_SCREEN);
 #endif
 
 	// DX_LIB_11の使用
@@ -63,7 +63,7 @@ void Application::Init(void)
 	SetWaitVSyncFlag(false);
 
 	// DX_LIB初期化処理
-	if (DxLib_Init() == -1) assert("\nDxLibが初期化されていません");
+	if (DxLib_Init() == -1) assert(false && "\nDxLibが初期化されていません");
 
 
 	// エフェクト初期化処理

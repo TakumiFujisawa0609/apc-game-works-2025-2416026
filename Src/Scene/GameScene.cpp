@@ -81,6 +81,7 @@ void GameScene::ReInit(void)
 
 	// ƒJƒƒ‰ˆÚ“®—ÌˆæŠ„‚è“–‚Ä
 	Camera& camera = SceneManager::GetInstance().GetCamera();
+
 	float angleY = static_cast<float>(player_->GetRotationLocal().y);
 	camera.Init(Camera::MODE::FOLLOW, player_->GetPos(), angleY, player_);
 

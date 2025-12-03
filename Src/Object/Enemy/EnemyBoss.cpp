@@ -84,7 +84,7 @@ void EnemyBoss::InitPost(void)
 
 	isSpawnCircle_ = true;
 
-	const float SPAWN_TIME = 3.35f;
+	const float SPAWN_TIME = 3.0f;
 	spawnTime_ = SPAWN_TIME;
 
 	InitSpawnCircle();
@@ -206,8 +206,10 @@ void EnemyBoss::SetIsSpawnCircle(bool _flag)
 	if (!_flag && isSpawnCircle_)
 	{
 		EffectController& effect = SceneManager::GetInstance().GetEffects();
+		VECTOR pos = { circlePos_.x, circlePos_.y + 2.0f, circlePos_.z };
+
 		effect.SetEffect(EffectController::EFFECT_TYPE::SPAWN_SKELETON,
-						 circlePos_, 2.0f, AsoUtility::VECTOR_ZERO,
+						 pos, 2.0f, AsoUtility::VECTOR_ZERO,
 						 VGet(75.0f, 75.0f, 75.0f));
 		
 	}

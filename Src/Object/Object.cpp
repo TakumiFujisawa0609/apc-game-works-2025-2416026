@@ -13,33 +13,12 @@
 #include "./Common/AttackMotion.h"
 
 
-Object::Object(void)
+Object::Object(void):
+	paramChara_(ParamChara::ParamChara()),
+	anim_(nullptr)
 {
-	paramChara_.handle = -1;
-	paramChara_.velocity = AsoUtility::VECTOR_ZERO;
-
-	paramChara_.pos = paramChara_.prePos = AsoUtility::VECTOR_ZERO;
-	paramChara_.posLocal = AsoUtility::VECTOR_ZERO;
-	paramChara_.posForward = AsoUtility::VECTOR_ZERO;
-	paramChara_.isView = true;	
-
-	paramChara_.quaRot = Quaternion::Identity();
-	paramChara_.quaRotLocal = Quaternion::Identity();
-	
-	paramChara_.quaRotLocal = Quaternion::Mult(paramChara_.quaRotLocal,
-		Quaternion::AngleAxis(AsoUtility::Deg2Rad(0.0f), AsoUtility::AXIS_X));
-
-	paramChara_.quaRotLocal = Quaternion::Mult(paramChara_.quaRotLocal,
-		Quaternion::AngleAxis(AsoUtility::Deg2Rad(0.0f), AsoUtility::AXIS_Y));
-
-	paramChara_.quaRotLocal = Quaternion::Mult(paramChara_.quaRotLocal,
-		Quaternion::AngleAxis(AsoUtility::Deg2Rad(0.0f), AsoUtility::AXIS_Z));	
-	
-	paramChara_.timeInv = 0.0f;
-	paramChara_.isGround = true;
 	paramChara_.frames.clear();
 
-	anim_ = nullptr;
 	//collision_ = nullptr;
 }
 
@@ -54,12 +33,13 @@ void Object::Load(void)
 void Object::Init(const VECTOR& _pos, float _angleY)
 {
 	// 位置割り当て
-	paramChara_.pos = paramChara_.prePos = _pos;
-	float rotY = AsoUtility::Deg2Rad(_angleY);
-	paramChara_.quaRot = Quaternion::Euler({ 0.0f, rotY, 0.0f });
+	paramChara_.pos = _pos;
+	paramChara_.prePos = _pos;
+	paramChara_.quaRot = Quaternion::AngleAxis(AsoUtility::Deg2Rad(_angleY),
+												AsoUtility::AXIS_Y);
 
 	paramChara_.velocity = AsoUtility::VECTOR_ZERO;
-	paramChara_.dir = {};
+	paramChara_.dir = AsoUtility::VECTOR_ZERO;
 
 	// 攻撃状態初期化
 	paramChara_.atkMotion.Init();
@@ -264,7 +244,7 @@ int Object::FindFrameNum(const std::string& name)
 			return num;
 		}
 	}
-	assert("\nフレーム名が一致しませんでした。\n");
+	assert(false &&"\nフレーム名が一致しませんでした。\n");
 	return num;
 }
 
@@ -524,12 +504,6 @@ void Object::SetPosForward(void)
 	paramChara_.posForward = pos;
 }
 
-
-VECTOR& Object::GetPosChatch(void)
-{
-	/* 持ちあげ位置を取得 */
-	return paramChara_.posChatch;
-}
 
 const VECTOR& Object::GetPosDelta(void) const
 {
