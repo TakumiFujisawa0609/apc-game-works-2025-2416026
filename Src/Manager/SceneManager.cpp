@@ -106,8 +106,6 @@ void SceneManager::Update(void)
 {
 	/*　更新処理　*/
 
-	InputManager& input = InputManager::GetInstance();
-
 	// シーン無効時は処理終了
 	if (curScene_ == nullptr) return;
 
@@ -130,7 +128,7 @@ void SceneManager::Update(void)
 
 	// デバッグモード有効化処理
 #ifdef _DEBUG
-	if (input.KeyIsTrgDown(KEY_INPUT_TAB))
+	if (InputManager::GetInstance().KeyIsTrgDown(KEY_INPUT_TAB))
 	{
 		isDebugMode_ = ((!isDebugMode_) ? true : false);
 	}

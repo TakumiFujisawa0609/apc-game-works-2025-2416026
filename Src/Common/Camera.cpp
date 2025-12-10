@@ -102,35 +102,34 @@ void Camera::SetBeforeDraw(void)
 
 void Camera::DebugMove(void)
 {
-	InputManager& input = InputManager::GetInstance();
 	const float move = 2.5f;
 	const float rot = 1.0f;
 
-	if (input.KeyIsNew(KEY_INPUT_UP))
+	if (InputManager::GetInstance().KeyIsNew(KEY_INPUT_UP))
 	{
-		if (input.KeyIsNew(KEY_INPUT_LSHIFT)) { pos_.camera.y += move; }
+		if (InputManager::GetInstance().KeyIsNew(KEY_INPUT_LSHIFT)) { pos_.camera.y += move; }
 
-		else if (input.KeyIsNew(KEY_INPUT_RSHIFT)) { rot_.camera.x += AsoUtility::Deg2Rad(rot); }
+		else if (InputManager::GetInstance().KeyIsNew(KEY_INPUT_RSHIFT)) { rot_.camera.x += AsoUtility::Deg2Rad(rot); }
 
 		else { pos_.camera.z += move; }
 	}
-	if (input.KeyIsNew(KEY_INPUT_DOWN))
+	if (InputManager::GetInstance().KeyIsNew(KEY_INPUT_DOWN))
 	{
-		if (input.KeyIsNew(KEY_INPUT_LSHIFT)) { pos_.camera.y -= move; }
+		if (InputManager::GetInstance().KeyIsNew(KEY_INPUT_LSHIFT)) { pos_.camera.y -= move; }
 
-		else if (input.KeyIsNew(KEY_INPUT_LCONTROL)) { rot_.camera.x -= AsoUtility::Deg2Rad(rot); }
+		else if (InputManager::GetInstance().KeyIsNew(KEY_INPUT_LCONTROL)) { rot_.camera.x -= AsoUtility::Deg2Rad(rot); }
 
 		else { pos_.camera.z -= move; }
 	}
-	if (input.KeyIsNew(KEY_INPUT_RIGHT))
+	if (InputManager::GetInstance().KeyIsNew(KEY_INPUT_RIGHT))
 	{
-		if (input.KeyIsNew(KEY_INPUT_LCONTROL)) { rot_.camera.y += AsoUtility::Deg2Rad(rot); }
+		if (InputManager::GetInstance().KeyIsNew(KEY_INPUT_LCONTROL)) { rot_.camera.y += AsoUtility::Deg2Rad(rot); }
 
 		else { pos_.camera.x += move; }
 	}
-	if (input.KeyIsNew(KEY_INPUT_LEFT))
+	if (InputManager::GetInstance().KeyIsNew(KEY_INPUT_LEFT))
 	{
-		if (input.KeyIsNew(KEY_INPUT_LCONTROL)) { rot_.camera.y -= AsoUtility::Deg2Rad(rot); }
+		if (InputManager::GetInstance().KeyIsNew(KEY_INPUT_LCONTROL)) { rot_.camera.y -= AsoUtility::Deg2Rad(rot); }
 
 		else { pos_.camera.x -= move; }
 	}
@@ -214,21 +213,22 @@ void Camera::SmoothRotation(void)
 void Camera::_UpdateCameraRot(void)
 {
 	float smoothPow = 0.15f;
-	InputManager& input = InputManager::GetInstance();
 	float rotPow = (AsoUtility::Deg2Rad(2.5f));
 	VECTOR rotInput = {};
 
-	//if (input.KeyIsNew(KEY_INPUT_UP)) { rotInput.x += rotPow; }
-		//if (input.KeyIsNew(KEY_INPUT_DOWN)) { rotInput.x -= rotPow; }
-	/*
-	if (input.KeyIsNew(KEY_INPUT_LEFT) ||
-		input.GetMouseDir().x < 0) { rotInput.y += rotPow; }
-	if (input.KeyIsNew(KEY_INPUT_RIGHT) ||
-		input.GetMouseDir().x > 0) { rotInput.y -= rotPow; }*/
+	if (InputManager::GetInstance().KeyIsNew(KEY_INPUT_UP)) { rotInput.x += rotPow; }
+	if (InputManager::GetInstance().KeyIsNew(KEY_INPUT_DOWN)) { rotInput.x -= rotPow; }
+	
+	//VECTOR mouseDir = InputManager::GetInstance().GetMouseDir();
+	if (InputManager::GetInstance().KeyIsNew(KEY_INPUT_LEFT)/* ||
+		mouseDir.x < 0*/) { rotInput.y += rotPow; }
 
-	if (input.PadIsAlgKeyNew(InputManager::PAD_NO::PAD1, InputManager::JOYPAD_ALGKEY::RIGHT))
+	if (InputManager::GetInstance().KeyIsNew(KEY_INPUT_RIGHT)/* ||
+		mouseDir.x > 0*/) { rotInput.y -= rotPow; }
+
+	if (InputManager::GetInstance().PadIsAlgKeyNew(InputManager::PAD_NO::PAD1, InputManager::JOYPAD_ALGKEY::RIGHT))
 	{
-		VECTOR dir = input.GetAlgKeyDirXZ(InputManager::PAD_NO::PAD1, InputManager::JOYPAD_ALGKEY::RIGHT);
+		VECTOR dir = InputManager::GetInstance().GetAlgKeyDirXZ(InputManager::PAD_NO::PAD1, InputManager::JOYPAD_ALGKEY::RIGHT);
 		rotInput.y += (dir.x * rotPow);
 		//rotInput.x += (dir.y * rotPow);
 	}

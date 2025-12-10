@@ -131,9 +131,6 @@ void Application::Run(void)
 	// シーン管理マネージャ
 	SceneManager& scene = SceneManager::GetInstance();
 
-	// 入力マネージャ
-	InputManager& input = InputManager::GetInstance();
-
 
 	while (ProcessMessage() == 0 && isGame_)
 	{
@@ -147,7 +144,7 @@ void Application::Run(void)
 			fps.SetFrameRate();
 
 			// 入力マネージャ更新
-			input.Update();
+			InputManager::GetInstance().Update();
 
 			if (!exit_->GetIsActiveMenu())
 			{
@@ -166,7 +163,7 @@ void Application::Run(void)
 
 			// データ再ロード
 			if (scene.GetIsDebugMode() &&
-				input.KeyIsTrgDown(KEY_INPUT_DELETE) &&
+				InputManager::GetInstance().KeyIsTrgDown(KEY_INPUT_DELETE) &&
 				scene.GetSceneId() == SceneManager::SCENE_ID::TITLE)
 			{
 				StatusData::GetInstance().Load();

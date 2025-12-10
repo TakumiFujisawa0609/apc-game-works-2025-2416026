@@ -270,14 +270,12 @@ void Player::UpdateActionState(void)
 
 void Player::UpdateStateIdle(void)
 {
-	auto& input = InputManager::GetInstance();
-
 	// ジャンプ
 	//Jump();
 
 	// 移動処理
-	if (input.KeyIsNewAll() ||
-		input.PadIsAlgKeyNew(InputManager::PAD_NO::PAD1, PAD_ALGKEY::LEFT))
+	if (InputManager::GetInstance().KeyIsNewAll() ||
+		InputManager::GetInstance().PadIsAlgKeyNew(InputManager::PAD_NO::PAD1, PAD_ALGKEY::LEFT))
 	{
 		Move();
 	}
@@ -414,8 +412,6 @@ void Player::ChangeActionState(ACTION_STATE _state)
 void Player::Move(void)
 {
 	/*　移動処理　*/
-
-	InputManager& input = InputManager::GetInstance();
 	VECTOR inputDir = AsoUtility::VECTOR_ZERO;
 	
 	// 移動速度
@@ -425,33 +421,33 @@ void Player::Move(void)
 
 	if (IsActiveAction())
 	{
-		if (input.PadIsAlgKeyNew(InputManager::PAD_NO::PAD1, InputManager::JOYPAD_ALGKEY::LEFT))
+		if (InputManager::GetInstance().PadIsAlgKeyNew(InputManager::PAD_NO::PAD1, InputManager::JOYPAD_ALGKEY::LEFT))
 		{
-			inputDir = input.GetAlgKeyDirXZ(InputManager::PAD_NO::PAD1, InputManager::JOYPAD_ALGKEY::LEFT);
+			inputDir = InputManager::GetInstance().GetAlgKeyDirXZ(InputManager::PAD_NO::PAD1, InputManager::JOYPAD_ALGKEY::LEFT);
 		}
 
 		if (AsoUtility::EqualsVZero(inputDir))
 		{
-			bool inputY = (input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_BACK]) &&
-				!input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_FRONT]) ||
-				!input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_BACK]) &&
-				input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_FRONT]));
+			bool inputY = (InputManager::GetInstance().KeyIsNew(inputKey_[INPUT_TYPE::MOVE_BACK]) &&
+				!InputManager::GetInstance().KeyIsNew(inputKey_[INPUT_TYPE::MOVE_FRONT]) ||
+				!InputManager::GetInstance().KeyIsNew(inputKey_[INPUT_TYPE::MOVE_BACK]) &&
+				InputManager::GetInstance().KeyIsNew(inputKey_[INPUT_TYPE::MOVE_FRONT]));
 
-			bool inputX = (input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_LEFT]) &&
-				!input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_RIGHT]) ||
-				!input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_LEFT]) &&
-				input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_RIGHT]));
+			bool inputX = (InputManager::GetInstance().KeyIsNew(inputKey_[INPUT_TYPE::MOVE_LEFT]) &&
+				!InputManager::GetInstance().KeyIsNew(inputKey_[INPUT_TYPE::MOVE_RIGHT]) ||
+				!InputManager::GetInstance().KeyIsNew(inputKey_[INPUT_TYPE::MOVE_LEFT]) &&
+				InputManager::GetInstance().KeyIsNew(inputKey_[INPUT_TYPE::MOVE_RIGHT]));
 
 
 			if (inputY)
 			{
-				if (input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_BACK]))
+				if (InputManager::GetInstance().KeyIsNew(inputKey_[INPUT_TYPE::MOVE_BACK]))
 				{
 					// 奥移動処理
 					inputDir.z = 1.0f;
 				}
 
-				if (input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_FRONT]))
+				if (InputManager::GetInstance().KeyIsNew(inputKey_[INPUT_TYPE::MOVE_FRONT]))
 				{
 					// 前移動処理
 					inputDir.z = -1.0f;
@@ -460,13 +456,13 @@ void Player::Move(void)
 
 			if (inputX)
 			{
-				if (input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_LEFT]))
+				if (InputManager::GetInstance().KeyIsNew(inputKey_[INPUT_TYPE::MOVE_LEFT]))
 				{
 					// 左移動処理
 					inputDir.x = -1.0f;
 				}
 
-				if (input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_RIGHT]))
+				if (InputManager::GetInstance().KeyIsNew(inputKey_[INPUT_TYPE::MOVE_RIGHT]))
 				{
 					// 右移動処理
 					inputDir.x = 1.0f;
@@ -537,7 +533,6 @@ void Player::DamageProc(void)
 void Player::AnimStateIdle(void)
 {
 	ANIM_STATE state = static_cast<ANIM_STATE>(anim_->GetPlayType());
-	InputManager& input = InputManager::GetInstance();
 
 	// 待機アニメーション状態
 	if (state == ANIM_STATE::IDLE)
@@ -714,17 +709,15 @@ bool Player::IsActionStrong(void)
 
 bool Player::IsInputMove(void)
 {
-	InputManager& input = InputManager::GetInstance();
-
 	bool ret = false;
 
 	// 左スティックが入力されている時
-	if (input.PadIsAlgKeyNew(PAD_NO::PAD1, PAD_ALGKEY::LEFT) ||
+	if (InputManager::GetInstance().PadIsAlgKeyNew(PAD_NO::PAD1, PAD_ALGKEY::LEFT) ||
 
-		input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_FRONT]) ||
-		input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_BACK]) ||
-		input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_LEFT]) ||
-		input.KeyIsNew(inputKey_[INPUT_TYPE::MOVE_RIGHT]))
+		InputManager::GetInstance().KeyIsNew(inputKey_[INPUT_TYPE::MOVE_FRONT]) ||
+		InputManager::GetInstance().KeyIsNew(inputKey_[INPUT_TYPE::MOVE_BACK]) ||
+		InputManager::GetInstance().KeyIsNew(inputKey_[INPUT_TYPE::MOVE_LEFT]) ||
+		InputManager::GetInstance().KeyIsNew(inputKey_[INPUT_TYPE::MOVE_RIGHT]))
 	{
 		// 移動入力時、true
 		ret = true;
@@ -735,13 +728,11 @@ bool Player::IsInputMove(void)
 
 bool Player::IsInputAtkJub(void)
 {
-	InputManager& input = InputManager::GetInstance();
-
 	bool ret = false;
 
 	// コントローラ入力時
-	if (input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::LEFT) ||
-		input.MouseIsTrgDown(inputKey_[INPUT_TYPE::ATTACK_JUB]))
+	if (InputManager::GetInstance().PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::LEFT) ||
+		InputManager::GetInstance().MouseIsTrgDown(inputKey_[INPUT_TYPE::ATTACK_JUB]))
 	{
 		// 移動入力時、true
 		ret = true;
@@ -752,13 +743,11 @@ bool Player::IsInputAtkJub(void)
 
 bool Player::IsInputAtkStrong(void)
 {
-	InputManager& input = InputManager::GetInstance();
-
 	bool ret = false;
 
 	// コントローラ入力時
-	if (input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::UP) ||
-		input.MouseIsTrgDown(inputKey_[INPUT_TYPE::ATTACK_STRONG]))
+	if (InputManager::GetInstance().PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::UP) ||
+		InputManager::GetInstance().MouseIsTrgDown(inputKey_[INPUT_TYPE::ATTACK_STRONG]))
 	{
 		// 移動入力時、true
 		ret = true;
@@ -770,11 +759,9 @@ bool Player::IsInputAtkStrong(void)
 bool Player::IsInputDash(void)
 {
 	/* ダッシュ入力判定 */
-	InputManager& input = InputManager::GetInstance();
-
-	if (input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::L_STICK) ||
-		input.PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::DOWN) ||
-		input.KeyIsTrgDown(inputKey_[INPUT_TYPE::DASH]))
+	if (InputManager::GetInstance().PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::L_STICK) ||
+		InputManager::GetInstance().PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::DOWN) ||
+		InputManager::GetInstance().KeyIsTrgDown(inputKey_[INPUT_TYPE::DASH]))
 	{
 		// ダッシュ切替処理
 		paramPlayer_.isDash = ((!paramPlayer_.isDash) ? true : false);

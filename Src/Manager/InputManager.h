@@ -16,10 +16,19 @@ public:
 		MAX,
 	};
 
+	enum class CURSOR_MODE
+	{
+		NONE = 0, // 変更なし
+		LOCKED,   // 画面中央固定
+		CONFINED, // ウィンドウ内
+		CONFINED_SIDE, // ウィンドウ内の反対側に行く
+	};
+
 	/// @brief コントローラー認識番号
 	enum class PAD_NO
 	{
-		PAD1 = 1,         // パッド１入力
+		NONE,
+		PAD1,             // パッド１入力
 		PAD2,             // パッド２入力
 		PAD3,             // パッド３入力
 		PAD4,             // パッド４入力
@@ -84,7 +93,7 @@ private:
 	};
 
 	/// @brief  マウス情報
-	struct Mouse
+	struct MouseButton
 	{
 		int type;	   // 入力の種類
 		bool inputOld; // 1フレーム前の入力状態
@@ -150,13 +159,13 @@ public:
 
 	// 十字キーの入力受付しきい値(0.0～1.0)
 	static constexpr float DPAD_THRESHOLD = (1.0f * 4500.0f);
-	
+
 	// マウスホイール移動最大
 	static constexpr int MOUSE_WHEEL_MAX = 2;
 
 
 	using KeyMap    = std::unordered_map<int, InputManager::Key>;
-	using MouseMap  = std::unordered_map<int, InputManager::Mouse>;
+	using MouseMap  = std::unordered_map<int, InputManager::MouseButton>;
 
 
 	/// @brief インスタンスを明示的に生成
@@ -176,9 +185,8 @@ public:
 	/// @brief インスタンス削除
 	void Destroy(void);
 
-	void InitInput(void);
 
-#pragma region キーボード入力
+	/*　キーボード入力　*/
 
 	/// @brief 判定を行うキーを追加
 	/// @param _type 追加対象
@@ -202,18 +210,15 @@ public:
 	/// @brief 全てのキーの入力判定
 	bool KeyIsNewAll(void) const;
 
-#pragma endregion
 
-#pragma region マウス入力
+	/* マウス入力　*/
 
 	/// @brief 判定を行うキーを追加
 	/// @param _type 追加対象
 	void AddMouse(unsigned int _type);
 
-	/// <summary>
-	/// マウス座標の取得
-	/// </summary>
-	/// <returns>マウス座標</returns>
+	/// @brief マウスの移動量取得
+	/// @returns マウス座標
 	Vector2 GetMousePos(void) const;
 
 	/// @brief マウス入力処理
@@ -236,9 +241,11 @@ public:
 	/// </summary>
 	int GetMouseWheelRot(void);
 
-#pragma endregion
+	/// @brief マウスカーソル状態割り当て
+	void SetCursorMode(CURSOR_MODE mode, bool _isVisible = true);
 
-#pragma region コントローラー入力
+
+	/*　コントローラー入力　*/
 
 	/// <summary>
 	/// コントローラの入力判定
@@ -343,9 +350,6 @@ public:
 	/// <param name=""></param>
 	/// <returns></returns>
 	bool PadAnyInput(void)const;
-	
-
-#pragma endregion
 
 
 private:
@@ -357,24 +361,25 @@ private:
 	static constexpr float ALGKEY_VAL_MAX = 1000.0f;
 
 
-#pragma region キーボードのメンバ変数
+	/*　キーボード　*/
+
 	// キー情報配列
 	KeyMap keys_;
 	InputManager::Key keyInfoEmpty_;
-#pragma endregion
 
 
-	/*　マウスのメンバ変数　*/
+	/*　マウス　*/
 
 	// マウス情報配列
 	
-	MouseMap mouses_;
-	InputManager::Mouse mouseInfoEmpty_;
+	MouseMap mouseButton_;
+	InputManager::MouseButton mouseInfoEmpty_;
 
-	Vector2 mousePos_; // マウスカーソル位置
+	// マウス位置
+	Vector2 mousePos_;
 
 	// マウスホイール回転量
-	Mouse mouseWheel_;
+	MouseButton mouseWheel_;
 
 
 	/*　コントローラのメンバ変数　*/
@@ -401,6 +406,12 @@ private:
 	//InputManager(InputManager&&) = delete;
 	//InputManager& operator=(InputManager&&) = delete;
 
+	// 各入力更新処理
+	void UpdateKey(void);
+	void UpdateMouse(void);
+	void UpdatePad(void);
+	void UpdateCursor(void);
+
 
 	/// <summary>
 	/// 配列内から対象のキーの入力を取得
@@ -412,21 +423,23 @@ private:
 	/// @brief 判定する入力キーを割り当て
 	void SetInputKey(void);
 
-#pragma region マウスメンバ変数
+
+	/*　マウス　*/
 
 	/// <summary>
 	/// 配列内から対象のマウスボタンの入力を取得
 	/// </summary>
 	/// <param name="keyType">探索するマウスボタンの種類</param>
 	/// <returns>マウスボタンの情報(定数)</returns>
-	const InputManager::Mouse& FindMouse(unsigned int mouseType) const;
+	const InputManager::MouseButton& FindMouse(unsigned int mouseType) const;
 
 	/// @brief 判定するマウスを割り当て
 	void SetInputMouse(void);
 
-#pragma endregion
+	void SetCursorOtherSide(void);
 
-#pragma region コントローラ識別
+
+	/*　コントローラ　*/
 
 	/// @brief コントローラの入力情報
 	/// @param _padNum コントローラの対象
@@ -466,5 +479,4 @@ private:
 	/// <param name="jPadNo"></param>
 	JOYPAD_TYPE GetJPadType(PAD_NO jPadNo);
 
-#pragma endregion
 };

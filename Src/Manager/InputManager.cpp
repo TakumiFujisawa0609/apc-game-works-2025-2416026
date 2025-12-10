@@ -96,7 +96,7 @@ void InputManager::Update(void)
 
 
 	// マウス入力判定
-	for (auto&[type, mouse] : mouses_)
+	for (auto&[type, mouse] : mouseButton_)
 	{
 		mouse.inputOld = mouse.inputNew;
 		mouse.inputNew = ((GetMouseInput() & mouse.type) != 0);
@@ -118,17 +118,13 @@ void InputManager::Destroy(void)
 
 	// リソース解放（インスタンスメンバにアクセス）
 	keys_.clear();	 // 入力キー配列 解放
-	mouses_.clear(); // マウス入力配列 解放
+	mouseButton_.clear(); // マウス入力配列 解放
 	
 	// インスタンスポインタを先にクリアしておく
 	//InputManager* toDelete = instance_;
 	//instance_ = nullptr;
 	delete instance_;
 
-}
-
-void InputManager::InitInput(void)
-{
 }
 
 
@@ -196,7 +192,7 @@ const InputManager::Key& InputManager::FindKey(unsigned int _keyType)const
 
 void InputManager::AddMouse(unsigned int type)
 {
-	Mouse mouse = InputManager::Mouse();
+	MouseButton mouse = InputManager::MouseButton();
 
 	mouse.type = type;
 	mouse.inputOld = false;
@@ -204,13 +200,13 @@ void InputManager::AddMouse(unsigned int type)
 	mouse.trgDown = false;
 	mouse.trgUp   = false;
 	// 配列に格納
-	mouses_.emplace(mouse.type, mouse);
+	mouseButton_.emplace(mouse.type, mouse);
 }
 
-const InputManager::Mouse& InputManager::FindMouse(unsigned int _mouseType) const
+const InputManager::MouseButton& InputManager::FindMouse(unsigned int _mouseType) const
 {
-	auto it = mouses_.find(_mouseType);
-	if (it != mouses_.end())
+	auto it = mouseButton_.find(_mouseType);
+	if (it != mouseButton_.end())
 	{
 		// マウスの情報を返す
 		return it->second;
