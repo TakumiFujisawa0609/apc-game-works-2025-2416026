@@ -4,10 +4,6 @@
 
 class SceneBase
 {
-	using PAD_ALGKEY = InputManager::JOYPAD_ALGKEY;
-	using PAD_BTN = InputManager::PAD_BTN;
-	using PAD_NO = InputManager::PAD_NO;
-
 public:
 
 	// デフォルトコンストラクタ
@@ -39,12 +35,6 @@ public:
 
 
 protected:
-
-	/// @brief 決定時の入力判定
-	bool IsCheck(void);
-
-	/// @brief キャンセル時の入力判定
-	bool IsCansel(void);
 
 	/// <summary>
 	/// 選択の上の判定処理

@@ -48,7 +48,7 @@ void Application::Init(void)
 	SetGraphMode(SCREEN_SIZE_X, SCREEN_SIZE_Y, 32);
 
 	// ウィンドウの状態の設定
-	constexpr bool WINDOW_SCREEN = false;
+	constexpr bool WINDOW_SCREEN = true;
 #ifdef _DEBUG
 	ChangeWindowMode(true);
 #else
@@ -79,6 +79,9 @@ void Application::Init(void)
 	exit_ = std::make_unique<GameExit>();
 	exit_->Init();
 
+	// フレームレート
+	frameRate_ = std::make_unique<FrameRate>();
+
 	// ゲーム可能処理
 	isGame_ = true;
 
@@ -107,9 +110,6 @@ void Application::CreateManagers(void)
 	// 音声マネージャー生成
 	SoundManager::CreateInstance();
 
-	// フレームレートマネージャ生成
-	FrameRate::CreateInstance();
-
 	// シーンマネージャ生成
 	SceneManager::CreateInstance();
 
@@ -124,9 +124,6 @@ void Application::CreateManagers(void)
 void Application::Run(void)
 {
 	/*　実行処理　*/
-	
-	// fps管理マネージャ
-	FrameRate& fps = FrameRate::GetInstance();
 
 	// シーン管理マネージャ
 	SceneManager& scene = SceneManager::GetInstance();
@@ -135,13 +132,13 @@ void Application::Run(void)
 	while (ProcessMessage() == 0 && isGame_)
 	{
 		// フレームレート更新処理
-		fps.Update();
+		frameRate_->Update();
 
 		//フレームレート制限
-		if (fps.GetLimitFrameRate() == false)
+		if (frameRate_->GetLimitFrameRate() == false)
 		{
 			// フレームレート割り当て
-			fps.SetFrameRate();
+			frameRate_->SetFrameRate();
 
 			// 入力マネージャ更新
 			InputManager::GetInstance().Update();
@@ -150,6 +147,11 @@ void Application::Run(void)
 			{
 				// シーン更新
 				scene.Update();
+				scene.GetCamera().SetIsActive(true);
+			}
+			else
+			{
+				scene.GetCamera().SetIsActive(false);
 			}
 
 			if (isActiveExitMenu_)
@@ -163,7 +165,7 @@ void Application::Run(void)
 
 			// データ再ロード
 			if (scene.GetIsDebugMode() &&
-				InputManager::GetInstance().KeyIsTrgDown(KEY_INPUT_DELETE) &&
+				CheckHitKey(KEY_INPUT_DELETE) &&
 				scene.GetSceneId() == SceneManager::SCENE_ID::TITLE)
 			{
 				StatusData::GetInstance().Load();
@@ -190,13 +192,16 @@ void Application::Draw(void)
 
 
 	// フレームレート描画
-	if (scene.GetIsDebugMode()){ FrameRate::GetInstance().Draw(); }
+	if (scene.GetIsDebugMode())
+	{
+		frameRate_->Draw();
+	}
 
 	scene.DrawDebug();
 
 	if (scene.GetIsDebugMode() &&
 		scene.GetSceneId() == SceneManager::SCENE_ID::TITLE &&
-		InputManager::GetInstance().KeyIsNew(KEY_INPUT_DELETE))
+		CheckHitKey(KEY_INPUT_DELETE))
 	{
 		DrawString(SCREEN_SIZE_X - 225, 16, "リソースデータ リロード", 0x0000ff);
 	}
@@ -218,9 +223,6 @@ void Application::Destroy(void)
 
 	// シーンマネージャ
 	SceneManager::GetInstance().Destroy();
-
-	// フレームレートマネージャ
-	FrameRate::GetInstance().Destroy();
 
 	// 音声マネージャ
 	SoundManager::GetInstance().Destroy();

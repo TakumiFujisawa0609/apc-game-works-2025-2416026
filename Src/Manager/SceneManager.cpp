@@ -128,7 +128,7 @@ void SceneManager::Update(void)
 
 	// デバッグモード有効化処理
 #ifdef _DEBUG
-	if (InputManager::GetInstance().KeyIsTrgDown(KEY_INPUT_TAB))
+	if (InputManager::GetInstance().IsTrgDown(InputManager::TYPE::DEBUG_MODE))
 	{
 		isDebugMode_ = ((!isDebugMode_) ? true : false);
 	}

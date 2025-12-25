@@ -12,10 +12,6 @@ class StatusPlayer;
 
 class Player : public Object
 {
-	using PAD_BTN = InputManager::PAD_BTN;
-	using PAD_ALGKEY = InputManager::JOYPAD_ALGKEY;
-	using PAD_NO = InputManager::PAD_NO;
-
 public:
 
 	using MOTION_TYPE = StatusPlayer::MOTION_TYPE;
@@ -73,31 +69,6 @@ public:
 	};
 
 
-	enum class INPUT_TYPE
-	{
-		NONE = -1,
-		MOVE_BACK,	// 奥移動
-		MOVE_FRONT, // 前移動
-		MOVE_LEFT,	// 左移動
-		MOVE_RIGHT,	// 右移動
-
-		ROTATION_LEFT,  // 左回転
-		ROTATION_RIGHT,  // 左回転
-
-		CHANGE_WEAPON, // 武器変更
-		SWITCH_WEAPON_UP, // 武器切り替え
-		SWITCH_WEAPON_DOWN, // 武器切り替え
-
-		DODGE,		// 回避
-		DEFENCE, 	// 防御
-		ATTACK_JUB,    // 弱攻撃
-		ATTACK_STRONG, // 強攻撃
-
-		DASH,		  // ダッシュ
-
-		MAX,
-	};
-
 	static constexpr COLOR_F COLOR_DAMAGE = { 1.0f, 0.0f, 1.0f, 1.0f };
 
 	// 攻撃を有効前の待機時間
@@ -114,7 +85,7 @@ public:
 	static constexpr float CATCH_OFFSET = 75.0f;
 
 
-	static constexpr VECTOR LOCAL_POS = { 0.0f, -100.0f, 0.0f };
+	static constexpr VECTOR LOCAL_POS = { 0.0f, 0.0f, 0.0f };
 
 	static constexpr float LOCAL_ANGLE_Y = (180.0f * (DX_PI_F / 180.0f));
 	// モデルの位置調整値
@@ -226,9 +197,6 @@ protected:
 
 	StatusPlayer& status_;
 
-	// 入力するキーの種類
-	std::unordered_map<INPUT_TYPE, unsigned int> inputKey_;
-
 
 	/// @brief パラメータ割り当て
 	void SetParam(void) override;
@@ -301,12 +269,6 @@ private:
 
 	/// @brief 移動入力をしているか否か
 	bool IsInputMove(void);
-
-	/// @brief弱攻撃入力をしているか否か
-	bool IsInputAtkJub(void);
-
-	/// @brief 攻撃入力をしているか否か
-	bool IsInputAtkStrong(void);
 
 	/// @brief ダッシュ入力をしているか否か
 	bool IsInputDash(void);

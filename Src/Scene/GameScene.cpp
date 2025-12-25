@@ -9,6 +9,7 @@
 #include "../Common/Vector2.h"
 #include "../Object/Player/Player.h"
 #include "../Object/Enemy/EnemyController.h"
+#include "../Object/Stage/Stage.h"
 #include "../Manager/EffectController.h"
 #include "../Manager/SceneManager.h"
 #include "../Manager/CollisionManager.h"
@@ -38,6 +39,8 @@ void GameScene::Load(void)
 
 	// 敵マネージャー
 	enemys_ = new EnemyController(*player_);
+
+	stage_ = new Stage();
 
 	// 当たり判定マネージャ
 	CollisionManager::CreateInstance(*player_, *enemys_);
@@ -94,11 +97,6 @@ void GameScene::ReInit(void)
 void GameScene::Update(void)
 {
 	/*　更新処理　*/
-		
-	if (InputManager::GetInstance().KeyIsTrgDown(KEY_INPUT_SPACE))
-	{
-		//SceneManager::GetInstance().GetPerform().SetHitStop(1.0f);
-	}
 
 	// ステージ更新処理
 	//gameStage_->Update();
@@ -121,7 +119,7 @@ void GameScene::Update(void)
 	}
 	else if (gameState_ == GAME_STATE::RESULT)
 	{
-		if (IsCheck())
+		if (InputManager::GetInstance().IsTrgDown(InputManager::TYPE::SELECT_DECISION))
 		{
 			// 決定処理後、シーン遷移
 			SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::TITLE);
@@ -134,13 +132,15 @@ void GameScene::Draw(void)
 	/*　描画処理　*/
 	Font& font = Font::GetInstance();
 
-	Vector2 textPos = {};
+	Vector2 textPos = AsoUtility::VECTOR2_ZERO;
 	Vector2 midPos = { Application::SCREEN_HALF_X, Application::SCREEN_HALF_Y };
-
+	/*
 	// 地面
 	DrawCube3D({ -5000.0f, 0.0f, -2500.0f },
 			   { 5000.0f, -100.0f, 30000.0f },
-				0x00aa00, 0x0, true);
+				0x00aa00, 0x0, true);*/
+
+	stage_->Draw();
 
 	// グリッド線描画
 #ifdef _DEBUG
@@ -156,8 +156,6 @@ void GameScene::Draw(void)
 	// プレイヤー描画
 	player_->Draw();
 
-	//ステージ描画処理
-	//gameStage_->Draw();
 
 	// Effekseerにより再生中のエフェクトを描画する
 	DrawEffekseer3D();
@@ -193,6 +191,9 @@ void GameScene::Release(void)
 	// プレイヤー解放・削除
 	player_->Release();
 	delete player_;
+
+	stage_->Release();
+	delete stage_;
 
 	//ステージ解放処理
 	//gameStage_->Release();

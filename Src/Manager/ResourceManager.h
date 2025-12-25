@@ -26,6 +26,9 @@ public:
 		MODEL_WEAPON,
 		MODEL_SWORD,
 
+		MODEL_ROAD,
+		MODEL_STAGE,
+
 		// 画像リソース
 		IMG_TITLE,
 		IMG_CLEAR,
@@ -80,16 +83,13 @@ public:
 	static void CreateInstance(void);
 
 	/// @brief インスタンス取得処理
-	static ResourceManager& GetInstance(void);
+	static ResourceManager& GetInstance(void) { return *instance_; };
 
 	/// @brief 初期化処理
 	void Load(void);
 
-	/// @brief 解放処理
-	void Release(void);
-
 	/// @brief インスタンス削除
-	void Destroy(void);
+	static void Destroy(void);
 
 
 	/// @brief リソースのロード
@@ -118,14 +118,22 @@ private:
 	std::unordered_map<SRC, Resource*> loadedMap_;
 
 
-	/// @brief デフォルトコンストラクタ(private化で外部生成不可化)
+	/// @brief 解放処理
+	void Release(void);
+
+
+	/// @brief デフォルトコンストラクタ
 	ResourceManager(void);
 
-	/// @brief デフォルトデストラクタ(private化で外部で生成不可化)
+	/// @brief デフォルトデストラクタ
 	~ResourceManager(void) = default;
 
-	/// @brief コピーコンストラクタ対策
-	ResourceManager(const ResourceManager& _other) = default;
+	// コピーコンストラクタ対策
+	ResourceManager(const ResourceManager&) = delete;
+	ResourceManager& operator=(const ResourceManager&) = delete;
+	ResourceManager(ResourceManager&&) = delete;
+	ResourceManager& operator=(ResourceManager&&) = delete;
+	
 
 
 	/// @brief リソースを取得する処理

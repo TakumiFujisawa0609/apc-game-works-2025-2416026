@@ -95,13 +95,7 @@ private:
 	// ゲーム終了フラグ
 	bool isEnd_;
 
-	/// @brief メニュー有効判定
-	bool IsActive(void);
-
 
 	/// @brief 選択判定
 	bool IsSelect(void);
-	
-	/// @brief 決定判定
-	bool IsCheck(void);
 };

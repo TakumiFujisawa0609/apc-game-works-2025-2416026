@@ -2,6 +2,7 @@
 #include <DxLib.h>
 #include <memory>
 class GameExit;
+class FrameRate;
 
 class Application
 {
@@ -61,6 +62,9 @@ private:
 
 	// ゲーム終了
 	std::unique_ptr<GameExit> exit_;
+
+	// フレームレート
+	std::unique_ptr<FrameRate> frameRate_;
 
 	// ゲームを継続するか否か
 	bool isGame_;

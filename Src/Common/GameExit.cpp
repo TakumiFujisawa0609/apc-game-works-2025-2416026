@@ -6,22 +6,12 @@
 #include "../Manager/SoundManager.h"
 #include <DxLib.h>
 
-using PAD_ALGKEY = InputManager::JOYPAD_ALGKEY;
-using PAD_BTN = InputManager::PAD_BTN;
-using PAD_NO = InputManager::PAD_NO;
 
-
-GameExit::GameExit(void)
+GameExit::GameExit(void):
+	select_(SELECT::NONE),
+	isEnd_(false),
+	isActiveMenu_(false)
 {
-	// 確認状態
-	select_ = SELECT::NONE;
-
-	// ゲーム終了 有効化フラグ
-	isEnd_ = false;
-
-	// 終了選択 有効化フラグ
-	isActiveMenu_ = false;
-
 	Init();
 }
 
@@ -45,7 +35,28 @@ void GameExit::Update(void)
 	/*　更新処理　*/
 	SoundManager* sound = &SoundManager::GetInstance();
 	SceneManager* scene = &SceneManager::GetInstance();
+
 	if (!sound || !scene) { return; }
+
+	if (InputManager::GetInstance().IsTrgDown(InputManager::TYPE::PAUSE))
+	{
+		isActiveMenu_ = ((!isActiveMenu_) ? true : false);
+
+		if (isActiveMenu_)
+		{
+			// 音量を通常に戻す
+			sound->SetVolumeMaster(SoundManager::VOLUME_MASTER_MAX);
+		}
+		else
+		{
+			// 終了無効 状態化
+			select_ = SELECT::NO;
+
+			// 音量を半減
+			sound->SetVolumeMaster(sound->GetVolumeMaster() / 2);
+		}
+
+	}
 
 	if (isActiveMenu_)
 	{
@@ -58,7 +69,7 @@ void GameExit::Update(void)
 			select_ = ((select_ == SELECT::NO) ? SELECT::YES : SELECT::NO);
 		}
 
-		if (IsCheck())
+		if (InputManager::GetInstance().IsTrgDown(InputManager::TYPE::SELECT_DECISION))
 		{
 			// ゲーム終了処理
 			if (select_ == SELECT::YES)
@@ -89,35 +100,12 @@ void GameExit::Update(void)
 			}
 		}
 	}
-
-	if (IsActive() && sound)
-	{
-		if (isActiveMenu_)
-		{
-			// 終了確認画面 無効化
-			isActiveMenu_ = false;
-
-			// 音量を通常に戻す
-			sound->SetVolumeMaster(SoundManager::VOLUME_MASTER_MAX);
-		}
-		else
-		{
-			// メニュー画面 有効化
-			isActiveMenu_ = true;
-
-			// 終了無効 状態化
-			select_ = SELECT::NO;
-
-			// 音量を半減
-			sound->SetVolumeMaster(sound->GetVolumeMaster() / 2);
-		}
-	}
 }
 
 void GameExit::Draw(void)
 {
 	// メニュー未有効時、処理終了
-	if (!isActiveMenu_) return;
+	if (!isActiveMenu_) { return; }
 
 	Font& font = Font::GetInstance();
 	SceneManager& scene = SceneManager::GetInstance();
@@ -204,59 +192,16 @@ void GameExit::Release(void)
 	/*　解放処理　*/
 }
 
-
-
-bool GameExit::IsActive(void)
-{
-	bool ret = false;
-	InputManager* input = &InputManager::GetInstance();
-	if (!input) { return false; }
-
-	if (input->KeyIsTrgDown(KEY_INPUT_ESCAPE) ||
-		input->PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::BACK))
-	{
-		ret = true;
-	}
-
-	return ret;
-}
-
 bool GameExit::IsSelect(void)
 {
 	bool ret = false;
-	InputManager* input = &InputManager::GetInstance();
-	if (!input) { return false; }
-
-	if (input->PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::LEFT)  ||
-		input->PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::D_PAD) ||
-		input->PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) ||
-
-		input->KeyIsTrgDown(KEY_INPUT_W) || input->KeyIsTrgDown(KEY_INPUT_UP) ||
-		input->KeyIsTrgDown(KEY_INPUT_S) || input->KeyIsTrgDown(KEY_INPUT_DOWN) ||
-		input->KeyIsTrgDown(KEY_INPUT_A) || input->KeyIsTrgDown(KEY_INPUT_LEFT) ||
-		input->KeyIsTrgDown(KEY_INPUT_D) || input->KeyIsTrgDown(KEY_INPUT_RIGHT))
+	if (InputManager::GetInstance().IsTrgDown(InputManager::TYPE::SELECT_LEFT) ||
+		InputManager::GetInstance().IsTrgDown(InputManager::TYPE::SELECT_RIGHT) ||
+		InputManager::GetInstance().IsTrgDown(InputManager::TYPE::SELECT_UP) ||
+		InputManager::GetInstance().IsTrgDown(InputManager::TYPE::SELECT_DOWN))
 	{
 		ret = true;
 	}
 
-	return ret;
-}
-
-bool GameExit::IsCheck(void)
-{
-	bool ret = false;
-	InputManager* input = &InputManager::GetInstance();
-	if (!input) { return false; }
-
-	if (input->PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::START) ||
-		input->PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::BACK)  ||
-		input->PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::RIGHT) ||
-		input->PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::DOWN)  ||
-
-		input->KeyIsTrgDown(KEY_INPUT_SPACE) ||
-		input->KeyIsTrgDown(KEY_INPUT_RETURN))
-	{
-		ret = true;
-	}
 	return ret;
 }

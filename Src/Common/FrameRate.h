@@ -4,6 +4,30 @@ class FrameRate
 {
 public:
 
+	/// @brief デフォルトコンストラクタ
+	FrameRate(void);
+
+	/// @brief デフォルトデストラクタ
+	~FrameRate(void) = default;
+
+
+	/// @brief 更新処理
+	void Update(void);
+
+	/// @brief 描画処理
+	void Draw(void);
+
+
+	/// @brief フレームレート割り当て
+	void SetFrameRate(void);
+
+	/// @brief フレームレート制限 判定
+	/// @returns 制御するか否か
+	bool GetLimitFrameRate(void) { return ((curTime_ - lateTime_) < FRAME_RATE); };
+
+
+private:
+
 	// 平均フレームレート
 	static constexpr int FRAME_RATE_AVE = 60;
 
@@ -17,71 +41,18 @@ public:
 	static constexpr int TEXT_POS_Y = 25;
 
 
-	/// <summary>
-	/// 明示的にインスタンス生成
-	/// </summary>
-	static void CreateInstance(void);
+	// 現在の時間
+	int curTime_;
 
-	/// <summary>
-	/// 静的インスタンス生成
-	/// </summary>
-	/// <returns>フレームレートマネージャ</returns>
-	static FrameRate& GetInstance(void) { return *instance_;  };
+	// 前フレーム実行時間
+	int lateTime_;
 
-	/// <summary>
-	/// 更新処理
-	/// </summary>
-	void Update(void);
+	// フレームカウンタ
+	int frameCnt_;
 
-	/// <summary>
-	/// 描画処理
-	/// </summary>
-	void Draw(void);
+	// フレーム更新時間
+	int updateTime_;
 
-	/// <summary>
-	/// インスタンス削除処理
-	/// </summary>
-	void Destroy(void);
-
-	/// <summary>
-	/// フレームレート割り当て
-	/// </summary>
-	void SetFrameRate(void);
-
-	/// <summary>
-	/// フレームレート制限 判定
-	/// </summary>
-	/// <returns>制御するか否か</returns>
-	bool GetLimitFrameRate(void) { return ((curTime_ - lateTime_) < FRAME_RATE); };
-
-
-private:
-
-
-	static FrameRate* instance_; // 静的インスタンス
-
-	int curTime_;  // 現在の時間
-	int lateTime_; // 前フレーム実行時間
-
-	int frameCnt_;	 // フレームカウンタ
-	int updateTime_; // フレーム更新時間
-
-	float viewFramelate_; // フレームレート(描画用)
-
-
-
-	/// <summary>
-	/// デフォルトコンストラクタ
-	/// </summary>
-	FrameRate(void);
-
-	/// <summary>
-	/// デストラクタ(private)
-	/// </summary>
-	~FrameRate(void) = default;
-
-	/// <summary>
-	/// コピーコンストラクタ
-	/// </summary>
-	FrameRate(FrameRate& other) = default;
+	// フレームレート(描画用)
+	float viewFramelate_;
 };

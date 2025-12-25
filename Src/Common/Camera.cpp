@@ -12,7 +12,8 @@ Camera::Camera(void) :
 		 AsoUtility::VECTOR_ZERO, AsoUtility::VECTOR_ZERO, AsoUtility::VECTOR_ZERO),
 	rot_(Quaternion::Identity(), Quaternion::Identity(), nullptr),
 	follow_(nullptr),
-	mode_(MODE::NONE)
+	mode_(MODE::NONE),
+	isActive_(false)
 {
 	targetsPos_.clear();
 
@@ -28,7 +29,7 @@ void Camera::Load(void)
 void Camera::Init(MODE mode, const VECTOR& pos, float angleY, Player* player)
 {
 	mode_ = mode;
-
+	isActive_ = true;
 	pos_.camera = pos;
 
 	follow_ = player;
@@ -48,33 +49,33 @@ void Camera::SetBeforeDraw(void)
 
 	switch (mode_)
 	{
-		case Camera::MODE::FIXEX_POINT:
-		{
+	case Camera::MODE::FIXEX_POINT:
+	{
 #ifdef _DEBUG
-			/*
-			SetBeforeDraw_FixexPoint();
-			DebugMove();*/
+		/*
+		SetBeforeDraw_FixexPoint();
+		DebugMove();*/
 #endif
-		}
-		break;
+	}
+	break;
 
-		case Camera::MODE::FOLLOW:
-		{
-			SetBeforeDraw_Follow();
-		}
-		break;
+	case Camera::MODE::FOLLOW:
+	{
+		SetBeforeDraw_Follow();
+	}
+	break;
 
-		case Camera::MODE::FOLLOW_AUTO_ZOOM:
-		{
-			SetBeforeDraw_FollowZoom();
-		}
-		break;
+	case Camera::MODE::FOLLOW_AUTO_ZOOM:
+	{
+		SetBeforeDraw_FollowZoom();
+	}
+	break;
 
-		case Camera::MODE::NONE:
-		default:
+	case Camera::MODE::NONE:
+	default:
 		break;
 	}
-
+	
 
 	if (mode_ != MODE::FOLLOW)
 	{
@@ -105,31 +106,31 @@ void Camera::DebugMove(void)
 	const float move = 2.5f;
 	const float rot = 1.0f;
 
-	if (InputManager::GetInstance().KeyIsNew(KEY_INPUT_UP))
+	if (CheckHitKey(KEY_INPUT_UP))
 	{
-		if (InputManager::GetInstance().KeyIsNew(KEY_INPUT_LSHIFT)) { pos_.camera.y += move; }
+		if (CheckHitKey(KEY_INPUT_LSHIFT)) { pos_.camera.y += move; }
 
-		else if (InputManager::GetInstance().KeyIsNew(KEY_INPUT_RSHIFT)) { rot_.camera.x += AsoUtility::Deg2Rad(rot); }
+		else if (CheckHitKey(KEY_INPUT_RSHIFT)) { rot_.camera.x += AsoUtility::Deg2Rad(rot); }
 
 		else { pos_.camera.z += move; }
 	}
-	if (InputManager::GetInstance().KeyIsNew(KEY_INPUT_DOWN))
+	if (CheckHitKey(KEY_INPUT_DOWN))
 	{
-		if (InputManager::GetInstance().KeyIsNew(KEY_INPUT_LSHIFT)) { pos_.camera.y -= move; }
+		if (CheckHitKey(KEY_INPUT_LSHIFT)) { pos_.camera.y -= move; }
 
-		else if (InputManager::GetInstance().KeyIsNew(KEY_INPUT_LCONTROL)) { rot_.camera.x -= AsoUtility::Deg2Rad(rot); }
+		else if (CheckHitKey(KEY_INPUT_LCONTROL)) { rot_.camera.x -= AsoUtility::Deg2Rad(rot); }
 
 		else { pos_.camera.z -= move; }
 	}
-	if (InputManager::GetInstance().KeyIsNew(KEY_INPUT_RIGHT))
+	if (CheckHitKey(KEY_INPUT_RIGHT))
 	{
-		if (InputManager::GetInstance().KeyIsNew(KEY_INPUT_LCONTROL)) { rot_.camera.y += AsoUtility::Deg2Rad(rot); }
+		if (CheckHitKey(KEY_INPUT_LCONTROL)) { rot_.camera.y += AsoUtility::Deg2Rad(rot); }
 
 		else { pos_.camera.x += move; }
 	}
-	if (InputManager::GetInstance().KeyIsNew(KEY_INPUT_LEFT))
+	if (CheckHitKey(KEY_INPUT_LEFT))
 	{
-		if (InputManager::GetInstance().KeyIsNew(KEY_INPUT_LCONTROL)) { rot_.camera.y -= AsoUtility::Deg2Rad(rot); }
+		if (CheckHitKey(KEY_INPUT_LCONTROL)) { rot_.camera.y -= AsoUtility::Deg2Rad(rot); }
 
 		else { pos_.camera.x -= move; }
 	}
@@ -150,15 +151,17 @@ void Camera::SetBeforeDraw_Follow(void)
 {
 	/*　追尾カメラ　*/
 
-	// 回転処理
-	_UpdateCameraRot();
-	SmoothRotation();
+	if (isActive_)
+	{
+		// 回転処理
+		_UpdateCameraRot();
+		SmoothRotation();
+	}
 
 
 	// カメラの移動
 	// カメラの回転行列を作成
 	MATRIX mat = rot_.camera.ToMatrix();
-	//mat = MMult(mat, MGetRotZ(angles_.z));
 
 
 	VECTOR local = LOCAL_CAMERA_POS;
@@ -216,19 +219,16 @@ void Camera::_UpdateCameraRot(void)
 	float rotPow = (AsoUtility::Deg2Rad(2.5f));
 	VECTOR rotInput = {};
 
-	if (InputManager::GetInstance().KeyIsNew(KEY_INPUT_UP)) { rotInput.x += rotPow; }
-	if (InputManager::GetInstance().KeyIsNew(KEY_INPUT_DOWN)) { rotInput.x -= rotPow; }
-	
-	//VECTOR mouseDir = InputManager::GetInstance().GetMouseDir();
-	if (InputManager::GetInstance().KeyIsNew(KEY_INPUT_LEFT)/* ||
-		mouseDir.x < 0*/) { rotInput.y += rotPow; }
+	// マウス回転
+	//if (InputManager::GetInstance().GetMouseMove().y > 0) { rotInput.x += rotPow; }
+	//if (InputManager::GetInstance().GetMouseMove().y < 0) { rotInput.x -= rotPow; }
+	if (InputManager::GetInstance().GetMouseMove().x > 0) { rotInput.y += rotPow; }
+	if (InputManager::GetInstance().GetMouseMove().x < 0) { rotInput.y -= rotPow; }
 
-	if (InputManager::GetInstance().KeyIsNew(KEY_INPUT_RIGHT)/* ||
-		mouseDir.x > 0*/) { rotInput.y -= rotPow; }
-
-	if (InputManager::GetInstance().PadIsAlgKeyNew(InputManager::PAD_NO::PAD1, InputManager::JOYPAD_ALGKEY::RIGHT))
+	// コントローラ回転
+	if (InputManager::GetInstance().GetKnockLStickSize().x != 0)
 	{
-		VECTOR dir = InputManager::GetInstance().GetAlgKeyDirXZ(InputManager::PAD_NO::PAD1, InputManager::JOYPAD_ALGKEY::RIGHT);
+		Vector2 dir = InputManager::GetInstance().GetKnockLStickSize();
 		rotInput.y += (dir.x * rotPow);
 		//rotInput.x += (dir.y * rotPow);
 	}

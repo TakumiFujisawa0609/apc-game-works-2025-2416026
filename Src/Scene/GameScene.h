@@ -9,13 +9,11 @@ class EnemyController;
 class CollisionManager;
 class EffectController;
 class HpBer;
+class Stage;
 
 
 class GameScene : public SceneBase
 {
-
-	using PAD_BTN = InputManager::PAD_BTN;
-
 public:
 
 	enum class GAME_STATE
@@ -28,7 +26,7 @@ public:
 
 
 	// プレイヤー開始位置
-	static constexpr VECTOR POS_START_PLAYER = { 0.0f, 0.0f, -250.0f };
+	static constexpr VECTOR POS_START_PLAYER = { 0.0f, 0.0f, -1750.0f };
 
 	// プレイヤー開始時の向き
 	static constexpr float ANGLE_START_PLAYER = 90.0f;
@@ -72,8 +70,11 @@ private:
 	// プレイヤー
 	Player* player_;
 
+	Stage* stage_;
+
 	//ステージオブジェクト
 	GameStageController* gameStage_;
+
 
 	EnemyController* enemys_;
 

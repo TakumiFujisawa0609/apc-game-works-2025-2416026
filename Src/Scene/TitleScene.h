@@ -7,10 +7,6 @@
 
 class TitleScene : public SceneBase
 {
-	using PAD_ALGKEY = InputManager::JOYPAD_ALGKEY;
-	using PAD_BTN = InputManager::PAD_BTN;
-	using PAD_NO = InputManager::PAD_NO;
-
 public:
 
 	enum class TITLE_STATE
@@ -144,4 +140,6 @@ private:
 
 	/// @brief —V‚Ñ•û•`‰æˆ—
 	void DrawInfo(void);
+
+	void PromotionVideo(void);
 };

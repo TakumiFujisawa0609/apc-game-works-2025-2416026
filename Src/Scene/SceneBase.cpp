@@ -17,59 +17,12 @@ bool SceneBase::IsLoad(void)
 	return false;
 }
 
-bool SceneBase::IsCheck(void)
-{
-	bool ret = false;
-	
-	if (InputManager::GetInstance().PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::START) ||
-		InputManager::GetInstance().PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::RIGHT) ||
-		InputManager::GetInstance().PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::DOWN) ||
-
-		InputManager::GetInstance().KeyIsTrgDown(KEY_INPUT_SPACE) ||
-		InputManager::GetInstance().KeyIsTrgDown(KEY_INPUT_RETURN))
-	{
-		ret = true;
-	}
-	return ret;
-}
-bool SceneBase::IsCansel(void)
-{
-	bool ret = false;
-	
-	if (InputManager::GetInstance().KeyIsTrgDown(KEY_INPUT_ESCAPE) ||
-		InputManager::GetInstance().KeyIsTrgDown(KEY_INPUT_X) ||
-		InputManager::GetInstance().PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::BACK) ||
-		InputManager::GetInstance().PadIsBtnTrgDown(PAD_NO::PAD1, PAD_BTN::RIGHT))
-	{
-		ret = true;
-	}
-
-	return ret;
-}
-
 bool SceneBase::IsSelectUp(void)
 {
 	bool ret = false;
 	
-	if (InputManager::GetInstance().PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::LEFT) &&
-		InputManager::GetInstance().PadAlgKeyX(PAD_NO::PAD1, PAD_ALGKEY::LEFT) < 0 ||
-		InputManager::GetInstance().PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::LEFT) &&
-		InputManager::GetInstance().PadAlgKeyY(PAD_NO::PAD1, PAD_ALGKEY::LEFT) < 0 ||
-
-		InputManager::GetInstance().PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) &&
-		InputManager::GetInstance().PadAlgKeyX(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) < 0 ||
-		InputManager::GetInstance().PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) &&
-		InputManager::GetInstance().PadAlgKeyY(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) < 0 ||
-
-		InputManager::GetInstance().PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::D_PAD) &&
-		InputManager::GetInstance().PadAlgKeyX(PAD_NO::PAD1, PAD_ALGKEY::D_PAD) < 0 ||
-		InputManager::GetInstance().PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::D_PAD) &&
-		InputManager::GetInstance().PadAlgKeyY(PAD_NO::PAD1, PAD_ALGKEY::D_PAD) < 0 ||
-
-		InputManager::GetInstance().KeyIsTrgDown(KEY_INPUT_W) ||
-		InputManager::GetInstance().KeyIsTrgDown(KEY_INPUT_A) ||
-		InputManager::GetInstance().KeyIsTrgDown(KEY_INPUT_LEFT) ||
-		InputManager::GetInstance().KeyIsTrgDown(KEY_INPUT_UP))
+	if (InputManager::GetInstance().IsTrgDown(InputManager::TYPE::SELECT_UP) ||
+		 InputManager::GetInstance().IsTrgDown(InputManager::TYPE::SELECT_LEFT))
 	{
 		ret = true;
 	}
@@ -80,25 +33,8 @@ bool SceneBase::IsSelectDown(void)
 {
 	bool ret = false;
 	
-	if (InputManager::GetInstance().PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::LEFT) &&
-		InputManager::GetInstance().PadAlgKeyX(PAD_NO::PAD1, PAD_ALGKEY::LEFT) > 0 ||
-		InputManager::GetInstance().PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::LEFT) &&
-		InputManager::GetInstance().PadAlgKeyY(PAD_NO::PAD1, PAD_ALGKEY::LEFT) > 0 ||
-
-		InputManager::GetInstance().PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) &&
-		InputManager::GetInstance().PadAlgKeyX(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) > 0 ||
-		InputManager::GetInstance().PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) &&
-		InputManager::GetInstance().PadAlgKeyY(PAD_NO::PAD1, PAD_ALGKEY::RIGHT) > 0 ||
-
-		InputManager::GetInstance().PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::D_PAD) &&
-		InputManager::GetInstance().PadAlgKeyX(PAD_NO::PAD1, PAD_ALGKEY::D_PAD) > 0 ||
-		InputManager::GetInstance().PadIsAlgKeyTrgDown(PAD_NO::PAD1, PAD_ALGKEY::D_PAD) &&
-		InputManager::GetInstance().PadAlgKeyY(PAD_NO::PAD1, PAD_ALGKEY::D_PAD) > 0 ||
-
-		InputManager::GetInstance().KeyIsTrgDown(KEY_INPUT_S) ||
-		InputManager::GetInstance().KeyIsTrgDown(KEY_INPUT_D) ||
-		InputManager::GetInstance().KeyIsTrgDown(KEY_INPUT_RIGHT) ||
-		InputManager::GetInstance().KeyIsTrgDown(KEY_INPUT_DOWN))
+	if (InputManager::GetInstance().IsTrgDown(InputManager::TYPE::SELECT_DOWN) ||
+		InputManager::GetInstance().IsTrgDown(InputManager::TYPE::SELECT_RIGHT))
 	{
 		ret = true;
 	}

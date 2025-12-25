@@ -69,7 +69,7 @@ void TitleScene::Update(void)
 		arrowScale_ = ((arrowScale_ != ARROW_SCALE) ? ARROW_SCALE : 1.0f);
 	}
 
-	if (IsCheck() && !isPvActive_)
+	if (InputManager::GetInstance().IsTrgDown(InputManager::TYPE::SELECT_DECISION) && !isPvActive_)
 	{
 		switch (state_)
 		{
@@ -127,32 +127,8 @@ void TitleScene::Update(void)
 	// 状態割り当て
 	state_ = static_cast<TITLE_STATE>(state);
 
-	return;
-
-	pvTime_ += delta;
-	if (pvTime_ > 60.0f || CheckHitKey(KEY_INPUT_TAB))
-	{
-		if (!isPvActive_)
-		{
-			isPvActive_ = true;
-
-			// 最初から再生
-			SeekMovieToGraph(pv_, 0);
-			PlayMovieToGraph(pv_);
-			//SoundManager::GetInstance().Stop(SoundManager::SRC::BGM_TITLE);
-		}
-	}
-	if (isPvActive_)
-	{
-		if (IsCheck() || GetMovieStateToGraph(pv_) == 0)
-		{
-			// 動画停止
-			PauseMovieToGraph(pv_);
-			isPvActive_ = false;
-			pvTime_ = 0.0f;
-			//SoundManager::GetInstance().Play(SoundManager::SRC::BGM_TITLE, true);
-		}
-	}
+	// PV
+	//PromotionVideo();
 }
 
 void TitleScene::Draw(void)
@@ -224,7 +200,7 @@ void TitleScene::FontSettings(void)
 void TitleScene::DrawFont(void)
 {
 	int yOffset = 0;
-	unsigned int color;
+	//unsigned int color;
 
 	// ゲーム開始テキスト
 	DrawTitleText(yOffset, "ゲームスタート", TITLE_STATE::START_GAME);
@@ -290,7 +266,7 @@ void TitleScene::UpdateInfo(void)
 	info_ = static_cast<INFO_TYPE>(info);
 
 
-	if (IsCansel())
+	if (InputManager::GetInstance().IsTrgDown(InputManager::TYPE::SELECT_CANCEL))
 	{
 		// 終了メニュー有効化
 		Application::GetInstance().SetIsExitMenu(true);
@@ -357,4 +333,34 @@ void TitleScene::DrawInfo(void)
 	// テキスト描画
 	font.DrawTextA(Font::FONT_GAME, x, y, "※ ※ ※ ※　 このゲームはコントローラ操作を推奨しています。　※ ※ ※ ※",
 		0xFF0000, -1, Font::FONT_TYPE_ANTIALIASING);
+}
+
+void TitleScene::PromotionVideo(void)
+{
+	float delta = SceneManager::GetInstance().GetDeltaTime();
+	pvTime_ += delta;
+
+	if (pvTime_ > 60.0f || CheckHitKey(KEY_INPUT_TAB))
+	{
+		if (!isPvActive_)
+		{
+			isPvActive_ = true;
+
+			// 最初から再生
+			SeekMovieToGraph(pv_, 0);
+			PlayMovieToGraph(pv_);
+			//SoundManager::GetInstance().Stop(SoundManager::SRC::BGM_TITLE);
+		}
+	}
+	if (isPvActive_)
+	{
+		if (InputManager::GetInstance().IsTrgDown(InputManager::TYPE::SELECT_DECISION) || GetMovieStateToGraph(pv_) == 0)
+		{
+			// 動画停止
+			PauseMovieToGraph(pv_);
+			isPvActive_ = false;
+			pvTime_ = 0.0f;
+			//SoundManager::GetInstance().Play(SoundManager::SRC::BGM_TITLE, true);
+		}
+	}
 }

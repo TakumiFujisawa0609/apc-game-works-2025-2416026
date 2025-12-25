@@ -37,7 +37,6 @@ void EnemyController::Update(void)
 	if (enemys_.empty()) return;
 
 	bool isView = false;
-	temp = 0;
 	for (auto& enemyList : enemys_)
 	{
 		// 敵リストが空の時、スキップ
@@ -51,7 +50,6 @@ void EnemyController::Update(void)
 
 			if (!isView) { continue; }
 
-			temp++;
 			enemy->Update();
 		}
 	}
@@ -71,7 +69,7 @@ void EnemyController::Draw(void)
 		enemyBoss_->Draw();
 		DrawFormatString(Application::SCREEN_HALF_X, 0, 0xffffff, "ボスのHP：%d", enemyBoss_->GetCurHp());
 	}
-
+	int temp = 0;
 
 	if (!enemys_.empty())
 	{
@@ -97,7 +95,6 @@ void EnemyController::DrawDebug(void)
 	
 	if (!SceneManager::GetInstance().GetIsDebugMode()) { return; }
 
-	DrawFormatString(0, 100, 0xff0000, "enemyCnt:%d", temp);
 	int y = 136;
 
 	for (auto& enemyList : enemys_)

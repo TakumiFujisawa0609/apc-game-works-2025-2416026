@@ -138,26 +138,29 @@ void Object::Draw(void)
 		// 当たり判定表示
 		unsigned color = 0xaaaaaa;
 
-		for (auto& col : paramChara_.colList)
+		for (auto& [type, col] : paramChara_.colList)
 		{
-			if (col.first == COLLISION_TYPE::BODY) continue;
+			if (type == COLLISION_TYPE::BODY) { continue; }
 
-			color = ((col.first == COLLISION_TYPE::HEAD) ? 0xff0000 : color);
-			color = ((col.first == COLLISION_TYPE::BOTTOM) ? 0x00ff00 : color);
-			color = ((col.first == COLLISION_TYPE::HAND_L) ? 0x0000ff : color);
-			color = ((col.first == COLLISION_TYPE::HAND_R) ? 0x0000ff : color);
+			color = ((type == COLLISION_TYPE::HEAD) ? 0xff0000 : color);
+			color = ((type == COLLISION_TYPE::BOTTOM) ? 0x00ff00 : color);
+			color = ((type == COLLISION_TYPE::HAND_L) ? 0x0000ff : color);
+			color = ((type == COLLISION_TYPE::HAND_R) ? 0x0000ff : color);
 
 			// 当たり判定位置
-			DrawSphere3D(col.second->pos, 8, 16, color, 0xffffff, true);
+			DrawSphere3D(col->pos, 8, 16, color, 0xffffff, true);
 
 			// 当たり判定範囲
-			DrawSphere3D(col.second->pos, paramChara_.radius / 2.0f, 16,
+			DrawSphere3D(col->pos, paramChara_.radius / 2.0f, 16,
 				color, 0xffffff, false);
 		}
 
 		// 胴体の当たり判定
-		DrawSphere3D(paramChara_.colList[COLLISION_TYPE::BODY]->pos, paramChara_.radius,
-					 16, 0xffffff, 0xffffff, false);
+		if (paramChara_.colList.contains(COLLISION_TYPE::BODY))
+		{
+			DrawSphere3D(paramChara_.colList[COLLISION_TYPE::BODY]->pos, paramChara_.radius,
+				16, 0xffffff, 0xffffff, false);
+		}
 	}
 
 	// 各オブジェクト独自の描画

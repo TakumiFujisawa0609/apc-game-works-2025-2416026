@@ -134,6 +134,9 @@ public:
 
 	bool GetIsCameraClip(const VECTOR& _target);
 
+	void SetIsActive(bool _isActive) { isActive_ = _isActive; };
+
+
 private:
 
 	// ƒJƒƒ‰ó‘Ô
@@ -178,6 +181,8 @@ private:
 
 	// ’Ç”ö‚µ‚È‚¢ŠÔ
 	float freeTime_;
+
+	bool isActive_;
 
 
 

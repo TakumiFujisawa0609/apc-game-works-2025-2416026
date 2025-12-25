@@ -28,13 +28,7 @@ void ResourceManager::CreateInstance(void)
 		instance_ = new ResourceManager();
 	}
 
-	instance_->Load(); // マネージャ初期化
-}
-
-ResourceManager& ResourceManager::GetInstance(void)
-{
-	/*　インスタンス取得処理　*/
-	return *instance_;
+	instance_->Load();
 }
 
 ResourceManager::ResourceManager(void)
@@ -79,6 +73,12 @@ void ResourceManager::SetResource(void)
 		res = Resource(Resource::LOAD_TYPE::MODEL, PATH_MODEL + data.GetHandlePathWeapon(i));
 		resourcesMap_.emplace(static_cast<SRC>(src), res);
 	}
+
+	res = Resource(Resource::LOAD_TYPE::MODEL, PATH_MODEL + "Stage/Road.mv1");
+	resourcesMap_.emplace(SRC::MODEL_ROAD, res);
+
+	res = Resource(Resource::LOAD_TYPE::MODEL, PATH_MODEL + "Stage/mapObject.mv1");
+	resourcesMap_.emplace(SRC::MODEL_STAGE, res);
 
 	// 画像
 	res = Resource(Resource::LOAD_TYPE::IMAGE, PATH_IMAGE + "Title.png");
@@ -132,32 +132,31 @@ void ResourceManager::Release(void)
 {
 	/* メモリ解放処理 */
 
-	if (loadedMap_.empty()) return;
-
-	for (auto& p : loadedMap_) 
+	if (!resourcesMap_.empty())
 	{
-		// 読み込み済みリソース解放
-		p.second->Release(); 
-		delete p.second;
+		// リソースリストをクリア(空の時は行わない)
+		resourcesMap_.clear();
 	}
+	if (!loadedMap_.empty())
+	{
+		for (auto& [src, resource] : loadedMap_)
+		{
+			// 読み込み済みリソース解放
+			resource->Release();
+			delete resource;
+		}
 
-	// 読み込み済みリソースリストをクリア
-	loadedMap_.clear(); 
+		// 読み込み済みリソースリストをクリア
+		loadedMap_.clear();
+	}
 }
 
 void ResourceManager::Destroy(void)
 {
 	/*　インスタンス削除処理　*/
 
-	Release(); // リソースマネージャ解放
-
-	if (!resourcesMap_.empty())
-	{
-		// リソースリストをクリア(空の時は行わない)
-		resourcesMap_.clear();
-	}
-
-	delete instance_; // インスタンス削除
+	instance_->Release();
+	delete instance_;
 }
 
 

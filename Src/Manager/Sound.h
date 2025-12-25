@@ -21,7 +21,7 @@ public:
 	};
 
 
-	struct SOUND
+	struct SoundInfo
 	{
 		// 再生する種類
 		TYPE type;
@@ -46,6 +46,30 @@ public:
 
 		// 再生しているか否か
 		bool isPlayOld;
+
+		SoundInfo(void)
+		{
+			type = TYPE::NONE;
+			handle = -1;
+			path = "";
+			maxVolume = 255;
+			pos = VGet(0.0f, 0.0f, 0.0f);
+			radius = 0.0f;
+			isPlay = false;
+			isPlayOld = false;
+		};
+
+		SoundInfo(TYPE _type, const std::string& _path)
+		{
+			type = _type;
+			handle = -1;
+			path = _path;
+			maxVolume = 255;
+			pos = VGet(0.0f, 0.0f, 0.0f);
+			radius = 0.0f;
+			isPlay = false;
+			isPlayOld = false;
+		};
 	};
 
 
@@ -115,5 +139,5 @@ private:
 	// 半音階(1オクターブ=1200.0f)
 	static constexpr float MUSICAL_SCALE_HALF = (100.0f / 2.0f);
 
-	SOUND sound_;
+	SoundInfo sound_;
 };

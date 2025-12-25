@@ -28,7 +28,7 @@ void GameClearScene::Init(void)
 
 void GameClearScene::Update(void)
 {	
-	if (IsCheck())
+	if (InputManager::GetInstance().IsTrgDown(InputManager::TYPE::SELECT_DECISION))
 	{
 		switch (state_)
 		{

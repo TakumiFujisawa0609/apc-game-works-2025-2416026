@@ -61,7 +61,6 @@ private:
 	// ¶¬ˆÊ’u’†‰›‚Ì“G‚ğœ‚­Aˆê“x‚É¶¬‚³‚ê‚é”
 	static constexpr int SPAWN_MAX = (3 * SPAWN_CIRCLE_SPLIT) - 1;
 
-	int temp;
 	Player* player_;
 
 	EnemyList enemys_;

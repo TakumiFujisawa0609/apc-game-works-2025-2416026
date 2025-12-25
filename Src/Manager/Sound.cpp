@@ -2,26 +2,18 @@
 #include "./SoundManager.h"
 #include <algorithm>
 
-Sound::Sound(void)
+Sound::Sound(void):
+	sound_(SoundInfo())
 {
-	sound_.handle = -1;
-	sound_.type = TYPE::NONE;
-	sound_.path = "";
-	sound_.maxVolume = 255;
 
-	sound_.isPlay = false;
-	sound_.isPlayOld = false;
+}
+Sound::Sound(TYPE type, const std::string& path):
+	sound_(SoundInfo(type, path))
+
+{
+
 }
 
-Sound::Sound(TYPE type, const std::string& path)
-{
-	sound_.handle = -1;
-	sound_.type = type;
-	sound_.path = path;
-
-	sound_.isPlay = false;
-	sound_.isPlayOld = false;
-}
 
 void Sound::Update(VECTOR pos)
 {
@@ -228,7 +220,7 @@ void Sound::SetVolume(float per)
 {
 	// âπó ÇÃè„å¿ÅEâ∫å¿êßå¿(0.0Å`1.0)
 
-	std::clamp(per, 0.0f, 1.0f);
+	per = std::clamp(per, 0.0f, 1.0f);
 
 	// âπó äÑÇËìñÇƒ
 	ChangeVolumeSoundMem((per * sound_.maxVolume), sound_.handle);
