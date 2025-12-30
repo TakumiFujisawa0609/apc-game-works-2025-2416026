@@ -174,30 +174,11 @@ void Input::SetMousePos(const Vector2& pos)
 	SetMousePoint(static_cast<int>(mousePos_.x), static_cast<int>(mousePos_.y));
 }
 
-Vector2 Input::GetMousePos(void) const
-{
-	return mousePos_;
-}
-
 Vector2 Input::GetMousePosDistance(void) const
 {
 	return { (mousePos_.x - mousePrePos_.x) ,(mousePos_.y - mousePrePos_.y) };
 }
 
-int Input::GetMouse(void) const
-{
-	return mouseInput_;
-}
-
-bool Input::IsClickMouseLeft(void) const
-{
-	return mouseInput_ == MOUSE_INPUT_LEFT;
-}
-
-bool Input::IsClickMouseRight(void) const
-{
-	return mouseInput_ == MOUSE_INPUT_RIGHT;
-}
 
 bool Input::IsMouseNew(MOUSE mouse) const
 {

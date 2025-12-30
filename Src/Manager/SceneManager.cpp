@@ -2,6 +2,7 @@
 #include "SceneManager.h"
 #include <DxLib.h>
 #include <chrono>
+#include <cassert>
 #include "../Application.h"
 #include "../Common/Camera.h"
 #include "../Common/Perform.h"
@@ -28,21 +29,17 @@ void SceneManager::CreateInstance(void)
 	instance_->Load();
 }
 
-SceneManager::SceneManager(void)
+SceneManager::SceneManager(void):
+	curScene_(nullptr),
+	sceneId_(SCENE_ID::NONE),
+	waitSceneId_(SCENE_ID::NONE),
+	isChangeScene_(false),
+	isDebugMode_(false)
 {
 	/*　デフォルトコンストラクタ　*/
 
-	sceneId_ = START_SCENE;
-	waitSceneId_ = SCENE_ID::NONE;
-
-	isChangeScene_ = false; // 遷移フラグ
-
-	isDebugMode_ = false;
-
 	// マウスカーソルの非表示
 	ShowCursor(FALSE);
-
-	Load(); // 初期化処理
 }
 
 
@@ -51,9 +48,8 @@ void SceneManager::Load(void)
 	/*　初期化処理　*/
 
 	curScene_ = nullptr;
-	sceneId_	 = START_SCENE;	   // 現在シーン
 	waitSceneId_ = SCENE_ID::NONE; // 待機シーンID
-	DoChangeState(sceneId_); // シーン初期化
+	DoChangeState(START_SCENE); // シーン初期化
 
 	isChangeScene_ = false; // 遷移フラグ無効化
 
@@ -265,11 +261,12 @@ void SceneManager::DoChangeState(SCENE_ID nextScene)
 
 	sceneId_ = nextScene; // シーン状態遷移
 
-	if (curScene_ != nullptr)
+  	if (curScene_ != nullptr)
 	{
 		// 遷移前のシーンを解放
 		curScene_->Release();
 		delete curScene_;
+		curScene_ = nullptr;
 	}
 
 	// シーン状態遷移
@@ -282,9 +279,15 @@ void SceneManager::DoChangeState(SCENE_ID nextScene)
 	case SCENE_ID::GAME:
 		curScene_ = new GameScene();
 		break;
+
 	case SCENE_ID::CLEAR:
 		curScene_ = new GameClearScene();
 		break;
+
+	default:
+		assert("シーンが未割当です。");
+		break;
+
 	}
 
 	curScene_->Init(); // 現在シーン初期化

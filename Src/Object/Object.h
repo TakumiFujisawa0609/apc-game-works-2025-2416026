@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Common/Quaternion.h"
+#include "../Manager/SceneManager.h"
 #include "../Manager/ResourceManager.h"
 #include "../Manager/SoundManager.h"
 #include "./Common/AnimationController.h"
@@ -206,6 +207,12 @@ protected:
 	};
 	ParamChara paramChara_;
 
+	// シーンマネージャ
+	ResourceManager& resMng_;
+
+	// リソースマネージャ
+	SceneManager& sceneMng_;
+
 	// アニメーション
 	AnimationController* anim_;
 
@@ -292,8 +299,9 @@ protected:
 
 	// 移動処理
 	virtual void Move(void) {};
-public:
 
+
+public:
 
 	/// @brief デフォルトコンストラクタ
 	Object(void);

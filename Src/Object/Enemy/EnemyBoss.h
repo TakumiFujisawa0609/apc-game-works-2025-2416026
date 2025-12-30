@@ -27,6 +27,7 @@ public:
 
 	~EnemyBoss(void) = default;
 
+
 	void DrawMagicCircle(void);
 
 	void SetIsSpawnCircle(bool _flag);

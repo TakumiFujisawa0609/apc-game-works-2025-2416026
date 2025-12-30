@@ -13,10 +13,10 @@ void InputManager::CreateInstance(void)
 	instance_->Init();
 }
 
-InputManager::InputManager(void)
+InputManager::InputManager(void):
+	input_(nullptr),
+	cursorMode_(CURSOR_MODE::NONE)
 {
-	input_ = nullptr;
-
 	triggerMap_.clear();
 	funcNewMap_.clear();
 	funcTrgDownMap_.clear();
@@ -130,7 +130,6 @@ Vector2 InputManager::GetMousePos(void) const
 {
 	return input_->GetMousePos();
 }
-
 Vector2 InputManager::GetMouseMove(void) const
 {
 	return input_->GetMousePosDistance();
@@ -142,7 +141,6 @@ Vector2 InputManager::GetKnockLStickSize(Input::JOYPAD_NO _num) const
 
 	return Vector2(padInfo.AKeyLX, padInfo.AKeyLY);
 }
-
 Vector2 InputManager::GetKnockRStickSize(Input::JOYPAD_NO _num) const
 {
 	auto padInfo = input_->GetJPadInputState(_num);
@@ -270,6 +268,7 @@ void InputManager::RegisterTriggerFunction(const TYPE type, std::vector<std::fun
 	funcTrgUpMap_.emplace(type, trgUpFuncs);
 }
 
+
 bool InputManager::IsNewKey(const TYPE type)
 {
 	for (int key : triggerMap_[type].keys)
@@ -281,7 +280,6 @@ bool InputManager::IsNewKey(const TYPE type)
 	}
 	return false;
 }
-
 bool InputManager::IsTrgDownKey(const TYPE type)
 {
 	for (int key : triggerMap_[type].keys)
@@ -293,7 +291,6 @@ bool InputManager::IsTrgDownKey(const TYPE type)
 	}
 	return false;
 }
-
 bool InputManager::IsTrgUpKey(const TYPE type)
 {
 	for (int key : triggerMap_[type].keys)
@@ -306,6 +303,7 @@ bool InputManager::IsTrgUpKey(const TYPE type)
 	return false;
 }
 
+
 bool InputManager::IsNewPadButton(const TYPE type, const Input::JOYPAD_NO padNo)
 {
 	for (auto button : triggerMap_[type].padButtons)
@@ -317,7 +315,6 @@ bool InputManager::IsNewPadButton(const TYPE type, const Input::JOYPAD_NO padNo)
 	}
 	return false;
 }
-
 bool InputManager::IsTrgDownPadButton(const TYPE type, const Input::JOYPAD_NO padNo)
 {
 	for (auto button : triggerMap_[type].padButtons)
@@ -329,7 +326,6 @@ bool InputManager::IsTrgDownPadButton(const TYPE type, const Input::JOYPAD_NO pa
 	}
 	return false;
 }
-
 bool InputManager::IsTrgUpPadButton(const TYPE type, const Input::JOYPAD_NO padNo)
 {
 	for (auto button : triggerMap_[type].padButtons)
@@ -342,6 +338,7 @@ bool InputManager::IsTrgUpPadButton(const TYPE type, const Input::JOYPAD_NO padN
 	return false;
 }
 
+
 bool InputManager::IsNewPadStick(const TYPE type, const Input::JOYPAD_NO padNo)
 {
 	for (auto stick : triggerMap_[type].padSticks)
@@ -353,7 +350,6 @@ bool InputManager::IsNewPadStick(const TYPE type, const Input::JOYPAD_NO padNo)
 	}
 	return false;
 }
-
 bool InputManager::IsTrgDownPadStick(const TYPE type, const Input::JOYPAD_NO padNo)
 {
 	for (auto stick : triggerMap_[type].padSticks)
@@ -365,7 +361,6 @@ bool InputManager::IsTrgDownPadStick(const TYPE type, const Input::JOYPAD_NO pad
 	}
 	return false;
 }
-
 bool InputManager::IsTrgUpPadStick(const TYPE type, const Input::JOYPAD_NO padNo)
 {
 	for (auto stick : triggerMap_[type].padSticks)
@@ -378,16 +373,15 @@ bool InputManager::IsTrgUpPadStick(const TYPE type, const Input::JOYPAD_NO padNo
 	return false;
 }
 
+
 bool InputManager::IsNewMouse(const TYPE type)
 {
 	return input_->IsMouseNew(triggerMap_[type].mouse);
 }
-
 bool InputManager::IsTrgDownMouse(const TYPE type)
 {
 	return input_->IsMouseTrgDown(triggerMap_[type].mouse);
 }
-
 bool InputManager::IsTrgUpMouse(const TYPE type)
 {
 	return input_->IsMouseTrgUp(triggerMap_[type].mouse);

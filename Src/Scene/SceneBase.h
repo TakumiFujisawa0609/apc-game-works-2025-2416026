@@ -1,6 +1,8 @@
 #pragma once
 #include "../Manager/InputManager.h"
 #include "../Common/Vector2.h"
+class ResourceManager;
+class SceneManager;
 
 class SceneBase
 {
@@ -35,6 +37,9 @@ public:
 
 
 protected:
+
+	ResourceManager& resMng_;
+	SceneManager& sceneMng_;
 
 	/// <summary>
 	/// ‘I‘ğ‚Ìã‚Ì”»’èˆ—

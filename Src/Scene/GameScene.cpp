@@ -3,7 +3,6 @@
 #include <DxLib.h>
 #include <EffekseerForDXLib.h>
 #include <string>
-#include "./SceneBase.h"
 #include "../Application.h"
 #include "../Utility/AsoUtility.h"
 #include "../Common/Vector2.h"
@@ -25,8 +24,8 @@
 
 
 GameScene::GameScene(void):
-	SceneBase::SceneBase(),
-	gameState_(GAME_STATE::NONE)
+	gameState_(GAME_STATE::NONE),
+	SceneBase()
 {
 	Load();
 }
@@ -83,7 +82,7 @@ void GameScene::ReInit(void)
 
 
 	// カメラ移動領域割り当て
-	Camera& camera = SceneManager::GetInstance().GetCamera();
+	Camera& camera = sceneMng_.GetCamera();
 
 	float angleY = static_cast<float>(player_->GetRotationLocal().y);
 	camera.Init(Camera::MODE::FOLLOW, player_->GetPos(), angleY, player_);
@@ -104,7 +103,7 @@ void GameScene::Update(void)
 	// 当たり判定更新
 	CollisionManager::GetInstance().Update();
 
-	Camera& camera = SceneManager::GetInstance().GetCamera();
+	Camera& camera = sceneMng_.GetCamera();
 	// カメラ位置更新
 	camera.UpdatePlayerTransform(&player_->GetPos(), &player_->GetRotation());
 	camera.SetTrackingTarget(&player_->GetPos());
@@ -122,7 +121,7 @@ void GameScene::Update(void)
 		if (InputManager::GetInstance().IsTrgDown(InputManager::TYPE::SELECT_DECISION))
 		{
 			// 決定処理後、シーン遷移
-			SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::TITLE);
+			sceneMng_.ChangeScene(SceneManager::SCENE_ID::TITLE);
 		}
 	}
 }
@@ -141,10 +140,10 @@ void GameScene::Draw(void)
 				0x00aa00, 0x0, true);*/
 
 	stage_->Draw();
-
+	
 	// グリッド線描画
 #ifdef _DEBUG
-	SceneManager::GetInstance().DrawGrid();
+	sceneMng_.DrawGrid();
 #endif
 
 	// Effekseerにより再生中のエフェクトを更新する
@@ -171,7 +170,7 @@ void GameScene::Draw(void)
 	/*
 	CollisionManager::GetInstance().DrawDebug();
 
-	SceneManager::GetInstance().DrawDebug();*/
+	sceneMng_.DrawDebug();*/
 #endif
 }
 
@@ -220,12 +219,12 @@ void GameScene::GameIdleProc(void)
 
 	if (enemys_->GetIsActiveBoss() && enemys_->GetIsDefeatBoss())
 	{
-		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::CLEAR);
+		sceneMng_.ChangeScene(SceneManager::SCENE_ID::CLEAR);
 	}
 	else if (player_->GetCurHp() <= 0)
 	{
-		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::TITLE);
-		//SceneManager::ChangeScene(SceneManager::SCENE_ID::GAMEOVER);
+		sceneMng_.ChangeScene(SceneManager::SCENE_ID::TITLE);
+		//sceneMng_.ChangeScene(SceneManager::SCENE_ID::GAMEOVER);
 	}
 
 	

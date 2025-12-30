@@ -17,7 +17,7 @@ GameClearScene::GameClearScene(void):
 
 void GameClearScene::Load(void)
 {
-	clearHandle_ = ResourceManager::GetInstance().LoadHandleId(ResourceManager::SRC::IMG_CLEAR);
+	clearHandle_ = resMng_.LoadHandleId(ResourceManager::SRC::IMG_CLEAR);
 }
 
 void GameClearScene::Init(void)

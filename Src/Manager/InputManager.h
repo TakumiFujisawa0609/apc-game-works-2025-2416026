@@ -48,7 +48,7 @@ public:
 		MAX,
 	};
 
-	enum class MOUSE_MODE
+	enum class CURSOR_MODE
 	{
 		NONE,     // 変更なし
 		LOCKED,   // 画面中央固定
@@ -140,7 +140,7 @@ private:
 	static InputManager* instance_;
 
 	// カーソル状態
-	MOUSE_MODE cursorMode_;
+	CURSOR_MODE cursorMode_;
 
 
 	// 入力トリガーの情報
@@ -199,6 +199,7 @@ private:
 	bool IsTrgDownMouse(const TYPE type);
 	bool IsTrgUpMouse(const TYPE type);
 
+	void CursorProcess(void);
 
 	/// @brief コンストラクタ
 	InputManager(void);
@@ -211,5 +212,4 @@ private:
 	InputManager& operator=(const InputManager&) = delete;
 	InputManager(InputManager&&) = delete;
 	InputManager& operator=(InputManager&&) = delete;
-
 };

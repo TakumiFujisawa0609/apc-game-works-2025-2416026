@@ -29,7 +29,7 @@ Player::Player(void):
 
 void Player::LoadPost(void)
 {
-	paramChara_.handle = ResourceManager::GetInstance().LoadHandleId(ResourceManager::SRC::MODEL_PLAYER);
+	paramChara_.handle = resMng_.LoadHandleId(ResourceManager::SRC::MODEL_PLAYER);
 }
 
 void Player::SetParam(void)
@@ -100,31 +100,31 @@ void Player::InitAnim(void)
 	int res = -1;
 
 	// ãUŒ‚1
-	res = ResourceManager::GetInstance().LoadHandleId(RES_SRC::ANIM_JUB_1_SWORD);
+	res = resMng_.LoadHandleId(RES_SRC::ANIM_JUB_1_SWORD);
 	SetExternalAnim(ANIM_STATE::JUB_1, MOTION_TYPE::JUB_1, res);
 
 	// ãUŒ‚2
-	res = ResourceManager::GetInstance().LoadHandleId(RES_SRC::ANIM_JUB_2_SWORD);
+	res = resMng_.LoadHandleId(RES_SRC::ANIM_JUB_2_SWORD);
 	SetExternalAnim(ANIM_STATE::JUB_2, MOTION_TYPE::JUB_2, res);
 
 	// ãUŒ‚3
-	res = ResourceManager::GetInstance().LoadHandleId(RES_SRC::ANIM_JUB_3_SWORD);
+	res = resMng_.LoadHandleId(RES_SRC::ANIM_JUB_3_SWORD);
 	SetExternalAnim(ANIM_STATE::JUB_END, MOTION_TYPE::JUB_END, res);
 
 	// •KE‹Z
-	res = ResourceManager::GetInstance().LoadHandleId(RES_SRC::ANIM_SPECIAL_SWORD);
+	res = resMng_.LoadHandleId(RES_SRC::ANIM_SPECIAL_SWORD);
 	SetExternalAnim(ANIM_STATE::SPECIAL, MOTION_TYPE::SPECIAL , res);
 
 	// ‹­UŒ‚1
-	res = ResourceManager::GetInstance().LoadHandleId(RES_SRC::ANIM_STRONG_1_SWORD);
+	res = resMng_.LoadHandleId(RES_SRC::ANIM_STRONG_1_SWORD);
 	SetExternalAnim(ANIM_STATE::STRONG_1, MOTION_TYPE::STRONG_1, res);
 
 	// ‹­UŒ‚2
-	res = ResourceManager::GetInstance().LoadHandleId(RES_SRC::ANIM_STRONG_2_SWORD);
+	res = resMng_.LoadHandleId(RES_SRC::ANIM_STRONG_2_SWORD);
 	SetExternalAnim(ANIM_STATE::STRONG_2, MOTION_TYPE::STRONG_2, res);
 
 	// ‹­UŒ‚3
-	res = ResourceManager::GetInstance().LoadHandleId(RES_SRC::ANIM_STRONG_3_SWORD);
+	res = resMng_.LoadHandleId(RES_SRC::ANIM_STRONG_3_SWORD);
 	SetExternalAnim(ANIM_STATE::STRONG_3, MOTION_TYPE::STRONG_3, res);
 
 
@@ -302,7 +302,7 @@ void Player::UpdateStateAtk(void)
 
 void Player::UpdateStateOver(void)
 {
-	float delta = SceneManager::GetInstance().GetDeltaTime();
+	float delta = sceneMng_.GetDeltaTime();
 
 	if (paramChara_.timeInv > 0.0f)
 	{
@@ -471,7 +471,7 @@ void Player::Move(void)
 	if (!AsoUtility::EqualsVZero(inputDir))
 	{
 		// ƒJƒƒ‰‚ÌŠp“x
-		Camera& camera = SceneManager::GetInstance().GetCamera();
+		Camera& camera = sceneMng_.GetCamera();
 		float cameraEulerY = camera.GetCameraRot().ToEuler().y;
 		Quaternion cameraYRot = Quaternion::Euler(0.0f, cameraEulerY, 0.0f);
 
@@ -567,7 +567,7 @@ void Player::AnimStateIdle(void)
 
 void Player::UpdateMotion(void)
 {
-	float delta = SceneManager::GetInstance().GetDeltaTime();
+	float delta = sceneMng_.GetDeltaTime();
 
 	// ƒ‚[ƒVƒ‡ƒ“XV
 	paramChara_.atkMotion.Update();

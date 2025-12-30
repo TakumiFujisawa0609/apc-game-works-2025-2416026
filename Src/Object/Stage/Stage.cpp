@@ -18,7 +18,7 @@ void Stage::LoadPost(void)
 
 	roadObj_ = new Transform();
 	roadObj_->pos = {0.0f, -15.0f, -00.0f};
-	roadObj_->modelId = ResourceManager::GetInstance().LoadHandleId(ResourceManager::SRC::MODEL_ROAD);
+	roadObj_->modelId = resMng_.LoadHandleId(ResourceManager::SRC::MODEL_ROAD);
 	roadObj_->InitTransform(SCALE,
 							Quaternion::Identity(),
 							Quaternion::AngleAxis(AsoUtility::Deg2Rad(-90.0f), AsoUtility::AXIS_Y));
@@ -28,7 +28,7 @@ void Stage::LoadPost(void)
 	{
 		Transform* obj = new Transform();
 		obj->pos = pos;
-		obj->modelId = ResourceManager::GetInstance().LoadModelDuplicate(ResourceManager::SRC::MODEL_STAGE);
+		obj->modelId = resMng_.LoadModelDuplicate(ResourceManager::SRC::MODEL_STAGE);
 		obj->InitTransform(SCALE,
 						   Quaternion::Identity(),
 						   Quaternion::AngleAxis(AsoUtility::Deg2Rad(-90.0f), AsoUtility::AXIS_Y));

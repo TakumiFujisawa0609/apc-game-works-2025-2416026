@@ -27,7 +27,7 @@ void Enemy::LoadPost(void)
 	type += static_cast<int>(ResourceManager::SRC::MODEL_ENEMY);
 	ResourceManager::SRC src = static_cast<ResourceManager::SRC>(type);
 
-	paramChara_.handle = ResourceManager::GetInstance().LoadModelDuplicate(src);
+	paramChara_.handle = resMng_.LoadModelDuplicate(src);
 }
 
 void Enemy::SetParam(void)
@@ -93,7 +93,7 @@ void Enemy::Update(void)
 		if (paramEnemy_.isAttack)
 		{
 			// UŒ‚ŠÔŠuŒ¸­
-			float delta = SceneManager::GetInstance().GetDeltaTime();
+			float delta = sceneMng_.GetDeltaTime();
 			paramEnemy_.timeAtkInterval -= ((paramEnemy_.timeAtkInterval > 0.0f) ? delta : 0.0f);
 
 			// ˆê’èŠÔƒvƒŒƒCƒ„[‚ªUŒ‚”ÍˆÍ“ài“üAUŒ‚ó‘Ô‰»
@@ -132,7 +132,7 @@ void Enemy::UpdateState(void)
 
 void Enemy::UpdateStateSpawn(void)
 {
-	const float delta = SceneManager::GetInstance().GetDeltaTime();
+	const float delta = sceneMng_.GetDeltaTime();
 
 	if (paramChara_.timeInv <= 0.0f && 
 		anim_->IsEnd())
@@ -145,7 +145,7 @@ void Enemy::UpdateStateIdle(void)
 	// ’Tõ—LŒø+UŒ‚”ÍˆÍŠO‚ÌAˆÚ“®
 	if (paramEnemy_.isHearing && !paramEnemy_.isAttack)
 	{
-		animStateTime_ += SceneManager::GetInstance().GetDeltaTime();
+		animStateTime_ += sceneMng_.GetDeltaTime();
 		
 		if (animStateTime_ > 0.5f)
 		{
@@ -158,7 +158,7 @@ void Enemy::UpdateStateMove(void)
 {
 	if (!paramEnemy_.isHearing)
 	{ 
-		animStateTime_ += SceneManager::GetInstance().GetDeltaTime();
+		animStateTime_ += sceneMng_.GetDeltaTime();
 
 		if (animStateTime_ > 0.5f)
 		{

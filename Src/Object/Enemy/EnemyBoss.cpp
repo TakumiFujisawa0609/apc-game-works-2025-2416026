@@ -134,7 +134,7 @@ void EnemyBoss::InitSpawnCircle(void)
 	circleVertex_[3].su = 0.0f;
 	circleVertex_[3].sv = 0.0f;
 
-	circleImage_ = ResourceManager::GetInstance().LoadHandleId(ResourceManager::IMG_SPAWNCIRCLE);
+	circleImage_ = resMng_.LoadHandleId(ResourceManager::IMG_SPAWNCIRCLE);
 
 	const float rad = 350.0f;
 	circleRadius_ = rad;
@@ -151,7 +151,7 @@ void EnemyBoss::UpdateStateSpawn(void)
 
 	if (spawnTime_ > 0.0f)
 	{
-		spawnTime_ -= SceneManager::GetInstance().GetDeltaTime();
+		spawnTime_ -= sceneMng_.GetDeltaTime();
 
 		if (spawnTime_ <= 0.0f)
 		{
@@ -205,7 +205,7 @@ void EnemyBoss::SetIsSpawnCircle(bool _flag)
 {
 	if (!_flag && isSpawnCircle_)
 	{
-		EffectController& effect = SceneManager::GetInstance().GetEffects();
+		EffectController& effect = sceneMng_.GetEffects();
 		VECTOR pos = { circlePos_.x, circlePos_.y + 2.0f, circlePos_.z };
 
 		effect.SetEffect(EffectController::EFFECT_TYPE::SPAWN_SKELETON,

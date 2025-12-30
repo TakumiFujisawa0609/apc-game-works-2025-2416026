@@ -4,7 +4,6 @@
 #include <cassert>
 #include <algorithm>
 #include "../Status/StatusData.h"
-#include "../Object.h"
 #include "./Enemy.h"
 #include "./EnemySkeleton.h"
 #include "./EnemyBoss.h"

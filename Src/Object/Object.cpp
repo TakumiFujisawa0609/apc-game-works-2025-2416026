@@ -8,12 +8,13 @@
 #include "../Common/Quaternion.h"
 #include "../Common/Vector2.h"
 #include "../Utility/AsoUtility.h"
-#include "../Manager/SceneManager.h"
 #include "../Manager/SoundManager.h"
 #include "./Common/AttackMotion.h"
 
 
 Object::Object(void):
+	sceneMng_(SceneManager::GetInstance()),
+	resMng_(ResourceManager::GetInstance()),
 	paramChara_(ParamChara::ParamChara()),
 	anim_(nullptr)
 {
@@ -84,7 +85,7 @@ void Object::InitModelFrame(void)
 
 void Object::Update(void)
 {
-	float delta = SceneManager::GetInstance().GetDeltaTime();
+	float delta = sceneMng_.GetDeltaTime();
 
 	// –³“GŠÔŒ¸­
 	paramChara_.timeInv -= ((paramChara_.timeInv > 0.0f) ? delta : 0.0f);

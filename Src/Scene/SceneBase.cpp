@@ -1,3 +1,5 @@
+#include "../Manager/SceneManager.h"
+#include "../Manager/ResourceManager.h"
 #include "SceneBase.h"
 #include <DxLib.h>
 #include "../Manager/InputManager.h"
@@ -5,7 +7,9 @@
 #include "../Common/Vector2.h"
 
 
-SceneBase::SceneBase(void)
+SceneBase::SceneBase(void):
+	resMng_(ResourceManager::GetInstance()),
+	sceneMng_(SceneManager::GetInstance())
 {
 }
 

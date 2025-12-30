@@ -136,19 +136,20 @@ public:
 	void SetMousePos(const Vector2& pos);
 
 	// マウス座標の取得
-	Vector2 GetMousePos(void) const;
+	Vector2 GetMousePos(void) const { return mousePos_;  };
 
 	// マウスの移動距離を取得
 	Vector2 GetMousePosDistance(void)const;
 
 	// マウスのクリック状態を取得(MOUSE_INPUT_LEFT、RIGHT)
-	int GetMouse(void) const;
+	int GetMouse(void) const { return mouseInput_;  };
 
 	// マウスが左クリックされたか
-	bool IsClickMouseLeft(void) const;
+	bool IsClickMouseLeft(void)const { return (mouseInput_ == MOUSE_INPUT_LEFT); };
 
 	// マウスが右クリックされたか
-	bool IsClickMouseRight(void) const;
+	bool IsClickMouseRight(void) const { return (mouseInput_ == MOUSE_INPUT_RIGHT); };
+
 
 	// コントローラの入力情報を取得する
 	JOYPAD_IN_STATE GetJPadInputState(JOYPAD_NO no);

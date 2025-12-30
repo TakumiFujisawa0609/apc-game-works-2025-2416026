@@ -1,7 +1,6 @@
 #include "TitleScene.h"
 #include <string>
 #include <DxLib.h>
-#include "./SceneBase.h"
 #include "../Manager/InputManager.h"
 #include "../Manager/SceneManager.h"
 #include "../Manager/SoundManager.h"
@@ -13,10 +12,10 @@
 
 
 TitleScene::TitleScene(void) :
-	SceneBase::SceneBase(),
 	titleImage_(-1),
 	state_(TITLE_STATE::START_GAME),
-	info_(INFO_TYPE::PLAY_PAD)
+	info_(INFO_TYPE::PLAY_PAD),
+	SceneBase()
 {
 	Load();
 }
@@ -24,7 +23,7 @@ TitleScene::TitleScene(void) :
 void TitleScene::Load(void)
 {
 	//タイトル画像
-	titleImage_ = ResourceManager::GetInstance().LoadHandleId(ResourceManager::SRC::IMG_TITLE);
+	titleImage_ = resMng_.LoadHandleId(ResourceManager::SRC::IMG_TITLE);
 
 	/*
 	pv_ = resMng_.LoadHandleId(ResourceManager::SRC::MOVIE_PV);
@@ -57,7 +56,7 @@ void TitleScene::Init(void)
 
 void TitleScene::Update(void)
 {
-	float delta = SceneManager::GetInstance().GetDeltaTime();
+	float delta = sceneMng_.GetDeltaTime();
 
 	arrowPerformTime_ -= delta;
 	if (arrowPerformTime_ < 0.0f)
@@ -79,7 +78,8 @@ void TitleScene::Update(void)
 
 				Application::GetInstance().SetIsExitMenu(true);
 			
-				SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);
+				sceneMng_.ChangeScene(SceneManager::SCENE_ID::GAME);
+				return;
 			}
 			break;
 
@@ -257,7 +257,7 @@ void TitleScene::DrawTitleText(int& _posY, const char* _text, TitleScene::TITLE_
 
 void TitleScene::UpdateInfo(void)
 {
-	float delta = SceneManager::GetInstance().GetDeltaTime();
+	float delta = sceneMng_.GetDeltaTime();
 
 	// 選択処理
 	int info = static_cast<int>(info_);
@@ -337,7 +337,7 @@ void TitleScene::DrawInfo(void)
 
 void TitleScene::PromotionVideo(void)
 {
-	float delta = SceneManager::GetInstance().GetDeltaTime();
+	float delta = sceneMng_.GetDeltaTime();
 	pvTime_ += delta;
 
 	if (pvTime_ > 60.0f || CheckHitKey(KEY_INPUT_TAB))
