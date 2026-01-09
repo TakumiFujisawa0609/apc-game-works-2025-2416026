@@ -4,7 +4,7 @@
 #include "../Status/StatusData.h"
 #include "../Status/StatusEnemy.h"
 #include "../Common/AnimationController.h"
-#include "../Object.h"
+#include "../Actor/Object.h"
 #include "../Player/Player.h"
 
 EnemySkeleton::EnemySkeleton(Player& player)

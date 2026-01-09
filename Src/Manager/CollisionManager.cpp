@@ -5,7 +5,7 @@
 #include "../Common/Vector2.h"
 #include "../Utility/AsoUtility.h"
 #include "../Utility/UtilityCollision.h"
-#include "../Object/Object.h"
+#include "../Object/Actor/Object.h"
 #include "../Object/Player/Player.h"
 #include "../Object/Enemy/EnemyController.h"
 #include "../Object/Enemy/Enemy.h"

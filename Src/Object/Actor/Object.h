@@ -1,12 +1,9 @@
 #pragma once
 
-#include "../Common/Quaternion.h"
-#include "../Manager/SceneManager.h"
-#include "../Manager/ResourceManager.h"
-#include "../Manager/SoundManager.h"
-#include "./Common/AnimationController.h"
-#include "./Common/AttackMotion.h"
-#include "../Utility/AsoUtility.h"
+#include "./ActorBase.h"
+#include "../Common/AnimationController.h"
+#include "../Common/AttackMotion.h"
+#include "../../Utility/AsoUtility.h"
 #include <DxLib.h>
 #include <memory>
 #include <unordered_map>
@@ -16,7 +13,7 @@
 class StatusData;
 class AnimationController;
 
-class Object
+class Object : public ActorBase
 {
 	// リソース
 	using RES_SRC = ResourceManager::SRC;
@@ -122,28 +119,20 @@ protected:
 	struct ParamChara
 	{
 		ParamChara(void) :
-			pos(AsoUtility::VECTOR_ZERO), prePos(AsoUtility::VECTOR_ZERO),
-			posForward(AsoUtility::VECTOR_ZERO), posLocal(AsoUtility::VECTOR_ZERO),
-			velocity(AsoUtility::VECTOR_ZERO), knockBack(AsoUtility::VECTOR_ZERO), dir(AsoUtility::VECTOR_ZERO), 
-			rot(AsoUtility::VECTOR_ZERO), quaRot(Quaternion::Identity()),
-			quaRotLocal(Quaternion::Identity()), 
-			scale(AsoUtility::VECTOR_ZERO),radius(0.0f),radiusForward(0.0f),
-			handle(-1), hp(0), power(0), speed(0.0f),
+			prePos(AsoUtility::VECTOR_ZERO), posForward(AsoUtility::VECTOR_ZERO),
+			velocity(AsoUtility::VECTOR_ZERO), knockBack(AsoUtility::VECTOR_ZERO),
+			dir(AsoUtility::VECTOR_ZERO), 
+			radius(0.0f),radiusForward(0.0f),
+			hp(0), power(0), speed(0.0f),
 			isGround(true), isView(true), timeInv(0.0f),
 			atkMotion(AttackMotion())
 		{};
-		// 位置
-		VECTOR pos;
 
 		// 前フレームの位置
 		VECTOR prePos;
 
 		// 正面の位置
 		VECTOR posForward;
-
-		// モデル位置調整値
-		VECTOR posLocal;
-
 
 		// 移動量
 		VECTOR velocity;
@@ -154,26 +143,11 @@ protected:
 		// 移動方向
 		VECTOR dir;
 
-		// 回転(オイラー角)
-		VECTOR rot;
-
-		// 回転(クォータニオン)
-		Quaternion quaRot;
-
-		// ローカル回転(クォータニオン)
-		Quaternion quaRotLocal;
-
-		// スケール
-		VECTOR scale;
-
 		// 半径
 		float radius;
 
 		// 正面の半径
 		float radiusForward;
-
-		// ハンドルID
-		int handle;
 
 		// フレームのリスト
 		std::vector<Frame> frames;
@@ -206,12 +180,6 @@ protected:
 		AttackMotion atkMotion;
 	};
 	ParamChara paramChara_;
-
-	// シーンマネージャ
-	ResourceManager& resMng_;
-
-	// リソースマネージャ
-	SceneManager& sceneMng_;
 
 	// アニメーション
 	AnimationController* anim_;
@@ -261,8 +229,6 @@ protected:
 	/// @brief パラメータ割り当て
 	virtual void SetParam(void) = 0;
 
-	/// @brief 各オブジェクトの読み込み処理
-	virtual void LoadPost(void) = 0;
 
 	/// @brief アニメーション初期化
 	virtual void InitAnim(void) {};
@@ -270,17 +236,8 @@ protected:
 	/// @brief フレーム初期化
 	virtual void InitModelFrame(void);
 
-	/// @brief その他処理初期化 
-	virtual void InitPost(void) = 0;
-
 	/// @brief アニメーション更新処理
 	virtual void UpdateAnim(void) = 0;
-
-	// @brief サブクラス独自更新処理
-	virtual void UpdatePost(void) = 0;
-
-	/// @brief 各オブジェクト独自の描画
-	virtual void DrawPost(void) {};
 
 	virtual void SetPosForward(void);
 	
@@ -309,15 +266,15 @@ public:
 	/// @brief デフォルトデストラクタ
 	virtual ~Object(void) = default;
 
-	void Load(void);
+	void Load(void)override final;
 
-	void Init(const VECTOR& _pos, float _angleY = 0.0f);
+	void Init(const VECTOR& _pos, float _angleY = 0.0f)override final;
 
 	/// @brief 更新処理
-	virtual void Update(void);
+	virtual void Update(void)override;
 
 	/// @brief 描画処理
-	virtual void Draw(void);
+	virtual void Draw(void)override final;
 
 	/// @brief デバッグ描画
 	virtual void DrawDebug(void) {};
@@ -371,9 +328,6 @@ public:
 	bool CheckActiveAttack(void) const;
 
 
-	/// @brief 位置割り当て
-	void SetPos(const VECTOR& pos) { paramChara_.pos = pos; };
-
 	/// @brief 前位置を割り当て
 	void SetPrePos(const VECTOR& pos) { paramChara_.prePos = pos; };
 
@@ -389,14 +343,9 @@ public:
 	void SetIsView(bool flag) { paramChara_.isView = flag; };
 
 
-	/// @brief 現在位置取得
-	VECTOR& GetPos(void) { return paramChara_.pos; };
-
+	
 	/// @brief 前フレーム位置取得
 	VECTOR& GetPrePos(void) { return paramChara_.prePos; };
-
-	/// @brief ローカル座標取得
-	const VECTOR& GetPosLocal(void) const { return paramChara_.posLocal; };
 
 	/// @brief 正面の座標取得
 	VECTOR& GetPosForward(void) { return paramChara_.posForward; };
@@ -409,30 +358,13 @@ public:
 
 	/// @brief 向きベクトル取得
 	const VECTOR& GetDir(void) const { return paramChara_.dir; };
-
-
-	/// @brief オイラー角の向き取得
-	const VECTOR& GetRotationEuler(void) const { return paramChara_.rot; };
-
-	/// @brief クォータニオン角の向き取得
-	Quaternion& GetRotation(void) { return paramChara_.quaRot; };
-
-	/// @brief ローカル座標のクォータニオン角の向き取得
-	const Quaternion& GetRotationLocal(void) const { return paramChara_.quaRotLocal; };
-
-
-	/// @brief スケール取得
-	const VECTOR& GetScale(void) const { return paramChara_.scale; };
+	
 
 	/// @brief 半径取得
 	/// @param 当たり判定の種類
 	float GetRadius(COLLISION_TYPE _type);
 
 	virtual float GetRadiusForward(void)const { return paramChara_.radiusForward; };
-
-
-	/// @brief キャラモデルハンドル取得
-	int GetHandle(void) const { return paramChara_.handle; };
 
 
 	/// @brief 現在HP取得

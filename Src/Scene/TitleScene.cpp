@@ -7,6 +7,7 @@
 #include "../Manager/ResourceManager.h"
 #include "../Manager/Resource.h"
 #include "../Common/Font.h"
+#include "../Common/Camera.h"
 #include "../Application.h"
 #include "../Utility/AsoUtility.h"
 
@@ -52,6 +53,7 @@ void TitleScene::Init(void)
 	selectScale_ = 0.35f;
 	isPvActive_ = false;
 	pvTime_ = 0.0f;
+	sceneMng_.GetCamera().Init(Camera::MODE::FIXEX_POINT);
 }
 
 void TitleScene::Update(void)

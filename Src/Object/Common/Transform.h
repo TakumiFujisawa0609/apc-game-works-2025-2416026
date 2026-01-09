@@ -52,8 +52,8 @@ public:
 	void SetModel(int modelHId);
 
 	/// @brief êîílèâä˙
-	void InitTransform(const VECTOR& _scl,const Quaternion& _rot, const Quaternion& _rotLocal, const VECTOR& _pos);
-	void InitTransform(float _scl,const Quaternion& _rot, const Quaternion& _rotLocal, const VECTOR& _pos);
+	void InitTransform(const VECTOR& _scl,const Quaternion& _rot, const Quaternion& _rotLocal, const VECTOR& _pos, const VECTOR& _localPos);
+	void InitTransform(float _scl,const Quaternion& _rot, const Quaternion& _rotLocal, const VECTOR& _pos, const VECTOR& _localPos);
 	void InitTransform(float _scl,const Quaternion& _rot, const Quaternion& _rotLocal);
 	void InitTransform(void);
 

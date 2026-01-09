@@ -6,6 +6,9 @@
 #include "../Manager/InputManager.h"
 #include "../Utility/AsoUtility.h"
 #include "../Common/Font.h"
+#include "../Common/Camera.h"
+#include "../Object/Common/Transform.h"
+#include "../Object/Common/AnimationController.h"
 #include "../Application.h"
 
 
@@ -18,56 +21,40 @@ GameClearScene::GameClearScene(void):
 void GameClearScene::Load(void)
 {
 	clearHandle_ = resMng_.LoadHandleId(ResourceManager::SRC::IMG_CLEAR);
+
+	player_ = new Transform();
+	player_->modelId = resMng_.LoadModelDuplicate(ResourceManager::SRC::MODEL_PLAYER);
+
+	playerAnim_ = new AnimationController(player_->modelId);
+	playerAnim_->AddExternal(0, 30.0f, resMng_.LoadHandleId(ResourceManager::SRC::ANIM_DANCE));
 }
 
 void GameClearScene::Init(void)
 {
 	state_ = STATE_CLEAR::TITLE;
 
+	sceneMng_.GetCamera().Init(Camera::MODE::FIXEX_POINT);
+
+	player_->InitTransform(1.75f,
+						   Quaternion::Identity(), Quaternion::Identity(),
+						   VGet(0.0f, -250.0f, 500.0f), AsoUtility::VECTOR_ZERO);
+
+	playerAnim_->Play(0);
 }
 
 void GameClearScene::Update(void)
 {	
-	if (InputManager::GetInstance().IsTrgDown(InputManager::TYPE::SELECT_DECISION))
-	{
-		switch (state_)
-		{
-			case STATE_CLEAR::TITLE:
-			{
-				SoundManager::GetInstance().Play(SoundManager::SRC::SE_CLICK, false);
+	player_->Update();
+	playerAnim_->Update();
 
-				SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::TITLE);
-			}
-			break;
-
-			case STATE_CLEAR::RESTART:
-			{
-				SoundManager::GetInstance().Play(SoundManager::SRC::SE_CLICK, false);
-
-				SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);
-			}
-			break;
-
-			case STATE_CLEAR::GAME_END:
-			{
-				SoundManager::GetInstance().Play(SoundManager::SRC::SE_CLICK, false);
-
-				// ƒQ[ƒ€I—¹ˆ—
-				Application::GetInstance().SetIsGameEnd();
-			}
-			break;
-		}
-	}
-
-	// ó‘Ô‘JˆÚˆ—
-	int state = static_cast<int>(state_);
-	ChangeState(state, static_cast<int>(STATE_CLEAR::GAME_END), static_cast<int>(STATE_CLEAR::MAX));
-	state_ = static_cast<STATE_CLEAR>(state);
+	ChangeScene();
 }
 
 void GameClearScene::Draw(void)
 {
 	Font& font = Font::GetInstance();
+
+	MV1DrawModel(player_->modelId);
 
 	// ”wŒi•`‰æ
 	const Vector2 CLEAR_POS = { Application::SCREEN_HALF_X, 350 };
@@ -77,7 +64,6 @@ void GameClearScene::Draw(void)
 	//ƒtƒHƒ“ƒg‚Ì•`‰æ
 	const Vector2 TEXT_POS = { Application::SCREEN_HALF_X , Application::SCREEN_HALF_Y + 225 };
 	DrawFontText(TEXT_POS, 30, 0xffffff, "Œˆ’è‚Åƒ^ƒCƒgƒ‹‚É–ß‚é", false);
-
 
 	/*
 	if (isViewInfo_)
@@ -111,4 +97,49 @@ void GameClearScene::Draw(void)
 
 void GameClearScene::Release(void)
 {
+	playerAnim_->Release();
+	delete playerAnim_;
+
+	player_->Release();
+	delete player_;
+}
+
+
+void GameClearScene::ChangeScene(void)
+{
+	if (InputManager::GetInstance().IsTrgDown(InputManager::TYPE::SELECT_DECISION))
+	{
+		switch (state_)
+		{
+		case STATE_CLEAR::TITLE:
+		{
+			SoundManager::GetInstance().Play(SoundManager::SRC::SE_CLICK, false);
+
+			sceneMng_.ChangeScene(SceneManager::SCENE_ID::TITLE);
+		}
+		break;
+
+		case STATE_CLEAR::RESTART:
+		{
+			SoundManager::GetInstance().Play(SoundManager::SRC::SE_CLICK, false);
+
+			sceneMng_.ChangeScene(SceneManager::SCENE_ID::GAME);
+		}
+		break;
+
+		case STATE_CLEAR::GAME_END:
+		{
+			SoundManager::GetInstance().Play(SoundManager::SRC::SE_CLICK, false);
+
+			// ƒQ[ƒ€I—¹ˆ—
+			Application::GetInstance().SetIsGameEnd();
+		}
+		break;
+		}
+	}
+
+	// ó‘Ô‘JˆÚˆ—
+	int state = static_cast<int>(state_);
+	ChangeState(state, static_cast<int>(STATE_CLEAR::GAME_END), static_cast<int>(STATE_CLEAR::MAX));
+	state_ = static_cast<STATE_CLEAR>(state);
 }

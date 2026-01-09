@@ -1,7 +1,8 @@
 #include "Enemy.h"
 #include <DxLib.h>
 #include <unordered_map>
-#include "../Object.h"
+#include "../Actor/Object.h"
+#include "../Common/Transform.h"
 #include "../Player/Player.h"
 #include "../Common/AnimationController.h"
 #include "../Status/StatusData.h"
@@ -27,7 +28,7 @@ void Enemy::LoadPost(void)
 	type += static_cast<int>(ResourceManager::SRC::MODEL_ENEMY);
 	ResourceManager::SRC src = static_cast<ResourceManager::SRC>(type);
 
-	paramChara_.handle = resMng_.LoadModelDuplicate(src);
+	transform_->modelId = resMng_.LoadModelDuplicate(src);
 }
 
 void Enemy::SetParam(void)
@@ -35,23 +36,23 @@ void Enemy::SetParam(void)
 	paramEnemy_.name = status_.GetName();
 
 	int frameNum = FindFrameNum(paramChara_.colList[Object::COLLISION_TYPE::BODY]->name);// フレーム名割り当て
-	VECTOR sub = VSub(paramChara_.frames[frameNum].pos, paramChara_.pos);
-	paramChara_.posLocal = VSub(paramChara_.pos, sub);
+	VECTOR sub = VSub(paramChara_.frames[frameNum].pos, transform_->pos);
+	transform_->localPos = VSub(transform_->pos, sub);
 
 	paramEnemy_.type = status_.GetEnemyType();
 	paramEnemy_.searchRange = status_.GetSearchRange();
 	paramEnemy_.atkRange = status_.GetAtkRange();
 
-	paramChara_.quaRot = Quaternion::Identity();
-	paramChara_.quaRot = Quaternion::AngleAxis(LOCAL_ANGLE_Y, AsoUtility::AXIS_Y);
+	transform_->quaRot = Quaternion::Identity();
+	transform_->quaRot = Quaternion::AngleAxis(LOCAL_ANGLE_Y, AsoUtility::AXIS_Y);
 
-	paramChara_.quaRotLocal = Quaternion::Identity(); // ローカル回転初期化
-	paramChara_.quaRotLocal = Quaternion::AngleAxis(LOCAL_ANGLE_Y, AsoUtility::AXIS_Y);
+	transform_->quaRotLocal = Quaternion::Identity(); // ローカル回転初期化
+	transform_->quaRotLocal = Quaternion::AngleAxis(LOCAL_ANGLE_Y, AsoUtility::AXIS_Y);
 
 	float scale = status_.GetScale();
-	paramChara_.scale = { scale * (1.0f - SCALE_DIFF),
-						  scale * (1.0f + SCALE_DIFF),
-						  scale * (1.0f - SCALE_DIFF) };
+	transform_->scl = { scale * (1.0f - SCALE_DIFF),
+				  	    scale * (1.0f + SCALE_DIFF),
+						scale * (1.0f - SCALE_DIFF) };
 	paramChara_.radius = status_.GetRadius();
 
 	paramChara_.hp = status_.GetMaxHp();
@@ -327,7 +328,7 @@ void Enemy::LookPlayerPos(void)
 	VECTOR pPos = player_.GetPos();
 
 	// ワールド座標
-	VECTOR ePos = VAdd(paramChara_.pos, paramChara_.posLocal);
+	VECTOR ePos = VAdd(transform_->pos, transform_->localPos);
 
 	// プレイヤーと敵の距離
 	VECTOR diff = VSub(pPos, ePos);
@@ -341,7 +342,7 @@ void Enemy::LookPlayerPos(void)
 	//VECTOR dir = { paramChara_.dir.x, 0.0f, paramChara_.dir.z };
 	VECTOR dir = paramChara_.dir;
 	// 向きに反映
-	paramChara_.quaRot = Quaternion::LookRotation(dir, AsoUtility::AXIS_Y);
+	transform_->quaRot = Quaternion::LookRotation(dir, AsoUtility::AXIS_Y);
 }
 
 
@@ -361,7 +362,7 @@ void Enemy::Move(void)
 	// 攻撃可能時は移動無効化
 	if (paramEnemy_.isAttack) { return; }
 
-	VECTOR pos = VAdd(paramChara_.pos, paramChara_.posLocal);
+	VECTOR pos = VAdd(transform_->pos, transform_->localPos);
 
 	// Z軸の移動速度
 	float speedZ = ((pos.z < player_.GetPos().z) ? paramChara_.speed : -paramChara_.speed);
@@ -382,12 +383,12 @@ void Enemy::Move(void)
 
 	VECTOR dir = { paramChara_.dir.x, 0.0f, paramChara_.dir.z };
 
-	paramChara_.pos = VAdd(paramChara_.pos, VAdd(dir, velo));
+	transform_->pos = VAdd(transform_->pos, VAdd(dir, velo));
 }
 
 void Enemy::SearchField(void)
 {
-	VECTOR pos = VAdd(paramChara_.pos, { paramChara_.posLocal.x, 0.0f,paramChara_.posLocal.z });
+	VECTOR pos = VAdd(transform_->pos, { transform_->localPos.x, 0.0f,transform_->localPos.z });
 	VECTOR vec = VSub(player_.GetPos(), pos);
 
 	float diff = ((vec.x * vec.x) + (vec.z * vec.z));
@@ -405,7 +406,7 @@ void Enemy::SearchAttackField(void)
 	VECTOR eDir = VNorm(paramChara_.dir);
 
 	// 敵とプレイヤーとの間のベクトル
-	VECTOR diff = VSub(pPos, VAdd(paramChara_.pos, paramChara_.posLocal));
+	VECTOR diff = VSub(pPos, VAdd(transform_->pos, transform_->localPos));
 
 	// 敵から見たプレイヤーの方向
 	VECTOR dirPlayerFromEnemy = VNorm(diff);
@@ -429,21 +430,21 @@ void Enemy::DrawSearchRange(void)
 {
 	/* 索敵範囲描画 */
 	unsigned int color = ((paramEnemy_.isHearing) ? 0xffff00 : 0x00aaaa);
-	MATRIX mat = Quaternion::ToMatrix(paramChara_.quaRot);
+	MATRIX mat = Quaternion::ToMatrix(transform_->quaRot);
 
 	// 円の分割数
 	const int split = 36;
 	const float angle = (360.0f / split);
 
 	// 前方方向
-	VECTOR forward = paramChara_.quaRot.GetForward();
+	VECTOR forward = transform_->quaRot.GetForward();
 
 	MATRIX leftMat, rightMat = MGetIdent();
 	VECTOR left, right = {};
 
 	VECTOR leftPos, rightPos = {};
 
-	VECTOR pos = VAdd(paramChara_.pos, { paramChara_.posLocal.x, 0.0f,paramChara_.posLocal.z });
+	VECTOR pos = VAdd(transform_->pos, { transform_->localPos.x, 0.0f,transform_->localPos.z });
 
 	// 360°の索敵範囲描画
 	for (int i = 0; i < split; i++)
@@ -467,12 +468,12 @@ void Enemy::DrawAttackRange(void)
 	unsigned int color = ((paramEnemy_.isAttack) ? 0xff0000 : 0xaa00ff);
 	const float searchAngle = 50.0f;
 
-	MATRIX mat = Quaternion::ToMatrix(paramChara_.quaRot);
+	MATRIX mat = Quaternion::ToMatrix(transform_->quaRot);
 
-	VECTOR pos = VAdd(paramChara_.pos, paramChara_.posLocal);
+	VECTOR pos = VAdd(transform_->pos, transform_->localPos);
 
 	// 前方方向
-	VECTOR forward = paramChara_.quaRot.GetForward();
+	VECTOR forward = transform_->quaRot.GetForward();
 
 	// 左側方向
 	MATRIX leftMat = MMult(mat, MGetRotY(AsoUtility::Deg2Rad(-searchAngle)));

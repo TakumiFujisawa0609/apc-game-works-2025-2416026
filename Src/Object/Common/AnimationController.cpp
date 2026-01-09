@@ -64,6 +64,9 @@ void AnimationController::AddExternal(int _type, float _speed, int _handle)
 	Animation anim;
 
 	anim.modelId = _handle;
+#ifdef _DEBUG
+	if (_handle == -1) { OutputDebugString("\nアニメーションのハンドルが未割当です。\n"); }
+#endif
 
 	// アニメーション速度割り当て
 	anim.speed = _speed;
@@ -82,6 +85,18 @@ void AnimationController::Play(int _type, bool _isLoop, float _blendTime)
 	
 	// アニメーション未割当時・同じアニメーション時、処理を終了
 	if (!IsFindAnimation(_type) || playType_ == _type) { return; }
+
+	Animation& playAnim = animations_[_type];
+
+	// 外部アニメーション再生時、ハンドルが未割当の場合は処理終了
+	if (playAnim.type == ANIM_TYPE::EXTERNAL && playAnim.modelId == -1)
+	{
+#ifdef _DEBUG
+		OutputDebugString("\n外部アニメーション再生しようとしましたが、ハンドルが未割当でした。\n");
+#endif
+		return;
+	}
+
 
 	if (prePlayType_ != -1)
 	{
@@ -110,8 +125,6 @@ void AnimationController::Play(int _type, bool _isLoop, float _blendTime)
 	curBlendTime_ = 0.0f;
 
 	blendTime_ = _blendTime;
-
-	auto& playAnim = animations_[_type];
 
 	// 初期化
 	playAnim.step = 0.0f;
@@ -146,7 +159,7 @@ void AnimationController::Update(void)
 {
 	// 経過時間の取得
 	float deltaTime = SceneManager::GetInstance().GetDeltaTime();
-	auto& curAnim = animations_[playType_];
+	Animation& curAnim = animations_[playType_];
 	
 
 	// 停止時に処理終了
@@ -206,7 +219,7 @@ void AnimationController::DrawDebug(void)
 
 void AnimationController::Release(void)
 {
-	if (animations_.empty()) return;
+	if (animations_.empty()) { return; }
 
 	// ロードしたアニメーションを解放
 	for (auto& [type, anim] : animations_)

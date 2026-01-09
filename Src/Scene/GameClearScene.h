@@ -2,6 +2,9 @@
 #include "./SceneBase.h"
 #include <DxLib.h>
 
+class Transform;
+class AnimationController;
+
 class GameClearScene : public SceneBase
 {
 public:
@@ -42,4 +45,9 @@ private:
 	STATE_CLEAR state_;
 
 	int clearHandle_;
+
+	Transform* player_;
+	AnimationController* playerAnim_;
+
+	void ChangeScene(void);
 };

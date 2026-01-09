@@ -1,5 +1,5 @@
 #pragma once
-#include "../Object.h"
+#include "../Actor/Object.h"
 #include <DxLib.h>
 #include <vector>
 class Transform;

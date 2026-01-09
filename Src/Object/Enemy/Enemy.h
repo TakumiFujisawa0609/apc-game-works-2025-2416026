@@ -1,7 +1,8 @@
 #pragma once
-#include "../Object.h"
+#include "../Actor/Object.h"
 #include "../Status/StatusEnemy.h"
 #include "../Common/AnimationController.h"
+#include <map>
 #include <string>
 class StatusEnemy;
 class Player;

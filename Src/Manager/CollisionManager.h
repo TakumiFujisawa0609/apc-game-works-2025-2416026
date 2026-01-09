@@ -2,7 +2,7 @@
 #include "../Common/Vector2.h"
 #include <DxLib.h>
 #include <map>
-#include "../Object/Object.h"
+#include "../Object/Actor/Object.h"
 class Player;
 class Enemy;
 class EnemyController;

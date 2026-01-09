@@ -2,19 +2,20 @@
 #include <DxLib.h>
 #include <string>
 #include <cassert>
-#include "./Status/StatusData.h"
-#include "./Common/AnimationController.h"
-#include "../Application.h"
-#include "../Common/Quaternion.h"
-#include "../Common/Vector2.h"
-#include "../Utility/AsoUtility.h"
-#include "../Manager/SoundManager.h"
-#include "./Common/AttackMotion.h"
+#include "./ActorBase.h"
+#include "../Common/Transform.h"
+#include "../Status/StatusData.h"
+#include "../Common/AnimationController.h"
+#include "../../Application.h"
+#include "../../Common/Quaternion.h"
+#include "../../Common/Vector2.h"
+#include "../../Utility/AsoUtility.h"
+#include "../../Manager/SoundManager.h"
+#include "../Common/AttackMotion.h"
 
 
-Object::Object(void):
-	sceneMng_(SceneManager::GetInstance()),
-	resMng_(ResourceManager::GetInstance()),
+Object::Object(void) :
+	ActorBase::ActorBase(),
 	paramChara_(ParamChara::ParamChara()),
 	anim_(nullptr)
 {
@@ -25,19 +26,19 @@ Object::Object(void):
 
 void Object::Load(void)
 {
-	// 各オブジェクト独自の読み込み
-	LoadPost();
+	ActorBase::Load();
 
-	anim_ = new AnimationController(paramChara_.handle);
+	anim_ = new AnimationController(transform_->modelId);
 }
 
 void Object::Init(const VECTOR& _pos, float _angleY)
 {
 	// 位置割り当て
-	paramChara_.pos = _pos;
+	transform_->InitTransform(AsoUtility::VECTOR_ZERO,
+							  Quaternion::AngleAxis(AsoUtility::Deg2Rad(_angleY), AsoUtility::AXIS_Y), Quaternion::Identity(),
+							  _pos, AsoUtility::VECTOR_ZERO);
 	paramChara_.prePos = _pos;
-	paramChara_.quaRot = Quaternion::AngleAxis(AsoUtility::Deg2Rad(_angleY),
-												AsoUtility::AXIS_Y);
+				  
 
 	paramChara_.velocity = AsoUtility::VECTOR_ZERO;
 	paramChara_.dir = AsoUtility::VECTOR_ZERO;
@@ -64,19 +65,19 @@ void Object::Init(const VECTOR& _pos, float _angleY)
 }
 void Object::InitModelFrame(void)
 {
-	int max = MV1GetFrameNum(paramChara_.handle);
+	int max = MV1GetFrameNum(transform_->modelId);
 
 	for (int i = 0; i < max; i++)
 	{
 		Frame frame;
-		frame.name = MV1GetFrameName(paramChara_.handle, i);
+		frame.name = MV1GetFrameName(transform_->modelId, i);
 		frame.num = i;
-		frame.pos = MV1GetFramePosition(paramChara_.handle, i);
-		frame.localMat = MV1GetFrameLocalMatrix(paramChara_.handle, i);
+		frame.pos = MV1GetFramePosition(transform_->modelId, i);
+		frame.localMat = MV1GetFrameLocalMatrix(transform_->modelId, i);
 
 		// フレーム全表示
 		frame.isVisible = true;
-		MV1SetFrameVisible(paramChara_.handle, i, frame.isVisible);
+		MV1SetFrameVisible(transform_->modelId, i, frame.isVisible);
 
 		// フレーム格納
 		paramChara_.frames.push_back(frame);
@@ -94,15 +95,15 @@ void Object::Update(void)
 
 
 	// 現在位置割り当て
-	if (!AsoUtility::Equals(paramChara_.prePos, paramChara_.pos))
+	if (!AsoUtility::Equals(paramChara_.prePos, transform_->pos))
 	{
-		paramChara_.prePos = paramChara_.pos;
+		paramChara_.prePos = transform_->pos;
 	}
 
 	// Y座標がマイナス時、0にする
-	if (paramChara_.pos.y < 0.0f)
+	if (transform_->pos.y < 0.0f)
 	{
-		paramChara_.pos.y = paramChara_.prePos.y = 0.0f;
+		transform_->pos.y = paramChara_.prePos.y = 0.0f;
 	}
 
 	if (IsUpdateFrame())
@@ -115,6 +116,7 @@ void Object::Update(void)
 		GravityKnock();
 	}
 
+	ActorBase::Update();
 
 	// アニメーション更新
 	UpdateAnim();
@@ -127,14 +129,14 @@ void Object::Draw(void)
 {
 	/*　描画処理　*/
 
-	// モデル描画処理
-	MV1DrawModel(paramChara_.handle);
+	// 描画処理
+	ActorBase::Draw();
 
-	if (SceneManager::GetInstance().GetIsDebugMode())
+	if (sceneMng_.GetIsDebugMode())
 	{
 		// 向き描画
-		VECTOR pos = VAdd(paramChara_.pos, paramChara_.posLocal);
-		AsoUtility::DrawLineXYZ(pos, paramChara_.quaRot);
+		VECTOR pos = VAdd(transform_->pos, transform_->localPos);
+		AsoUtility::DrawLineXYZ(pos, transform_->quaRot);
 
 		// 当たり判定表示
 		unsigned color = 0xaaaaaa;
@@ -171,8 +173,7 @@ void Object::Draw(void)
 
 void Object::Release(void)
 {
-	// その他解放
-	ReleasePost();
+	ActorBase::Release();
 
 	// アニメーション解放
 	anim_->Release();
@@ -182,16 +183,16 @@ void Object::Release(void)
 void Object::SetMatrixModel(void)
 {
 	// 大きさ
-	MATRIX matScl = MGetScale(paramChara_.scale);
+	MATRIX matScl = MGetScale(transform_->scl);
 
 	// 回転
 	Quaternion mixRot = Quaternion::Identity();
 
 	// ローカル回転を加える
-	mixRot = Quaternion::Mult(paramChara_.quaRot, paramChara_.quaRotLocal);
+	mixRot = Quaternion::Mult(transform_->quaRot, transform_->quaRotLocal);
 
 	// 位置
-	VECTOR pos = VAdd(paramChara_.pos, paramChara_.posLocal);
+	VECTOR pos = VAdd(transform_->pos, transform_->localPos);
 	MATRIX matPos = MGetTranslate(pos);
 
 	/* 行列の合成 */
@@ -210,10 +211,10 @@ void Object::SetMatrixModel(void)
 
 
 	// 行列(大きさ、角度、位置)をモデルに設定
-	MV1SetMatrix(paramChara_.handle, mat);
+	MV1SetMatrix(transform_->modelId, mat);
 
 	// クォータニオン角からオイラー角に割り当て
-	paramChara_.rot = paramChara_.quaRot.ToEuler();
+	transform_->rot = transform_->quaRot.ToEuler();
 }
 
 void Object::UpdateModelFrames(void)
@@ -233,8 +234,8 @@ void Object::UpdateModelFrame(Object::COLLISION_TYPE _type)
 	int index = FindFrameNum(name);
 
 	// フレーム状態更新
-	paramChara_.frames[index].pos = MV1GetFramePosition(paramChara_.handle, index);
-	paramChara_.frames[index].localMat = MV1GetFrameLocalMatrix(paramChara_.handle, index);
+	paramChara_.frames[index].pos = MV1GetFramePosition(transform_->modelId, index);
+	paramChara_.frames[index].localMat = MV1GetFrameLocalMatrix(transform_->modelId, index);
 }
 int Object::FindFrameNum(const std::string& name)
 {
@@ -269,10 +270,10 @@ void Object::RevertPosXZ(const VECTOR& revertVec, float power)
 		paramChara_.velocity.x = 0.0f;
 
 		// 現在位置を前位置に戻す
-		paramChara_.pos.x = paramChara_.prePos.x;
+		transform_->pos.x = paramChara_.prePos.x;
 
 		// 現在位置を一定の方向に戻す
-		paramChara_.pos.x += revert.x;
+		transform_->pos.x += revert.x;
 	}
 
 	if (revert.z != 0.0f)
@@ -281,10 +282,10 @@ void Object::RevertPosXZ(const VECTOR& revertVec, float power)
 		paramChara_.velocity.z = 0.0f;
 
 		// 現在位置を前位置に戻す
-		paramChara_.pos.z = paramChara_.prePos.z;
+		transform_->pos.z = paramChara_.prePos.z;
 
 		// 現在位置を一定の方向に戻す
-		paramChara_.pos.z += revert.z;
+		transform_->pos.z += revert.z;
 	}
 }
 
@@ -301,7 +302,7 @@ void Object::RevertPosY(float revPosY, bool isVeloReset)
 
 	// 着地位置に戻す
 	paramChara_.prePos.y = revPosY;
-	paramChara_.pos.y = paramChara_.prePos.y;
+	transform_->pos.y = paramChara_.prePos.y;
 }
 
 void Object::SetDamage(int _damage)
@@ -341,12 +342,12 @@ void Object::GravityKnock(void)
 	paramChara_.velocity = VAdd(paramChara_.velocity, paramChara_.knockBack);
 
 	// 位置に反映
-	paramChara_.pos = VAdd(paramChara_.pos, paramChara_.velocity);
+	transform_->pos = VAdd(transform_->pos, paramChara_.velocity);
 	
 	if (paramChara_.knockBack.y < 0.0f &&
-		paramChara_.pos.y <= 0.0f)
+		transform_->pos.y <= 0.0f)
 	{
-		paramChara_.pos.y = 0.0f;
+		transform_->pos.y = 0.0f;
 		paramChara_.velocity = paramChara_.knockBack = AsoUtility::VECTOR_ZERO;
 	}
 }
@@ -460,7 +461,7 @@ void Object::Rotation(bool isRevert)
 
 	// 進行方向にプレイヤーを向かせる
 	Quaternion rot = Quaternion::LookRotation(velo);
-	paramChara_.quaRotLocal = rot;
+	transform_->quaRotLocal = rot;
 }
 
 float Object::DecVelocityXZ(const float* acc)
@@ -502,7 +503,8 @@ float Object::DecVelocityXZ(const float* acc)
 
 void Object::SetPosForward(void)
 {
-	 VECTOR forward = VScale(paramChara_.quaRot.GetForward(), paramChara_.radius);
+	
+	 VECTOR forward = VScale(transform_->GetForward(), paramChara_.radius);
 	VECTOR pos = VAdd(paramChara_.colList[COLLISION_TYPE::BODY]->pos, forward);
 
 	paramChara_.posForward = pos;
@@ -512,7 +514,7 @@ void Object::SetPosForward(void)
 const VECTOR& Object::GetPosDelta(void) const
 {
 	/* 移動量を取得 */
-	return VSub(paramChara_.pos, paramChara_.prePos);
+	return VSub(transform_->pos, paramChara_.prePos);
 }
 
 float Object::GetRadius(COLLISION_TYPE _type)
@@ -528,7 +530,7 @@ const VECTOR& Object::GetFramePos(COLLISION_TYPE _type)
 	int frameIndex = FindFrameNum(name);
 
 	// 座標更新して値を返す
-	VECTOR pos = MV1GetFramePosition(paramChara_.handle, frameIndex);
+	VECTOR pos = MV1GetFramePosition(transform_->modelId, frameIndex);
 	paramChara_.frames[frameIndex].pos = pos;
 
 	return paramChara_.frames[frameIndex].pos;

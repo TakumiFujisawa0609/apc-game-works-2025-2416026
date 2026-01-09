@@ -115,6 +115,9 @@ void ResourceManager::SetResource(void)
 	res = Resource(Resource::LOAD_TYPE::ANIM, PATH_ANIM + "SwordAnim3.mv1");
 	resourcesMap_.emplace(SRC::ANIM_STRONG_3_SWORD, res);
 
+	res = Resource(Resource::LOAD_TYPE::ANIM, PATH_ANIM + "DanceAnim.mv1");
+	resourcesMap_.emplace(SRC::ANIM_DANCE, res);
+
 
 	// エフェクト
 	res = Resource(Resource::LOAD_TYPE::EFFECT, PATH_EFFECT + "SpawnSkeleton.efkefc");

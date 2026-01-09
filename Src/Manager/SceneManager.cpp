@@ -47,13 +47,13 @@ void SceneManager::Load(void)
 {
 	/*　初期化処理　*/
 
+	camera_ = new Camera();
+
 	curScene_ = nullptr;
 	waitSceneId_ = SCENE_ID::NONE; // 待機シーンID
 	DoChangeState(START_SCENE); // シーン初期化
 
 	isChangeScene_ = false; // 遷移フラグ無効化
-
-	camera_ = new Camera();
 
 	// フェーダ初期化
 	//fader_ = new Fader();

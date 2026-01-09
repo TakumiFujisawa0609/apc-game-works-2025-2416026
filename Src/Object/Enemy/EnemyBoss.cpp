@@ -9,7 +9,7 @@
 #include "../Status/StatusEnemy.h"
 #include "../Common/AnimationController.h"
 #include "../../Utility/AsoUtility.h"
-#include "../Object.h"
+#include "../Actor/Object.h"
 #include "../Player/Player.h"
 
 EnemyBoss::EnemyBoss(Player& player)

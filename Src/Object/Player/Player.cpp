@@ -3,7 +3,7 @@
 #include <cassert>
 #include <string>
 
-#include "../Object.h"
+#include "../Actor/Object.h"
 #include "../../Application.h"
 #include "../../Manager/ResourceManager.h"
 #include "../../Manager/SoundManager.h"
@@ -16,6 +16,7 @@
 #include "../../Common/Camera.h"
 #include "../../Common/Perform.h"
 #include "../Common/AnimationController.h"
+#include "../Common/Transform.h"
 
 
 Player::Player(void):
@@ -29,7 +30,7 @@ Player::Player(void):
 
 void Player::LoadPost(void)
 {
-	paramChara_.handle = resMng_.LoadHandleId(ResourceManager::SRC::MODEL_PLAYER);
+	transform_->modelId = resMng_.LoadHandleId(ResourceManager::SRC::MODEL_PLAYER);
 }
 
 void Player::SetParam(void)
@@ -39,26 +40,26 @@ void Player::SetParam(void)
 	// s“®ó‘Ô
 	paramPlayer_.actionState = ACTION_STATE::IDLE;
 
-	paramChara_.pos = AsoUtility::VECTOR_ZERO;
+	transform_->pos = AsoUtility::VECTOR_ZERO;
 	paramChara_.prePos = AsoUtility::VECTOR_ZERO;
-	paramChara_.posLocal = LOCAL_POS;
+	transform_->localPos = LOCAL_POS;
 
 	// Šp“x‰Šú‰»
-	paramChara_.quaRot = Quaternion::Identity();
-	paramChara_.quaRotLocal = Quaternion::Identity(); // ƒ[ƒJƒ‹‰ñ“]‰Šú‰»
-	paramChara_.quaRotLocal = Quaternion::Mult(paramChara_.quaRotLocal,
+	transform_->quaRot = Quaternion::Identity();
+	transform_->quaRotLocal = Quaternion::Identity(); // ƒ[ƒJƒ‹‰ñ“]‰Šú‰»
+	transform_->quaRotLocal = Quaternion::Mult(transform_->quaRotLocal,
 											   Quaternion::AngleAxis(LOCAL_ANGLE_Y, AsoUtility::AXIS_Y));
 
 	VECTOR rotLocal = VAdd(AsoUtility::AXIS_X, AsoUtility::AXIS_Z);
 	
-	paramChara_.quaRotLocal = Quaternion::Mult(paramChara_.quaRotLocal,
+	transform_->quaRotLocal = Quaternion::Mult(transform_->quaRotLocal,
 											   Quaternion::AngleAxis(0.0f, rotLocal));
 
 	// ’…’n”»’è
 	paramChara_.isGround = false;
 
 	float scale = status_.GetScale();
-	paramChara_.scale = { scale ,scale, scale };
+	transform_->scl = { scale ,scale, scale };
 	paramChara_.radius = status_.GetRadius();
 
 	paramChara_.hp    = status_.GetHp();
@@ -224,7 +225,7 @@ void Player::DrawDebug(void)
 	/*
 	Object::DrawDebug();
 
-	VECTOR pos = VAdd(paramChara_.pos, paramChara_.posLocal);
+	VECTOR pos = VAdd(paramChara_.pos, transform_->localPos);
 
 	VECTOR rot = Quaternion::ToEuler(Quaternion::Mult(paramChara_.quaRot, paramChara_.quaRotLocal));
 	rot = Quaternion::ToEuler(paramChara_.quaRotLocal);
@@ -310,7 +311,7 @@ void Player::UpdateStateOver(void)
 	}
 
 	// YŽ²‰ÁŽZ
-	paramChara_.pos.y += paramChara_.velocity.y;
+	transform_->pos.y += paramChara_.velocity.y;
 }
 
 
@@ -514,7 +515,7 @@ void Player::Move(void)
 
 	// ˆÊ’u‚É”½‰f‚·‚é
 	// ˆÚ“®ˆ—
-	paramChara_.pos = VAdd(paramChara_.pos, paramChara_.velocity);
+	transform_->pos = VAdd(transform_->pos, paramChara_.velocity);
 }
 
 void Player::DamageProc(void)

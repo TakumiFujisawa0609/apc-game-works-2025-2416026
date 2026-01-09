@@ -1,7 +1,7 @@
 #include "Stage.h"
 #include <DxLib.h>
 #include <vector>
-#include "../Object.h"
+#include "../Actor/Object.h"
 #include "../../Manager/ResourceManager.h"
 #include "../../Utility/AsoUtility.h"
 #include "../Common/Transform.h"
