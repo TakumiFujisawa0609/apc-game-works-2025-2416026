@@ -89,6 +89,14 @@ public:
 		MAX
 	};
 
+	enum class CURSOR_MODE
+	{
+		NONE,     // 変更なし
+		LOCKED,   // 画面中央固定
+		CONFINED, // ウィンドウ内
+		CONFINED_SIDE, // ウィンドウ内の反対側に行く
+	};
+
 	// ゲームコントローラーの入力情報
 	struct JOYPAD_IN_STATE
 	{
@@ -217,6 +225,9 @@ private:
 	std::map<MOUSE, Input::MouseInfo> mouseInfos_;
 	Input::MouseInfo mouseInfoEmpty_;
 
+	// カーソル状態
+	CURSOR_MODE cursorMode_;
+
 	// スティック情報
 	std::map<JOYPAD_NO, std::vector<Input::StickInfo>> stickInfos_;
 
@@ -232,6 +243,8 @@ private:
 
 	// パッド情報
 	JOYPAD_IN_STATE padInfos_[5];
+
+	void UpdateMouse(void);
 
 	// 配列の中からキー情報を取得する
 	const Input::Info& Find(int key) const;

@@ -48,14 +48,6 @@ public:
 		MAX,
 	};
 
-	enum class CURSOR_MODE
-	{
-		NONE,     // 変更なし
-		LOCKED,   // 画面中央固定
-		CONFINED, // ウィンドウ内
-		CONFINED_SIDE, // ウィンドウ内の反対側に行く
-	};
-
 
 	static void CreateInstance(void);
 
@@ -139,9 +131,6 @@ private:
 
 	static InputManager* instance_;
 
-	// カーソル状態
-	CURSOR_MODE cursorMode_;
-
 
 	// 入力トリガーの情報
 	struct TriggerInfo
@@ -165,19 +154,17 @@ private:
 
 
 	// 入力状況に応じたトリガーを登録
-	void RegisterTrigger(
-		const TYPE type, 
-		const std::vector<int> keys,
-		const std::vector<Input::JOYPAD_BTN> padButtons,
-		const std::vector<Input::JOYPAD_STICK> padSticks,
-		const Input::MOUSE mouse = Input::MOUSE::MAX);
+	void RegisterTrigger(const TYPE type, 
+						 const std::vector<int> keys,
+						 const std::vector<Input::JOYPAD_BTN> padButtons,
+						 const std::vector<Input::JOYPAD_STICK> padSticks,
+						 const Input::MOUSE mouse = Input::MOUSE::MAX);
 
 	// 処理の登録
-	void RegisterTriggerFunction(
-		const InputManager::TYPE type, 
-		std::vector<std::function<bool(TYPE, Input::JOYPAD_NO)>> newFuncs,
-		std::vector<std::function<bool(TYPE, Input::JOYPAD_NO)>> trgDownFuncs,
-		std::vector<std::function<bool(TYPE, Input::JOYPAD_NO)>> trgUpFuncs);
+	void RegisterTriggerFunction(const InputManager::TYPE type, 
+								 std::vector<std::function<bool(TYPE, Input::JOYPAD_NO)>> newFuncs,
+								 std::vector<std::function<bool(TYPE, Input::JOYPAD_NO)>> trgDownFuncs,
+								 std::vector<std::function<bool(TYPE, Input::JOYPAD_NO)>> trgUpFuncs);
 
 	// キー関係の入力判定
 	bool IsNewKey(const TYPE type);
@@ -200,6 +187,7 @@ private:
 	bool IsTrgUpMouse(const TYPE type);
 
 	void CursorProcess(void);
+
 
 	/// @brief コンストラクタ
 	InputManager(void);

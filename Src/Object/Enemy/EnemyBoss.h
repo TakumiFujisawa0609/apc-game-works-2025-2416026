@@ -60,7 +60,7 @@ private:
 
 	static constexpr COLOR_U8 SPAWN_CIRCLE_COLOR = {255, 0, 0, 255};
 
-	static constexpr VECTOR CIRCLE_POS_OFFSET = { 0.0f, 0.0f,  1000.0f };
+	static constexpr VECTOR CIRCLE_POS_OFFSET = { 0.0f, 10.0f,  1000.0f };
 
 	float spawnTime_;
 

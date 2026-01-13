@@ -1,9 +1,14 @@
 #include "Input.h"
+#include "../Application.h"
+#include "../Utility/UtilityCommon.h"
+#include "../Utility/AsoUtility.h"
 #include <DxLib.h>
+#include <algorithm>
 
 
 Input::Input(void):
-	mouseInput_(-1)
+	mouseInput_(-1),
+	cursorMode_(CURSOR_MODE::NONE)
 {
 }
 
@@ -12,6 +17,7 @@ void Input::Init(void)
 {
 	Input::MouseInfo info;
 
+	cursorMode_ = CURSOR_MODE::CONFINED_SIDE;
 	// マウス
 	info = Input::MouseInfo();
 	for (int i = 0; i < static_cast<int>(MOUSE::MAX); i++)
@@ -45,10 +51,57 @@ void Input::Update(void)
 		keyInfo.keyTrgUp   = (!keyInfo.keyNew && keyInfo.keyOld);
 	}
 
+	// マウス
+	UpdateMouse();
+
+
+	// パッド情報
+	SetJPadInState(JOYPAD_NO::KEY_PAD1);
+	SetJPadInState(JOYPAD_NO::PAD1);
+	SetJPadInState(JOYPAD_NO::PAD2);
+	SetJPadInState(JOYPAD_NO::PAD3);
+	SetJPadInState(JOYPAD_NO::PAD4);
+
+	// スティック検知
+	for (auto& [type, stickInfo] : stickInfos_)
+	{
+		for (auto& stick : stickInfo)
+		{
+			int overSize = PadStickOverSize(type, stick.key);
+			stick.keyOld = stick.keyNew;
+			stick.keyNew = (overSize > STICK_THRESHOLD);
+			stick.keyTrgDown = (!stick.keyOld && stick.keyNew);
+			stick.keyTrgUp   = (stick.keyOld && !stick.keyNew);
+		}
+	}
+}
+void Input::UpdateMouse(void)
+{
 	// マウス検知
-	mouseInput_  = GetMouseInput();
+	mouseInput_ = GetMouseInput();
+
 	mousePrePos_ = mousePos_;
 	GetMousePoint(&mousePos_.x, &mousePos_.y);
+
+	const Vector2 SCREEN_SIZE = { Application::SCREEN_HALF_X, Application::SCREEN_SIZE_Y };
+
+	// 
+	bool isWrap = false;
+
+	if (cursorMode_ == CURSOR_MODE::CONFINED_SIDE)
+	{
+		// マウス座標が画面外に出たとき、反対に移動
+		bool isWrap = UtilityCommon::WrapValue(mousePos_, SCREEN_SIZE);
+		if (isWrap) { SetMousePos(mousePos_); }
+	}
+	else if (cursorMode_ == CURSOR_MODE::CONFINED)
+	{
+		// マウス座標を制限
+		mousePos_.x = std::clamp(mousePos_.x, AsoUtility::VECTOR2_ZERO.x, SCREEN_SIZE.x);
+		mousePos_.y = std::clamp(mousePos_.y, AsoUtility::VECTOR2_ZERO.y, SCREEN_SIZE.y);
+		if (isWrap) { SetMousePos(mousePos_); }
+	}
+
 	wheelRot_ = GetMouseWheelRotVol();
 
 	for (auto& [type, mouseInfo] : mouseInfos_)
@@ -98,27 +151,7 @@ void Input::Update(void)
 			break;
 		}
 		mouseInfo.keyTrgDown = (mouseInfo.keyNew && !mouseInfo.keyOld);
-		mouseInfo.keyTrgUp   = (!mouseInfo.keyNew && mouseInfo.keyOld);
-	}
-
-	// パッド情報
-	SetJPadInState(JOYPAD_NO::KEY_PAD1);
-	SetJPadInState(JOYPAD_NO::PAD1);
-	SetJPadInState(JOYPAD_NO::PAD2);
-	SetJPadInState(JOYPAD_NO::PAD3);
-	SetJPadInState(JOYPAD_NO::PAD4);
-
-	// スティック検知
-	for (auto& [type, stickInfo] : stickInfos_)
-	{
-		for (auto& stick : stickInfo)
-		{
-			int overSize = PadStickOverSize(type, stick.key);
-			stick.keyOld = stick.keyNew;
-			stick.keyNew = (overSize > STICK_THRESHOLD);
-			stick.keyTrgDown = (!stick.keyOld && stick.keyNew);
-			stick.keyTrgUp   = (stick.keyOld && !stick.keyNew);
-		}
+		mouseInfo.keyTrgUp = (!mouseInfo.keyNew && mouseInfo.keyOld);
 	}
 }
 

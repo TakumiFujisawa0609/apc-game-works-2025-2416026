@@ -10,15 +10,26 @@
 
 ResourceManager* ResourceManager::instance_ = nullptr;
 
+// リソースファイルのパス
+#ifdef _DEBUG
+const std::string PATH_DATA = "Data/";
+
+// 暗号化済みのリソースフォルダパス
+#else
+
+const std::string PATH_DATA = "_Data/";
+#endif
+
+
 // ファイルパスの割り当て
-const std::string ResourceManager::PATH_EFFECT = "Data/Effect/";
-const std::string ResourceManager::PATH_FONT   = "Data/Font/";
-const std::string ResourceManager::PATH_IMAGE  = "Data/Image/";
-const std::string ResourceManager::PATH_MODEL  = "Data/Model/";
-const std::string ResourceManager::PATH_ANIM  = "Data/Model/Animation/";
-const std::string ResourceManager::PATH_SE     = "Data/Sound/SE/";
-const std::string ResourceManager::PATH_BGM    = "Data/Sound/BGM/";
-const std::string ResourceManager::PATH_MOVIE  = "Data/Movie/";
+const std::string ResourceManager::PATH_EFFECT = PATH_DATA + "Effect/";
+const std::string ResourceManager::PATH_FONT   = PATH_DATA + "Font/";
+const std::string ResourceManager::PATH_IMAGE  = PATH_DATA + "Image/";
+const std::string ResourceManager::PATH_MODEL  = PATH_DATA + "Model/";
+const std::string ResourceManager::PATH_ANIM   = PATH_DATA + "Model/Animation/";
+const std::string ResourceManager::PATH_SE     = PATH_DATA + "Sound/SE/";
+const std::string ResourceManager::PATH_BGM    = PATH_DATA + "Sound/BGM/";
+const std::string ResourceManager::PATH_MOVIE  = PATH_DATA + "Movie/";
 
 
 void ResourceManager::CreateInstance(void)

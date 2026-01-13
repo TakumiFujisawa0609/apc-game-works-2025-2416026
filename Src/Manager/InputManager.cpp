@@ -14,8 +14,7 @@ void InputManager::CreateInstance(void)
 }
 
 InputManager::InputManager(void):
-	input_(nullptr),
-	cursorMode_(CURSOR_MODE::NONE)
+	input_(nullptr)
 {
 	triggerMap_.clear();
 	funcNewMap_.clear();

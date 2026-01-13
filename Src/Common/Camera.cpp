@@ -391,6 +391,7 @@ bool Camera::GetIsCameraClip(const VECTOR& _target)
 	float angle = acosf(dot);
 
 
+	// •`‰æŠp“x
 	const float viewAngle = 67.5f;
 	const float viewRad = AsoUtility::Deg2Rad(viewAngle);
 
@@ -398,6 +399,7 @@ bool Camera::GetIsCameraClip(const VECTOR& _target)
 	VECTOR vec = VSub(targetPos, cameraPos);
 	float distance = ((vec.x * vec.x) + (vec.z * vec.z)) / 2;
 	distance *= ((distance < 0) ? -1.0f : 1.0);
+
 	const float DISTANCE = 2000.0f;
 
 	// Ž‹–ì¶‰E“à‚É“ü‚Á‚Ä‚¢‚é
