@@ -9,12 +9,13 @@
 #include "../Status/StatusEnemy.h"
 #include "../Common/AnimationController.h"
 #include "../../Utility/AsoUtility.h"
+#include "../../Utility/UtilityCommon.h"
 #include "../Actor/Object.h"
 #include "../Player/Player.h"
 
-EnemyBoss::EnemyBoss(Player& player)
+EnemyBoss::EnemyBoss(Player& player, float _circleRad)
 	:Enemy(StatusEnemy::TYPE::SKELETON_BOSS, player, true),
-	isSpawnCircle_(true), circleRadius_(0.0f),
+	isSpawnCircle_(true), circleRadius_(_circleRad),
 	circlePos_(AsoUtility::VECTOR_ZERO)
 {
 
@@ -96,7 +97,9 @@ void EnemyBoss::InitSpawnCircle(void)
 	const VECTOR INIT_NORM = AsoUtility::DIR_UP;
 	COLOR_U8 INIT_DIFUSECOLOR = SPAWN_CIRCLE_COLOR;
 
-	circlePos_ = VAdd(SPAWN_POS, CIRCLE_POS_OFFSET);
+	// ñÇñ@êwà íu
+	circlePos_ = transform_->pos;
+	circlePos_.y += CIRCLE_POS_OFFSET_Y;
 
 	// ç∂ëO
 	circleVertex_[0].pos = VAdd(circlePos_, { -SPAWN_SIZE_HALF, 0.0f, -SPAWN_SIZE_HALF });
@@ -135,9 +138,6 @@ void EnemyBoss::InitSpawnCircle(void)
 	circleVertex_[3].sv = 0.0f;
 
 	circleImage_ = resMng_.LoadHandleId(ResourceManager::IMG_SPAWNCIRCLE);
-
-	const float rad = 350.0f;
-	circleRadius_ = rad;
 }
 
 
@@ -166,6 +166,8 @@ void EnemyBoss::UpdateStateSpawn(void)
 
 void EnemyBoss::DrawMagicCircle(void)
 {
+	/* ñÇñ@êwï\é¶ */
+
 	WORD index[6];
 	/*
 	index[0] = static_cast<int>(TYPE::LEFTUP);
@@ -185,20 +187,23 @@ void EnemyBoss::DrawMagicCircle(void)
 	index[4] = 2;
 	index[5] = 1;
 
-	if (isSpawnCircle_)
+
+
+	if (sceneMng_.GetIsDebugMode() && isSpawnCircle_)
 	{
 #ifdef _DEBUG
 		DrawSphere3D(circlePos_, circleRadius_, 16, 0xffff00, 0xffffff, false);
 #endif
 	}
 
-	// ñÇñ@êwï`âÊ
-	if (paramEnemy_.actionState == ACTION_STATE::SPAWN ||
-		paramEnemy_.actionState == ACTION_STATE::NONE)
+	for (auto& vert : circleVertex_)
 	{
-		DrawPolygonIndexed3D(circleVertex_, 4, index, 2, circleImage_, true);
+		// ñÇñ@êwÇÃêFÇê›íË
+		vert.dif = ((isSpawnCircle_) ? SPAWN_CIRCLE_COLOR : DESABLE_CIRCLE_COLOR);
 	}
-	
+
+	// ñÇñ@êwï`âÊ
+	DrawPolygonIndexed3D(circleVertex_, 4, index, 2, circleImage_, true);
 }
 
 void EnemyBoss::SetIsSpawnCircle(bool _flag)

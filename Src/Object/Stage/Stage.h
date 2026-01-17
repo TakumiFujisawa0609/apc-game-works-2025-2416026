@@ -1,31 +1,33 @@
 #pragma once
-#include "../Actor/Object.h"
+#include "../Actor/ActorBase.h"
 #include <DxLib.h>
 #include <vector>
 class Transform;
 
-class Stage : public Object
+class Stage : public ActorBase
 {
 public:
 
+	using SpawnPosList = std::vector<VECTOR>;
 	Stage(void);
 
 	~Stage(void) = default;
 
+	std::vector<VECTOR>& GetSpawnFrames(void);
+
+
 protected:
 
-	void SetParam(void)override {};
-	void UpdateAnim(void)override {};
-	void UpdatePost(void)override;
-	bool IsUpdateFrame(void)override { return false; };
-	void DamageProc(void)override {};
-	void InitPost(void)override {};
 
 	void LoadPost(void)override;
 
+	void InitPost(void)override;
+
+	void UpdatePost(void)override;
+
 	void DrawPost(void) override;
 
-	Transform* roadObj_;
+private:
 
-	std::vector<Transform*> object_;
+	SpawnPosList spawnPos_;
 };

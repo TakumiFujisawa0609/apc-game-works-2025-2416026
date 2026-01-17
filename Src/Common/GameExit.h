@@ -4,6 +4,9 @@
 #include "../Utility/UtilityCommon.h"
 #include "../Common/Vector2.h"
 
+class SceneManager;
+class InputManager;
+
 class GameExit
 {
 public:
@@ -84,6 +87,8 @@ public:
 
 private:
 
+	SceneManager& sceneMng_;
+	InputManager& input_;
 
 	// I—¹Šm”Fó‘Ô
 	SELECT select_;

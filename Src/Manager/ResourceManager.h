@@ -78,6 +78,9 @@ public:
 	// 動画ファイルパス
 	static const std::string PATH_MOVIE;
 
+	// 動画ファイルパス
+	static const std::string PATH_CSV;
+
 
 
 	/// @brief インスタンス生成

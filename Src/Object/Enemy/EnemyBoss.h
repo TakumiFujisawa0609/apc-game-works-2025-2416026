@@ -21,9 +21,7 @@ public:
 		MAX,
 	};
 
-	static constexpr VECTOR SPAWN_POS = { 0.0f, 0.0f, 500.0f };
-
-	EnemyBoss(Player& player);
+	EnemyBoss(Player& player, float _circleRad);
 
 	~EnemyBoss(void) = default;
 
@@ -58,9 +56,14 @@ private:
 
 	static constexpr int SPAWN_SIZE_HALF = (1024 / 2);
 
+	// 魔法陣色
 	static constexpr COLOR_U8 SPAWN_CIRCLE_COLOR = {255, 0, 0, 255};
 
-	static constexpr VECTOR CIRCLE_POS_OFFSET = { 0.0f, 10.0f,  1000.0f };
+	// 無効魔法陣色
+	static constexpr COLOR_U8 DESABLE_CIRCLE_COLOR = {100, 0, 0, 255};
+
+	static constexpr float CIRCLE_POS_OFFSET_Y = 10.0f;
+
 
 	float spawnTime_;
 

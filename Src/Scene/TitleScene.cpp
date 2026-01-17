@@ -47,6 +47,7 @@ void TitleScene::Init(void)
 {
  	state_ = TITLE_STATE::START_GAME;
 	isViewInfo_ = false; // —V‚Ñ•û•\Ž¦
+	stateWaitTime_ = STATE_WAIT_TIME;
 
 	//SoundManager::GetInstance().Play(SoundManager::SRC::BGM_TITLE, true);
 
@@ -70,7 +71,10 @@ void TitleScene::Update(void)
 		arrowScale_ = ((arrowScale_ != ARROW_SCALE) ? ARROW_SCALE : 1.0f);
 	}
 
-	if (InputManager::GetInstance().IsTrgDown(InputManager::TYPE::SELECT_DECISION) && !isPvActive_)
+	stateWaitTime_ -= delta;
+
+	if (InputManager::GetInstance().IsTrgDown(InputManager::TYPE::SELECT_DECISION) && !isPvActive_ &&
+		GetIsActiveState())
 	{
 		switch (state_)
 		{

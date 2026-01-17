@@ -8,6 +8,7 @@
 
 
 Camera::Camera(void) :
+	input_(InputManager::GetInstance()),
 	pos_(AsoUtility::VECTOR_ZERO, AsoUtility::VECTOR_ZERO, AsoUtility::VECTOR_ZERO,
 		 AsoUtility::VECTOR_ZERO, AsoUtility::VECTOR_ZERO, AsoUtility::VECTOR_ZERO),
 	rot_(Quaternion::Identity(), Quaternion::Identity(), nullptr),
@@ -85,7 +86,8 @@ void Camera::SetBeforeDraw(void)
 
 	
 #ifdef _DEBUG
-	//DrawFormatString(0, 0, 0xffff00, "mouseDir:(%.2f, %.2f)", InputManager::GetInstance().GetMouseDir().x, InputManager::GetInstance().GetMouseDir().y);
+	//DrawFormatString(0, 0, 0xffff00, "mouseDir:(%.2f, %.2f)", 
+	//				   input_.GetMouseDir().x, input_.GetMouseDir().y);
 	/*
 	if (follow_ != nullptr)
 	{
@@ -215,22 +217,36 @@ void Camera::SmoothRotation(void)
 
 void Camera::_UpdateCameraRot(void)
 {
-	float smoothPow = 0.15f;
-	float rotPow = (AsoUtility::Deg2Rad(2.5f));
-	VECTOR rotInput = {};
+	const float ROT_PAD_MOUSE = (AsoUtility::Deg2Rad(5.0f));
+	const float ROT_POW_PAD = (AsoUtility::Deg2Rad(0.1f));
+	VECTOR rotInput = AsoUtility::VECTOR_ZERO;
+
+	// マウス感度倍率
+	constexpr float ROT_SENS = (1.0 - 0.0f);
+
+
+	// マウス移動量
+	int mouseMoveY = input_.GetMouseMove().x;
+
+	// マウス速度の感度割り当て(ゼロ除算対策付き)
+	int mouseSens = 0.0f;
+	mouseSens = ((mouseMoveY != 0.0f) ? ((mouseMoveY * ROT_SENS) / mouseMoveY) : 0.0f);
 
 	// マウス回転
-	//if (InputManager::GetInstance().GetMouseMove().y > 0) { rotInput.x += rotPow; }
-	//if (InputManager::GetInstance().GetMouseMove().y < 0) { rotInput.x -= rotPow; }
-	if (InputManager::GetInstance().GetMouseMove().x > 0) { rotInput.y += rotPow; }
-	if (InputManager::GetInstance().GetMouseMove().x < 0) { rotInput.y -= rotPow; }
+	if (mouseMoveY != 0)
+	{
+		// 反転時、マイナスにする
+		int revert = ((mouseMoveY < 0) ? -1.0f : 1.0f);
+
+		// 回転
+		rotInput.y += (ROT_PAD_MOUSE * mouseSens * revert);
+	}
 
 	// コントローラ回転
-	if (InputManager::GetInstance().GetKnockLStickSize().x != 0)
+	int dirY = input_.GetKnockRStickSize().x;
+	if (dirY != 0)
 	{
-		Vector2 dir = InputManager::GetInstance().GetKnockLStickSize();
-		rotInput.y += (dir.x * rotPow);
-		//rotInput.x += (dir.y * rotPow);
+		rotInput.y += (dirY * ROT_POW_PAD);
 	}
 	
 

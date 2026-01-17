@@ -41,7 +41,7 @@ public:
 		RB_LEFT = 0,	// X
 		RB_RIGHT,		// B
 		RB_TOP,			// Y
-		RB_DOWN,		// A
+		RB_BOTTOM,		// A
 
 		R_TRIGGER,		// R_TRIGGER
 		L_TRIGGER,		// L_TRIGGER
@@ -158,6 +158,8 @@ public:
 	// マウスが右クリックされたか
 	bool IsClickMouseRight(void) const { return (mouseInput_ == MOUSE_INPUT_RIGHT); };
 
+	// カーソル状態変更
+	void SetCursorMode(CURSOR_MODE _mode) { cursorMode_ = _mode;  };
 
 	// コントローラの入力情報を取得する
 	JOYPAD_IN_STATE GetJPadInputState(JOYPAD_NO no);

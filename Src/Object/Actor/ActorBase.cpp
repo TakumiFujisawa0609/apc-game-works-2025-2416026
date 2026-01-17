@@ -17,13 +17,19 @@ void ActorBase::Load(void)
 	LoadPost();
 }
 
+void ActorBase::Init(void)
+{
+	InitPost();
+}
 void ActorBase::Init(const VECTOR& _pos, float _angleY)
 {
-
+	InitPost();
 }
 
 void ActorBase::Update(void)
 {
+	UpdatePost();
+
 	transform_->Update();
 }
 
@@ -31,6 +37,8 @@ void ActorBase::Draw(void)
 {
 	// ƒ‚ƒfƒ‹•`‰æˆ—
 	MV1DrawModel(transform_->modelId);
+
+	DrawPost();
 }
 
 void ActorBase::Release(void)

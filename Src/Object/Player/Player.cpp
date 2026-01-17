@@ -40,7 +40,6 @@ void Player::SetParam(void)
 	// 行動状態
 	paramPlayer_.actionState = ACTION_STATE::IDLE;
 
-	transform_->pos = AsoUtility::VECTOR_ZERO;
 	paramChara_.prePos = AsoUtility::VECTOR_ZERO;
 	transform_->localPos = LOCAL_POS;
 
@@ -219,7 +218,7 @@ void Player::DrawPost(void)
 
 void Player::DrawDebug(void)
 {
-	//DrawFormatString(Application::SCREEN_HALF_X-500, 0, 0xffffff, "プレイヤーのHP:%d", paramChara_.hp);
+	DrawFormatString(Application::SCREEN_HALF_X-500, 0, 0xffffff, "プレイヤーのHP:%d", paramChara_.hp);
 
 #ifdef _DEBUG
 	/*
@@ -412,6 +411,7 @@ void Player::Move(void)
 		!InputManager::GetInstance().IsNew(INPUT_TYPE::PLAYER_MOVE_LEFT) &&
 		!InputManager::GetInstance().IsNew(INPUT_TYPE::PLAYER_MOVE_RIGHT))
 	{
+		paramPlayer_.isDash = false;
 		return;
 	}
 
@@ -719,10 +719,11 @@ bool Player::IsInputMove(void)
 bool Player::IsInputDash(void)
 {
 	/* ダッシュ入力判定 */
-	if (InputManager::GetInstance().IsTrgDown(InputManager::TYPE::PLAYER_DASH))
+	if (InputManager::GetInstance().IsTrgDown(InputManager::TYPE::PLAYER_DASH) &&
+		!paramPlayer_.isDash)
 	{
 		// ダッシュ切替処理
-		paramPlayer_.isDash = ((!paramPlayer_.isDash) ? true : false);
+		paramPlayer_.isDash = true;
 	}
 
 	return paramPlayer_.isDash;

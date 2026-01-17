@@ -4,9 +4,8 @@
 #include <vector>
 #include <memory>
 
+class InputManager;
 class Player;
-class StageTutorial;
-
 
 class Camera
 {
@@ -25,10 +24,10 @@ public:
 	//static constexpr VECTOR DEFAULT_ANGLES = { (0.0f * (DX_PI_F / 180.0f)), 0.0f, 0.0f };
 
 	// カメラのローカル座標
-	static constexpr VECTOR LOCAL_CAMERA_POS = { 0.0, 400.0f, -1000.0f };
+	static constexpr VECTOR LOCAL_CAMERA_POS = { 0.0, 200.0f, -500.0f };
 
 	// 追尾位置のローカル座標
-	static constexpr VECTOR TARGET_LOCAL_POS = { 0.0f, 300.0f, 0.0f };
+	static constexpr VECTOR TARGET_LOCAL_POS = { 0.0f, 100.0f, 0.0f };
 
 
 	// カメラ最小描画領域
@@ -138,6 +137,9 @@ public:
 
 
 private:
+
+	// 入力マネージャ
+	InputManager& input_;
 
 	// カメラ状態
 	MODE mode_;

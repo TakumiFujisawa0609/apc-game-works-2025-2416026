@@ -32,7 +32,8 @@ void GameClearScene::Load(void)
 void GameClearScene::Init(void)
 {
 	state_ = STATE_CLEAR::TITLE;
-
+	stateWaitTime_ = STATE_WAIT_TIME;
+	
 	sceneMng_.GetCamera().Init(Camera::MODE::FIXEX_POINT);
 
 	player_->InitTransform(1.75f,
@@ -47,6 +48,8 @@ void GameClearScene::Update(void)
 	player_->Update();
 	playerAnim_->Update();
 
+	stateWaitTime_ -= sceneMng_.GetDeltaTime();
+	if (!GetIsActiveState()) { return; }
 	ChangeScene();
 }
 

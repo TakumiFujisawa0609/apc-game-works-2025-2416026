@@ -11,13 +11,13 @@
 ResourceManager* ResourceManager::instance_ = nullptr;
 
 // リソースファイルのパス
-#ifdef _DEBUG
+#ifndef _DEBUG
 const std::string PATH_DATA = "Data/";
 
 // 暗号化済みのリソースフォルダパス
 #else
 
-const std::string PATH_DATA = "_Data/";
+const std::string PATH_DATA = "_ResourceData/";
 #endif
 
 
@@ -30,6 +30,7 @@ const std::string ResourceManager::PATH_ANIM   = PATH_DATA + "Model/Animation/";
 const std::string ResourceManager::PATH_SE     = PATH_DATA + "Sound/SE/";
 const std::string ResourceManager::PATH_BGM    = PATH_DATA + "Sound/BGM/";
 const std::string ResourceManager::PATH_MOVIE  = PATH_DATA + "Movie/";
+const std::string ResourceManager::PATH_CSV  = PATH_DATA + "CSV/";
 
 
 void ResourceManager::CreateInstance(void)
@@ -88,7 +89,7 @@ void ResourceManager::SetResource(void)
 	res = Resource(Resource::LOAD_TYPE::MODEL, PATH_MODEL + "Stage/Road.mv1");
 	resourcesMap_.emplace(SRC::MODEL_ROAD, res);
 
-	res = Resource(Resource::LOAD_TYPE::MODEL, PATH_MODEL + "Stage/mapObject.mv1");
+	res = Resource(Resource::LOAD_TYPE::MODEL, PATH_MODEL + "Stage/map.mv1");
 	resourcesMap_.emplace(SRC::MODEL_STAGE, res);
 
 	// 画像

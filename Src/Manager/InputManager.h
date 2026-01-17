@@ -97,6 +97,9 @@ public:
 	/// <param name="pos"></param>
 	void SetMousePos(const Vector2& pos);
 
+	/// @brief カーソル状態遷移
+	void SetCursorMode(Input::CURSOR_MODE _mode);
+
 	/// <summary>
 	/// マウス座標の取得
 	/// </summary>

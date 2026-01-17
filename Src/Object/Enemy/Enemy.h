@@ -37,7 +37,7 @@ public:
 		SEARCH,   // ƒvƒŒƒCƒ„[’Ç]
 		MOVE,     // ˆÚ“®ó‘Ô
 		KNOCK,    // ‚Á”ò‚Î‚µó‘Ô
-		DEAD,	  // €–Só‘Ô
+		DEATH,	  // €–Só‘Ô
 		ATTACK,
 		ATTACK_START, 
 		ATTACK_ACTIVE,
@@ -78,6 +78,7 @@ public:
 
 	bool GetIsElite(void) { return paramEnemy_.isElite; };
 
+	bool GetIsDeath(void);
 
 protected:
 

@@ -7,19 +7,23 @@
 class Enemy;
 class EnemyBoss;
 class Player;
+class Stage;
+class SceneManager;
 
 using ENEMY_TYPE = StatusEnemy::TYPE;
 
 class EnemyController
 {
+public:
+
 	using Enemys = std::vector<Enemy*>;
 	using EnemyList = std::vector<Enemys>;
+	using EnemyBossList = std::vector<EnemyBoss*>;
 
-public:
 
 	/// @brief デフォルトコンストラクタ
 	/// @param player
-	EnemyController(Player& player);
+	EnemyController(Player& player, Stage& _stage);
 
 	/// @brief デフォルトデストラクタ
 	~EnemyController(void) = default;
@@ -42,12 +46,11 @@ public:
 	/// @param _listNum リスト番号
 	const Enemys& GetEnemys(int _listNum)const { return enemys_.at(_listNum); };
 
-	Enemy& GetEnemy(int _listNum, int num) { return *GetEnemys(_listNum).at(num); }
+	Enemy& GetEnemy(int _listNum, int num) { return *GetEnemys(_listNum).at(num); };
 
-	EnemyBoss& GetEnemyBoss(void) { return *enemyBoss_; }
+	EnemyBossList& GetEnemyBossList(void) { return enemyBossList_; };
 	
-	bool GetIsActiveBoss(void) { return (enemyBoss_ != nullptr);  };
-	bool GetIsDefeatBoss(void);
+	bool GetIsActiveBoss(void);
 	
 
 private:
@@ -61,13 +64,25 @@ private:
 	// 生成位置中央の敵を除く、一度に生成される数
 	static constexpr int SPAWN_MAX = (3 * SPAWN_CIRCLE_SPLIT) - 1;
 
-	Player* player_;
+	SceneManager& sceneMng_;
 
-	EnemyList enemys_;
-	EnemyBoss* enemyBoss_;
+	Player& player_;
+	Stage& stage_;
 	
 
-	void EnemyBossSpawn(void);
+	EnemyList enemys_;
+	EnemyBossList enemyBossList_;
+
+	enum class SPAWN_TYPE
+	{
+		MOB,
+		BOSS,
+		MAX
+	};
+	std::map<SPAWN_TYPE ,VECTOR> spawnPos_;
+	
+
+	void EnemyBossSpawn(const VECTOR& _pos);
 
 	void EnemysSpawn(ENEMY_TYPE _type, const VECTOR& _posField);
 

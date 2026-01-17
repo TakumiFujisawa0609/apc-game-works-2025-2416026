@@ -83,16 +83,18 @@ void Input::UpdateMouse(void)
 	mousePrePos_ = mousePos_;
 	GetMousePoint(&mousePos_.x, &mousePos_.y);
 
-	const Vector2 SCREEN_SIZE = { Application::SCREEN_HALF_X, Application::SCREEN_SIZE_Y };
+	const Vector2 SCREEN_SIZE = { Application::SCREEN_SIZE_X, Application::SCREEN_SIZE_Y };
 
 	// 
 	bool isWrap = false;
 
 	if (cursorMode_ == CURSOR_MODE::CONFINED_SIDE)
 	{
+		Vector2 cursorPos = mousePos_;
+
 		// マウス座標が画面外に出たとき、反対に移動
-		bool isWrap = UtilityCommon::WrapValue(mousePos_, SCREEN_SIZE);
-		if (isWrap) { SetMousePos(mousePos_); }
+		bool isWrap = UtilityCommon::WrapValue(cursorPos, SCREEN_SIZE);
+		if (isWrap) { SetMousePos(cursorPos); }
 	}
 	else if (cursorMode_ == CURSOR_MODE::CONFINED)
 	{
@@ -344,7 +346,7 @@ Input::JOYPAD_IN_STATE Input::GetJPadInputState(JOYPAD_NO no)
 		ret.ButtonsNew[idx] = d.Buttons[1];
 
 		// A
-		idx = static_cast<int>(JOYPAD_BTN::RB_DOWN);
+		idx = static_cast<int>(JOYPAD_BTN::RB_BOTTOM);
 		ret.ButtonsNew[idx] = d.Buttons[0];
 
 		// R_BUTTON
@@ -429,7 +431,7 @@ Input::JOYPAD_IN_STATE Input::GetJPadInputState(JOYPAD_NO no)
 		idx = static_cast<int>(JOYPAD_BTN::RB_RIGHT);
 		ret.ButtonsNew[idx] = d.Buttons[1];// B
 
-		idx = static_cast<int>(JOYPAD_BTN::RB_DOWN);
+		idx = static_cast<int>(JOYPAD_BTN::RB_BOTTOM);
 		ret.ButtonsNew[idx] = d.Buttons[0];// A
 
 		// 左スティック

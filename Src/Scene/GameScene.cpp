@@ -23,9 +23,11 @@
 #pragma endregion
 
 
-GameScene::GameScene(void):
+GameScene::GameScene(void) :
 	gameState_(GAME_STATE::NONE),
-	SceneBase()
+	SceneBase(),
+	curGameTime_(GAME_TIME),
+	collisionMng_(nullptr)
 {
 	Load();
 }
@@ -36,13 +38,14 @@ void GameScene::Load(void)
 	// プレイヤー処理
 	player_ = new Player();
 
-	// 敵マネージャー
-	enemys_ = new EnemyController(*player_);
-
 	stage_ = new Stage();
+	stage_->Init();
+
+	// 敵マネージャー
+	enemys_ = new EnemyController(*player_, *stage_);
 
 	// 当たり判定マネージャ
-	CollisionManager::CreateInstance(*player_, *enemys_);
+	collisionMng_ = new CollisionManager(*player_, *enemys_, *stage_);
 }
 
 void GameScene::Init(void)
@@ -51,7 +54,6 @@ void GameScene::Init(void)
 
 	// 初期化処理
 	ReInit();
-
 
 	// フォグ有効化
 	SetFogEnable(true);
@@ -101,7 +103,7 @@ void GameScene::Update(void)
 	//gameStage_->Update();
 
 	// 当たり判定更新
-	CollisionManager::GetInstance().Update();
+	collisionMng_->Update();
 
 	Camera& camera = sceneMng_.GetCamera();
 	// カメラ位置更新
@@ -131,6 +133,8 @@ void GameScene::Draw(void)
 	/*　描画処理　*/
 	Font& font = Font::GetInstance();
 
+	curGameTime_ -= sceneMng_.GetDeltaTime();
+
 	Vector2 textPos = AsoUtility::VECTOR2_ZERO;
 	Vector2 midPos = { Application::SCREEN_HALF_X, Application::SCREEN_HALF_Y };
 	/*
@@ -139,11 +143,16 @@ void GameScene::Draw(void)
 			   { 5000.0f, -100.0f, 30000.0f },
 				0x00aa00, 0x0, true);*/
 
+	collisionMng_->DrawDebug();
+
 	stage_->Draw();
 	
 	// グリッド線描画
 #ifdef _DEBUG
-	sceneMng_.DrawGrid();
+	if (sceneMng_.GetIsDebugMode())
+	{
+		sceneMng_.DrawGrid();
+	}
 #endif
 
 	// Effekseerにより再生中のエフェクトを更新する
@@ -158,6 +167,8 @@ void GameScene::Draw(void)
 
 	// Effekseerにより再生中のエフェクトを描画する
 	DrawEffekseer3D();
+
+	DrawTimeFeed();
 
 	// ゲーム描画
 	DrawUI();
@@ -179,7 +190,7 @@ void GameScene::Release(void)
 	/*　解放処理　*/
 
 	// 当たり判定マネージャ解放
-	CollisionManager::GetInstance().Destroy();
+	collisionMng_->Release();
 
 	// 敵マネージャ解放
 	enemys_->Release();
@@ -191,12 +202,9 @@ void GameScene::Release(void)
 	player_->Release();
 	delete player_;
 
+	//ステージ解放処理
 	stage_->Release();
 	delete stage_;
-
-	//ステージ解放処理
-	//gameStage_->Release();
-	//delete gameStage_;
 
 	// 全音声停止
 	SoundManager::GetInstance().StopAll();
@@ -217,7 +225,7 @@ void GameScene::GameIdleProc(void)
 	// 敵マネージャ更新
 	enemys_->Update();
 
-	if (enemys_->GetIsActiveBoss() && enemys_->GetIsDefeatBoss())
+	if (!enemys_->GetIsActiveBoss())
 	{
 		sceneMng_.ChangeScene(SceneManager::SCENE_ID::CLEAR);
 	}
@@ -228,4 +236,16 @@ void GameScene::GameIdleProc(void)
 	}
 
 	
+}
+
+void GameScene::TimeFeed(void)
+{
+
+}
+
+void GameScene::DrawTimeFeed(void)
+{
+	float range = (1.0f - (curGameTime_ / GAME_TIME));
+
+	float progress = curGameTime_ / GAME_TIME;
 }

@@ -41,6 +41,9 @@ protected:
 	ResourceManager& resMng_;
 	SceneManager& sceneMng_;
 
+	static constexpr float STATE_WAIT_TIME = 1.0f;
+	float stateWaitTime_;
+
 	/// <summary>
 	/// ‘I‘ğ‚Ìã‚Ì”»’èˆ—
 	/// </summary>
@@ -59,4 +62,6 @@ protected:
 
 	void DrawFontText(Vector2 pos, int size, unsigned int _color, 
 					  const char* text, bool _isSelect);
+
+	bool GetIsActiveState(void) { return (stateWaitTime_ <= 0.0f); }
 };

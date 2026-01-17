@@ -10,38 +10,29 @@
 #include "../Object/Enemy/EnemyController.h"
 #include "../Object/Enemy/Enemy.h"
 #include "../Object/Enemy/EnemyBoss.h"
+#include "../Object/Stage/Stage.h"
 #include "../Manager/ResourceManager.h"
 #include "../Manager/Resource.h"
 #include "../Manager/SceneManager.h"
 #include "../Manager/SoundManager.h"
 #include "../Manager/EffectController.h"
 
-// シングルトンクラス
-CollisionManager* CollisionManager::instance_ = nullptr;
-
-void CollisionManager::CreateInstance(Player& _player, EnemyController& _enemys)
+CollisionManager::CollisionManager(Player& _player, EnemyController& _enemys, Stage& _stage):
+	player_(&_player), enemys_(&_enemys), stage_(_stage),
+	stageColHandle_(-1)
 {
-	if (instance_ == nullptr)
-	{
-		instance_ = new CollisionManager(_player, _enemys);
-	}
+	// 当たり判定用ハンドル読み込み
+	stageColHandle_ = stage_.GetTransform().modelId;
 
-	//instance_->Init();
+	// ステージ当たり判定割り当て
+	MV1SetupCollInfo(stageColHandle_, -1);
+
+	//ステージサイズ設定
+	MV1SetScale(stageColHandle_, stage_.GetTransform().scl);
+
+	//ステージ座標設定
+	MV1SetPosition(stageColHandle_, stage_.GetTransform().pos);
 }
-
-CollisionManager::CollisionManager(Player& _player, EnemyController& _enemys)
-{
-	player_ = &_player;
-	enemys_ = &_enemys;
-	stageColHandle_ = -1;
-	stageDamageHandle_ = -1;
-
-	// リストクリア
-	//colChara_.clear();
-	//collisionStage_.clear();
-}
-
-
 
 
 void CollisionManager::Init(int& stageHandle, const VECTOR& stagePos, const VECTOR& stageScale,
@@ -50,23 +41,8 @@ void CollisionManager::Init(int& stageHandle, const VECTOR& stagePos, const VECT
 	//colChara_.clear();
 
 
-	// 当たり判定割り当て
-	SetStageCollision(stageHandle, stagePos, stageScale,
-					  damageHandle, damagePos, damageScale);
-}
-/*
-void CollisionManager::SetCharaCollision(CollisionManager::COL_TARGET target, CharaBase& chara)
-{
-	int num = static_cast<int>(target);
-
-	// 当たり判定をリストに格納
-	colChara_.emplace(num, &chara);
-}*/
-void CollisionManager::SetStageCollision(int& stageHandle, const VECTOR& stagePos, const VECTOR& stageScale,
-										 int& damageHandle, const VECTOR& damagePos, const VECTOR& damageScale)
-{
 	// 当たり判定用ハンドル読み込み
-	stageColHandle_ = stageHandle;
+	stageColHandle_ = stage_.GetTransform().modelId;
 
 	// ステージ当たり判定割り当て
 	MV1SetupCollInfo(stageColHandle_, -1);
@@ -76,23 +52,15 @@ void CollisionManager::SetStageCollision(int& stageHandle, const VECTOR& stagePo
 
 	//ステージ座標設定
 	MV1SetPosition(stageColHandle_, stagePos);
-
-
-	// ダメージ領域の当たり判定ハンドル読み込み
-	if (damageHandle != -1)
-	{
-		stageDamageHandle_ = damageHandle;
-
-		// ダメージ領域の当たり判定割り当て
-		MV1SetupCollInfo(stageDamageHandle_);
-
-		// ダメージ領域のサイズ設定
-		MV1SetScale(stageDamageHandle_, damageScale);
-
-		// ダメージ領域の座標設定
-		MV1SetPosition(stageDamageHandle_, damagePos);
-	}
 }
+/*
+void CollisionManager::SetCharaCollision(CollisionManager::COL_TARGET target, CharaBase& chara)
+{
+	int num = static_cast<int>(target);
+
+	// 当たり判定をリストに格納
+	colChara_.emplace(num, &chara);
+}*/
 
 
 void CollisionManager::Update(void)
@@ -103,6 +71,8 @@ void CollisionManager::Update(void)
 	// プレイヤーとボスの当たり判定
 	CollisionPlayerToBoss();
 
+	//CollisionGround();
+
 	// キャラクター同士の当たり判定
 	//CollisionChara();
 
@@ -110,7 +80,7 @@ void CollisionManager::Update(void)
 	//CollisionsGround();
 
 	// 壁当たり判定
-	//CollisionsWall();
+	CollisionsWall();
 }
 
 void CollisionManager::DrawDebug(void)
@@ -124,27 +94,14 @@ void CollisionManager::DrawDebug(void)
 
 	if (stageColHandle_ != -1)
 	{
-		//MV1DrawModel(stageColHandle_);
-	}
-	
-	if (stageDamageHandle_ != -1)
-	{
-		//MV1DrawModel(stageDamageHandle_);
+		MV1DrawModel(stageColHandle_);
 	}
 
 #endif // _DEBUG
 }
 
-void CollisionManager::Destroy(void)
+void CollisionManager::Release(void)
 {
-	// リストクリア
-	//colChara_.clear();
-	if (instance_ != nullptr)
-	{
-		delete instance_;
-
-		instance_ = nullptr;
-	}
 }
 
 
@@ -365,76 +322,81 @@ void CollisionManager::CollisionPlayerToBoss(void)
 	float pRad, eRad = 0.0f;
 	int power = 0;
 	pPos = player_->GetPos();
-	EnemyBoss& boss = enemys_->GetEnemyBoss();
 
-	pBody = player_->GetFramePos(COLLISION_TYPE::BODY);
-	pRad = player_->GetRadius(COLLISION_TYPE::BODY);
+	for (auto& boss : enemys_->GetEnemyBossList())
+	{
+		pBody = player_->GetFramePos(COLLISION_TYPE::BODY);
+		pRad = player_->GetRadius(COLLISION_TYPE::BODY);
 
-	if (boss.GetIsSpawnCircle())
-	{
-		eRad = boss.GetSpawnCircleRadius();
-		ePos = boss.GetSpawnCirclePos();
-	}
-	else
-	{
-		eBody = boss.GetFramePos(COLLISION_TYPE::BODY);
-		ePos = boss.GetPos();
-		eRad = boss.GetRadius(COLLISION_TYPE::BODY);
-	}
-
-	if (UtilityCollision::IsHitSphereToSphere(pBody, pRad, eBody, eRad))
-	{
-		// プレイヤーの位置と反発
-		//enemy->SetPos(UtilityCollision::CollisionReflectXZ(ePos.y, eBody, eRad, pBody, pRad));
-	}
-
-	if (boss.GetIsSpawnCircle())
-	{
-		if (UtilityCollision::IsHitSphereToSphere(pPos, pRad, ePos, eRad))
+		// 召喚魔法陣当たり判定
+		if (boss->GetIsSpawnCircle())
 		{
-			// 魔法陣無効化
-			boss.SetIsSpawnCircle(false);
+			eRad = boss->GetSpawnCircleRadius();
+			ePos = boss->GetSpawnCirclePos();
 		}
-		return;
-	}
 
-	// 敵未割当時、処理終了
-	// 無効状態・HP0の時、スキップ
-	if (!boss.GetIsCollisionActive()) { return; }
-
-	// プレイヤーの攻撃時の敵の被ダメージ処理
-	if (player_->CheckActiveAttack())
-	{
-		boss.UpdateModelFrames();
-
-		pBody = player_->GetPosForward();
-		pRad = player_->GetRadiusAttack(player_->GetMotionType());
-		power = player_->GetPower();
-		eBody = boss.GetFramePos(Object::COLLISION_TYPE::BODY);
-		eRad = boss.GetRadius(COLLISION_TYPE::BODY);
+		// ボス当たり判定
+		else
+		{
+			eBody = boss->GetFramePos(COLLISION_TYPE::BODY);
+			ePos = boss->GetPos();
+			eRad = boss->GetRadius(COLLISION_TYPE::BODY);
+		}
 
 		if (UtilityCollision::IsHitSphereToSphere(pBody, pRad, eBody, eRad))
 		{
-			boss.SetDamage(power);
-
-			SceneManager::GetInstance().GetEffects().
-				SetEffect(EffectController::EFFECT_TYPE::SWORD_HIT,
-					eBody, 0.0f, {50.0f, 50.0f,50.0f});
+			// プレイヤーの位置と反発
+			//enemy->SetPos(UtilityCollision::CollisionReflectXZ(ePos.y, eBody, eRad, pBody, pRad));
 		}
-	}
 
-	// 敵の攻撃時のプレイヤーの被ダメージ処理
-	if (boss.CheckActiveAttack())
-	{
-		eBody = boss.GetPosForward();
-		eRad  = boss.GetRadiusAttack();
-		power = boss.GetPower();
-		pBody = player_->GetFramePos(Object::COLLISION_TYPE::BODY);
-		pRad  = player_->GetRadius(COLLISION_TYPE::BODY);
-
-		if (UtilityCollision::IsHitSphereToSphere(eBody, eRad, pBody, pRad))
+		if (boss->GetIsSpawnCircle())
 		{
-			player_->SetDamage(power);
+			if (UtilityCollision::IsHitSphereToSphere(pPos, pRad, ePos, eRad))
+			{
+				// 魔法陣無効化
+				boss->SetIsSpawnCircle(false);
+			}
+			continue;
+		}
+
+		// 敵未割当時、処理終了
+		// 無効状態・HP0の時、スキップ
+		if (!boss->GetIsCollisionActive()) { continue; }
+
+		// プレイヤーの攻撃時の敵の被ダメージ処理
+		if (player_->CheckActiveAttack())
+		{
+			boss->UpdateModelFrames();
+
+			pBody = player_->GetPosForward();
+			pRad = player_->GetRadiusAttack(player_->GetMotionType());
+			power = player_->GetPower();
+			eBody = boss->GetFramePos(Object::COLLISION_TYPE::BODY);
+			eRad = boss->GetRadius(COLLISION_TYPE::BODY);
+
+			if (UtilityCollision::IsHitSphereToSphere(pBody, pRad, eBody, eRad))
+			{
+				boss->SetDamage(power);
+
+				SceneManager::GetInstance().GetEffects().
+					SetEffect(EffectController::EFFECT_TYPE::SWORD_HIT,
+						eBody, 0.0f, { 50.0f, 50.0f,50.0f });
+			}
+		}
+
+		// 敵の攻撃時のプレイヤーの被ダメージ処理
+		if (boss->CheckActiveAttack())
+		{
+			eBody = boss->GetPosForward();
+			eRad = boss->GetRadiusAttack();
+			power = boss->GetPower();
+			pBody = player_->GetFramePos(Object::COLLISION_TYPE::BODY);
+			pRad = player_->GetRadius(COLLISION_TYPE::BODY);
+
+			if (UtilityCollision::IsHitSphereToSphere(eBody, eRad, pBody, pRad))
+			{
+				player_->SetDamage(power);
+			}
 		}
 	}
 }
@@ -479,12 +441,9 @@ void CollisionManager::EnemyDamageProc(Enemy& _enemy, int _damage)
 	
 }
 
-void CollisionManager::CollisionsGround(void)
+void CollisionManager::CollisionGround(void)
 {
 	/*　地面の当たり判定　*/
-	/*
-	// 当たり判定
-	CollisionBase* col = nullptr;
 
 	// オフセット
 	float offset = 0.0f;
@@ -498,67 +457,85 @@ void CollisionManager::CollisionsGround(void)
 	// 衝突フラグ
 	bool checkGround; 
 
-	for (auto& charaCol : colChara_)
+	// 当たり判定位置
+	topPos = player_->GetFramePos(Object::COLLISION_TYPE::HEAD);
+	bottomPos = player_->GetPos();
+
+	// 壁の当たり判定
+	if (CheckGroundCollision(topPos, bottomPos, &result, offset))
 	{
-		CharaBase& chara   = *charaCol.second;
-		CollisionBase& col = chara.GetCollision();
+		// 衝突距離の差分
+		VECTOR hitLength = VSub(bottomPos, result.HitPosition);
 
-		// 当たり判定位置
-		topPos = col.GetColPos(COL_NUM::BODY_TOP);
-		bottomPos = chara.GetPos();
-
-		offset = (col.GetColOffset(COL_NUM::BODY_BOTTOM) / 2.0f);
-
-		// 地面衝突フラグ
-		checkGround = chara.GetIsGround();
-
-		// 投げ状態時、当たり判定を無効化
-		if (!chara.GetIsHit()) continue;
+		// 衝突距離の長さ
+		float distance = VSize(hitLength);
 
 
-		// 壁の当たり判定
-		if (CheckGroundCollision(topPos, bottomPos, &result, offset))
+		// 衝突距離がしきい値より小さい
+		if (distance <= THEESHOLD_GROUND)
 		{
-			// 衝突距離の差分
-			VECTOR hitLength = VSub(bottomPos, result.HitPosition);
+			// 衝突した位置
+			VECTOR hitPos = result.HitPosition;
 
-			// 衝突距離の長さ
-			float distance = VSize(hitLength);
+			// 現在地点を衝突した位置にする
+			player_->RevertPosY(hitPos.y);
 
-
-			// 衝突距離がしきい値より小さい
-			if (distance <= THEESHOLD_GROUND)
 			{
-				// 衝突した位置
-				VECTOR hitPos = result.HitPosition;
+				VECTOR charaVelo = player_->GetVelocity();
 
-				// 現在地点を衝突した位置にする
-				chara.RevertPosY(hitPos.y, !chara.GetIsGround());
-
-				if (!checkGround)
+				if (charaVelo.y < 0.0f)
 				{
-					VECTOR charaVelo = chara.GetVelocity();
+					//charaVelo.y = 0.0f;
+				}
 
-					if (charaVelo.y < 0.0f)
+				player_->SetVelocity(charaVelo);
+			}
+		}
+	}
+
+	/*
+	for (auto& enemyList : enemys_->GetEnemyLists())
+	{
+		for (auto& enemy : enemyList)
+		{
+			// 当たり判定位置
+			topPos = enemy->GetFramePos(Object::COLLISION_TYPE::HEAD);
+			bottomPos = enemy->GetPos();
+
+			// 壁の当たり判定
+			if (CheckGroundCollision(topPos, bottomPos, &result, offset))
+			{
+				// 衝突距離の差分
+				VECTOR hitLength = VSub(bottomPos, result.HitPosition);
+
+				// 衝突距離の長さ
+				float distance = VSize(hitLength);
+
+
+				// 衝突距離がしきい値より小さい
+				if (distance <= THEESHOLD_GROUND)
+				{
+					// 衝突した位置
+					VECTOR hitPos = result.HitPosition;
+
+					// 現在地点を衝突した位置にする
+					enemy->RevertPosY(hitPos.y);
+
 					{
-						charaVelo.y = 0.0f;
+						VECTOR charaVelo = enemy->GetVelocity();
+
+						if (charaVelo.y < 0.0f)
+						{
+							//charaVelo.y = 0.0f;
+						}
+
+						enemy->SetVelocity(charaVelo);
 					}
-
-					chara.SetVelocity(charaVelo);
-
-					// 着地処理
-					chara.SetIsGround(true);
 				}
 			}
 		}
-		else if (checkGround)
-		{
-			// 地面から離れる
-			chara.SetIsGround(false);
-		}
 	}*/
 }
-
 bool CollisionManager::CheckGroundCollision(VECTOR& top, VECTOR& bottom,
 	MV1_COLL_RESULT_POLY_DIM* result, float radius)
 {
@@ -625,54 +602,82 @@ bool CollisionManager::CheckGroundCollision(const VECTOR& top, const VECTOR& bot
 void CollisionManager::CollisionsWall(void)
 {
 	/*　壁の当たり判定処理　*/
-	/*
+	
 	// オフセット
-	float offset;
+	const float offset = 0.1f;
 
 	// 当たり判定位置
 	VECTOR topPos, bottomPos = AsoUtility::VECTOR_ZERO;
 
-	
-	for (auto& colChara : colChara_)
+	// 当たり判定の位置
+	topPos = player_->GetFramePos(Object::COLLISION_TYPE::HEAD);
+	bottomPos = player_->GetFramePos(Object::COLLISION_TYPE::BOTTOM);
+
+	// 当たり判定用ポリゴン
+	MV1_COLL_RESULT_POLY_DIM result;
+
+
+	// 敵と壁の当たり判定
+	if (CheckWallCollision(COL_TYPE::CAPCEL, topPos, bottomPos, &result, offset))
 	{
-		//　壁の当たり判定
-		
-		CharaBase& chara = *colChara.second;
-		CollisionBase& col = chara.GetCollision();
+		// 衝突した位置の法線ベクトル
+		VECTOR normVec = AsoUtility::VECTOR_ZERO;
 
-		// 当たり判定の位置
-		topPos    = col.GetColPos(COL_NUM::BODY_TOP);
-		bottomPos = col.GetColPos(COL_NUM::BODY_BOTTOM);
-		offset = col.GetColOffset(COL_NUM::BODY_BOTTOM);
+		// 衝突したポリゴンの数
+		int num = result.HitNum;
 
-		// 当たり判定用ポリゴン
-		MV1_COLL_RESULT_POLY_DIM result;
+		const int WALL_FRAME = 4;
 
-
-		// プレイヤーと壁の当たり判定
-		if (CheckWallCollision(COL_TYPE::CAPCEL, topPos, bottomPos, &result, offset))
+		for (int i = 0; i < num; i++)
 		{
-			// 衝突した位置の法線ベクトル
-			VECTOR normVec = AsoUtility::VECTOR_ZERO;
+			auto d = result.Dim[i];
 
-			// 衝突したポリゴンの数
-			int num = result.HitNum;
-
-			for (int i = 0; i < num; i++)
+			if (d.Normal.y < THEESHOLD_WALL &&
+				d.FrameIndex != WALL_FRAME)
 			{
-				auto d = result.Dim[i];
+				// 衝突した法線ベクトルを取得
+				normVec = d.Normal;
 
-				if (d.Normal.y < THEESHOLD_WALL)
+				// 現在地点を前フレームに戻す
+				player_->RevertPosXZ(normVec, BOUNCE_WALL);
+			}
+		}
+	}
+
+	return;
+	for (auto& enemyList : enemys_->GetEnemyLists())
+	{
+		for (auto& enemy : enemyList)
+		{
+			// 当たり判定の位置
+			topPos = enemy->GetFramePos(Object::COLLISION_TYPE::HEAD);
+			bottomPos = enemy->GetFramePos(Object::COLLISION_TYPE::BOTTOM);
+
+			// 敵と壁の当たり判定
+			if (CheckWallCollision(COL_TYPE::CAPCEL, topPos, bottomPos, &result, offset))
+			{
+				// 衝突した位置の法線ベクトル
+				VECTOR normVec = AsoUtility::VECTOR_ZERO;
+
+				// 衝突したポリゴンの数
+				int num = result.HitNum;
+
+				for (int i = 0; i < num; i++)
 				{
-					// 衝突した法線ベクトルを取得
-					normVec = d.Normal;
+					auto dim = result.Dim[i];
 
-					// 現在地点を前フレームに戻す
-					chara.RevertPosXZ(normVec, BOUNCE_WALL);
+					if (dim.Normal.y < THEESHOLD_WALL)
+					{
+						// 衝突した法線ベクトルを取得
+						normVec = dim.Normal;
+
+						// 現在地点を前フレームに戻す
+						enemy->RevertPosXZ(normVec, BOUNCE_WALL);
+					}
 				}
 			}
 		}
-	}*/
+	}
 }
 
 bool CollisionManager::CheckWallCollision(const VECTOR& startPos, const VECTOR& endPos,
@@ -685,10 +690,12 @@ bool CollisionManager::CheckWallCollision(const VECTOR& startPos, const VECTOR& 
 	VECTOR end = endPos;
 	end.y += offset;
 
-	MV1_COLL_RESULT_POLY res = MV1CollCheck_Line(stageColHandle_, -1,
-												 startPos, end);
+	MV1_COLL_RESULT_POLY res = MV1CollCheck_Line(stageColHandle_, -1,startPos, end);
+	
+	const int WALL_FRAME = 4;
 
-	if (res.HitFlag)
+	if (res.HitFlag &&
+		res.FrameIndex != WALL_FRAME)
 	{
 		*result = res;
 
@@ -714,7 +721,6 @@ bool CollisionManager::CheckWallCollision(COL_TYPE type, const VECTOR& topPos, c
 	res = MV1CollCheck_Capsule(stageColHandle_, -1,
 							   top, bottom,
 							   radius);
-
 	if (res.HitNum >= 1)
 	{
 		*result = res;

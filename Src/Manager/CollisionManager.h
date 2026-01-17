@@ -6,6 +6,7 @@
 class Player;
 class Enemy;
 class EnemyController;
+class Stage;
 
 class CollisionManager
 {
@@ -41,41 +42,31 @@ public:
 	static constexpr float THEESHOLD_GROUND = 7.5f;
 	
 	// 壁判定位置のしきい値
-	static constexpr float THEESHOLD_WALL = 1.0f;
+	static constexpr float THEESHOLD_WALL = 100.0f;
 
 	static constexpr float THEESHOLD_DAMAGE = 1.0f;
 	
 	// 壁判定の反発力
 	static constexpr float BOUNCE_WALL = 7.5f;
 
-	// プレイヤー同士の横反発力
-	static constexpr float BOUNCE_PLAYER_XZ = 0.1f;
 
-	// プレイヤー同士の縦反発力
-	static constexpr float BOUNCE_PLAYER_Y = 20.0f;
+	/// @brief コンストラクタ
+	/// @param プレイヤー
+	/// @param 敵
+	/// @param ステージ
+	CollisionManager(Player& _player, EnemyController& _enemy, Stage& _stage);
 
-
-	/// @brief インスタンス生成
-	/// @param _player プレイヤークラス
-	/// @param _enemy 敵クラス
-	static void CreateInstance(Player& _player, EnemyController& _enemy);
-
-	/// @brief インスタンス取得
-	static CollisionManager& GetInstance(void) { return *instance_; };
-
-	/// @brief インスタンス削除
-	static void Destroy(void);
+	/// @briefデフォルトデストラクタ
+	~CollisionManager(void) = default;
 
 
-	/// <summary>
-	/// 初期化処理
-	/// </summary>
-	/// <param name="stageHandle">ステージモデルハンドル</param>
-	/// <param name="stagePos">ステージの位置</param>
-	/// <param name="stageScale">ステージのサイズ</param>
-	/// <param name="damageHandle">ダメージ領域ハンドル</param>
-	/// <param name="damagePos">ダメージ領域の位置</param>
-	/// <param name="damageScale">ダメージ領域のサイズ</param>
+	/// @brief 初期化処理
+	/// @param stageHandle ステージモデルハンドル
+	/// @param stagePos ステージの位置
+	/// @param stageScale ステージのサイズ
+	/// @param damageHandle ダメージ領域ハンドル
+	/// @param damagePos ダメージ領域の位置
+	/// @param damageScale ダメージ領域のサイズ
 	void Init(int& stageHandle, const VECTOR& stagePos, const VECTOR& stageScale,
 			  int& damageHandle, const VECTOR& damagePos = {}, const VECTOR& damageScale = {});
 
@@ -85,6 +76,8 @@ public:
 	/// @brief デバッグ描画処理
 	void DrawDebug(void);
 
+	void Release(void);
+
 
 	/// <summary>
 	/// 当たり判定を行うキャラクター割り当て処理
@@ -92,20 +85,6 @@ public:
 	/// <param name="target">当たり判定対象</param>
 	/// <param name="chara">キャラクター</param>
 	//void SetCharaCollision(COL_TARGET target, CharaBase& chara);
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="stageHandle">ステージモデルハンドル</param>
-	/// <param name="stagePos">ステージの位置</param>
-	/// <param name="stageScale">ステージのサイズ</param>
-	/// <param name="damageHandle">ダメージ領域ハンドル</param>
-	/// <param name="damagePos">ダメージ領域の位置</param>
-	/// <param name="damageScale">ダメージ領域のサイズ</param>
-	void SetStageCollision(int& stageHandle, const VECTOR& stagePos, const VECTOR& stageScale,
-						   int& damageHandle, const VECTOR& damagePos = {}, const VECTOR& damageScale = {});
-
-
 
 	
 	/// <summary>
@@ -121,10 +100,9 @@ public:
 
 private:
 
-	static CollisionManager* instance_;
-
-
 	Player* player_;
+
+	Stage& stage_;
 
 
 	// 敵のマネージャ
@@ -134,24 +112,10 @@ private:
 	// ステージの当たり判定用モデルハンドル
 	int stageColHandle_;
 
-	// ステージのダメージ領域の当たり判定用モデルハンドル
-	int stageDamageHandle_;
-
 
 	// ステージ当たり判定対象リスト
 	//std::map < COL_TARGET, VECTOR* > collisionStage_;
 
-
-	/// @brief デフォルトコンストラクタ
-	/// @param プレイヤー
-	/// @param 敵
-	CollisionManager(Player& _player, EnemyController& _enemy);
-
-	/// @briefデフォルトデストラクタ
-	~CollisionManager(void) = default;
-
-	/// @brief コピーコンストラクタ対策
-	CollisionManager(CollisionManager& other) = default;
 
 
 	/// @brief キャラクター同士の当たり判定
@@ -166,8 +130,11 @@ private:
 	/// @brief 敵と敵の当たり判定
 	void CollisionEnemyToEnemy(void);
 
+	/// @brief キャラクターとステージの当たり判定
+	void CollisionGround(void);
+
 	/// @brief 各キャラクターのステージ床の当たり判定
-	void CollisionsGround(void);
+	//void CollisionsGround(void);
 
 	/// <summary>
 	/// 床の当たり判定(カプセル)

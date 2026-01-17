@@ -14,6 +14,7 @@ public:
 
 	virtual void Load(void);
 
+	virtual void Init(void);
 	virtual void Init(const VECTOR& _pos, float _angleY);
 
 	virtual void Update(void);

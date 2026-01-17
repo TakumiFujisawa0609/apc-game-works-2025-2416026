@@ -39,8 +39,8 @@ void InputManager::Init(void)
 	RegisterTrigger(TYPE::PLAYER_MOVE_BACK, { KEY_INPUT_W }, { }, { STICK::L_STICK_UP });
 	RegisterTrigger(TYPE::PLAYER_MOVE_FRONT, { KEY_INPUT_S }, { }, { STICK::L_STICK_DOWN });
 
-	RegisterTrigger(TYPE::PLAYER_ATTACK_JUB, { }, { BTN::RB_RIGHT }, { }, MOUSE::CLICK_LEFT);
-	RegisterTrigger(TYPE::PLAYER_ATTACK_STRONG, { }, { BTN::RB_RIGHT }, { }, MOUSE::CLICK_RIGHT);
+	RegisterTrigger(TYPE::PLAYER_ATTACK_JUB, { }, { BTN::RB_TOP }, { }, MOUSE::CLICK_LEFT);
+	RegisterTrigger(TYPE::PLAYER_ATTACK_STRONG, { }, { BTN::RB_BOTTOM }, { }, MOUSE::CLICK_RIGHT);
 	RegisterTrigger(TYPE::PLAYER_DASH, { KEY_INPUT_LSHIFT, KEY_INPUT_RSHIFT, }, { BTN::L_STICK }, { });
 
 	RegisterTrigger(TYPE::CAMERA_MOVE_RIGHT, { KEY_INPUT_RIGHT }, { }, { STICK::R_STICK_RIGHT }, MOUSE::MOVE_RIGHT);
@@ -49,13 +49,13 @@ void InputManager::Init(void)
 	RegisterTrigger(TYPE::CAMERA_MOVE_DOWN, { KEY_INPUT_DOWN }, { }, { STICK::R_STICK_DOWN }, MOUSE::MOVE_DOWN);
 
 	// ƒƒjƒ…[‘€ì
-	RegisterTrigger(TYPE::SELECT_RIGHT, { KEY_INPUT_D, KEY_INPUT_RIGHT }, { }, { STICK::L_STICK_RIGHT });
-	RegisterTrigger(TYPE::SELECT_LEFT, { KEY_INPUT_A, KEY_INPUT_LEFT }, { }, { STICK::L_STICK_LEFT });
-	RegisterTrigger(TYPE::SELECT_UP, { KEY_INPUT_W, KEY_INPUT_UP }, { }, { STICK::L_STICK_UP });
-	RegisterTrigger(TYPE::SELECT_DOWN, { KEY_INPUT_S, KEY_INPUT_DOWN }, { }, { STICK::L_STICK_DOWN });
-	RegisterTrigger(TYPE::SELECT_DECISION, { KEY_INPUT_SPACE, KEY_INPUT_RETURN  }, { BTN::RB_RIGHT, BTN::START }, { STICK::MAX }, MOUSE::CLICK_LEFT);
-	RegisterTrigger(TYPE::SELECT_CANCEL, { KEY_INPUT_BACK }, { BTN::RB_DOWN }, { });
-	RegisterTrigger(TYPE::PAUSE, { KEY_INPUT_ESCAPE, KEY_INPUT_BACK }, { BTN::SELECT }, { });
+	RegisterTrigger(TYPE::SELECT_LEFT,  { KEY_INPUT_A, KEY_INPUT_LEFT },  { BTN::L_BUTTON }, { STICK::L_STICK_LEFT });
+	RegisterTrigger(TYPE::SELECT_RIGHT, { KEY_INPUT_D, KEY_INPUT_RIGHT }, { BTN::R_BUTTON}, { STICK::L_STICK_RIGHT });
+	RegisterTrigger(TYPE::SELECT_UP,    { KEY_INPUT_W, KEY_INPUT_UP },    { BTN::L_BUTTON }, { STICK::L_STICK_UP });
+	RegisterTrigger(TYPE::SELECT_DOWN,  { KEY_INPUT_S, KEY_INPUT_DOWN },  { BTN::R_BUTTON }, { STICK::L_STICK_DOWN });
+	RegisterTrigger(TYPE::SELECT_DECISION, { KEY_INPUT_SPACE, KEY_INPUT_RETURN  }, { BTN::RB_RIGHT, BTN::START, BTN::RB_BOTTOM }, { STICK::MAX }, MOUSE::CLICK_LEFT);
+	RegisterTrigger(TYPE::SELECT_CANCEL,   { KEY_INPUT_BACK },                     { BTN::RB_RIGHT }, { });
+	RegisterTrigger(TYPE::PAUSE,           { KEY_INPUT_ESCAPE, KEY_INPUT_BACK },   { BTN::SELECT }, { });
 
 	// ƒQ[ƒ€ó‘Ô‘JˆÚ
 	RegisterTrigger(TYPE::GAME_STATE_CHANGE, { KEY_INPUT_SPACE }, { BTN::RB_RIGHT }, { });
@@ -123,6 +123,11 @@ bool InputManager::IsTrgUp(const TYPE type, const Input::JOYPAD_NO padNo)
 void InputManager::SetMousePos(const Vector2& pos)
 {
 	input_->SetMousePos(pos);
+}
+
+void InputManager::SetCursorMode(Input::CURSOR_MODE _mode)
+{
+	input_->SetCursorMode(_mode);
 }
 
 Vector2 InputManager::GetMousePos(void) const

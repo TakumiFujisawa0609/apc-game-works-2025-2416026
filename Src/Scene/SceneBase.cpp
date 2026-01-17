@@ -9,7 +9,8 @@
 
 SceneBase::SceneBase(void):
 	resMng_(ResourceManager::GetInstance()),
-	sceneMng_(SceneManager::GetInstance())
+	sceneMng_(SceneManager::GetInstance()),
+	stateWaitTime_(STATE_WAIT_TIME)
 {
 }
 

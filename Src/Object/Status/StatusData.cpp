@@ -11,6 +11,7 @@
 #include "./StatusPlayer.h"
 #include "./StatusEnemy.h"
 #include "./StatusWeapon.h"
+#include "../../Manager/ResourceManager.h"
 
 StatusData* StatusData::instance_ = nullptr;
 
@@ -43,7 +44,10 @@ void StatusData::Destroy(void)
 
 StatusData::StatusData(void)
 {
-	
+#ifndef _DEBUG
+	// リリースビルド時のみDXアーカイブを使用
+	SetUseDXArchiveFlag(TRUE);
+#endif
 }
 
 
@@ -59,6 +63,53 @@ void StatusData::Load(void)
 	LoadWeapon();
 }
 
+std::string StatusData::ReadCsvFile(const std::string& path)
+{
+	std::string content;
+
+#ifndef _DEBUG
+	// デバッグビルド：通常のファイルシステムから読み込み
+	std::ifstream file(path);
+
+	if (!file.is_open())
+	{
+		std::string error = "\ncsvファイルが読み込まれませんでした。\nファイルパス:";
+		error += path;
+		assert(false && error.c_str());
+		return "";
+	}
+
+	std::stringstream buffer;
+	buffer << file.rdbuf();
+	content = buffer.str();
+	file.close();
+
+#else
+	// リリースビルド：DXアーカイブから読み込み
+	int fileHandle = FileRead_open(path.c_str());
+
+	if (fileHandle == 0)
+	{
+		std::string error = "\ncsvファイルが読み込まれませんでした。\nファイルパス:";
+		error += path;
+		assert(false && error.c_str());
+		return "";
+	}
+
+	int fileSize = FileRead_size(path.c_str());
+	char* buffer = new char[fileSize + 1];
+	FileRead_read(buffer, fileSize, fileHandle);
+	buffer[fileSize] = '\0';
+	FileRead_close(fileHandle);
+
+	content = std::string(buffer);
+	delete[] buffer;
+#endif
+
+	return content;
+}
+
+
 void StatusData::LoadPlayerStatus(void)
 {
 	/*　csvファイル読み込み処理　*/
@@ -69,25 +120,20 @@ void StatusData::LoadPlayerStatus(void)
 
 	// 行
 	std::string line;
-	std::string path = (PATH_CSV_FILE + PATH_PLAYER);
+	std::string path = (ResourceManager::PATH_CSV + PATH_PLAYER);
 
 	// セーブファイルパス
-	std::ifstream file = std::ifstream(path);
+
+	// CSVファイルの内容を取得
+	std::string fileContent = ReadCsvFile(path);
+	std::istringstream fileStream(fileContent);
 
 	int length = 0;
 	int param = 0; // 種類
 
 
-	if (!file.is_open())
-	{
-		// ファイル読み込み失敗
-		std::string error = "\ncsvファイルが読み込まれませんでした。\nファイルパス：";
-		error += path;
-		assert(error.c_str());
-	}
-
 	// 行読み込み
-	while (getline(file, line))
+	while (getline(fileStream, line))
 	{
 		std::stringstream ss(line);
 		std::string text;
@@ -114,7 +160,6 @@ void StatusData::LoadPlayerStatus(void)
 		length = 0;
 		param++;
 	}
-	file.close();
 
 
 	// 数値読込
@@ -132,25 +177,18 @@ void StatusData::LoadPlayerMotion(void)
 
 	// 行
 	std::string line;
-	std::string path = (PATH_CSV_FILE + PATH_PLAYER_MOTION);
+	std::string path = (ResourceManager::PATH_CSV + PATH_PLAYER_MOTION);
 
-	// セーブファイルパス
-	std::ifstream file = std::ifstream(path);
+
+	// CSVファイルの内容を取得
+	std::string fileContent = ReadCsvFile(path);
+	std::istringstream fileStream(fileContent);
 
 	int length = 0;
 	int param = 0; // 種類
 
-
-	if (!file.is_open())
-	{
-		// ファイル読み込み失敗
-		std::string error = "\ncsvファイルが読み込まれませんでした。\nファイルパス：";
-		error += path;
-		assert(error.c_str());
-	}
-
 	// 行読み込み
-	while (getline(file, line))
+	while (getline(fileStream, line))
 	{
 		std::stringstream ss(line);
 		std::string text;
@@ -177,7 +215,6 @@ void StatusData::LoadPlayerMotion(void)
 		length = 0;
 		param++;
 	}
-	file.close();
 
 	for (int i = 0; i < (param - 1); i++)
 	{
@@ -199,25 +236,17 @@ void StatusData::LoadEnemy(void)
 
 	// 行
 	std::string line;
-	std::string path = (PATH_CSV_FILE + PATH_ENEMY);
+	std::string path = (ResourceManager::PATH_CSV + PATH_ENEMY);
 
-	// セーブファイルパス
-	std::ifstream file = std::ifstream(path);
+	// CSVファイルの内容を取得
+	std::string fileContent = ReadCsvFile(path);
+	std::istringstream fileStream(fileContent);
 
 	int length = 0;
 	int param = 0; // 種類
 
-
-	if (!file.is_open())
-	{
-		// ファイル読み込み失敗
-		std::string error = "\ncsvファイルが読み込まれませんでした。\nファイルパス：";
-		error += path;
-		assert(error.c_str());
-	}
-
 	// 行読み込み
-	while (getline(file, line))
+	while (getline(fileStream, line))
 	{
 		std::stringstream ss(line);
 		std::string text;
@@ -244,7 +273,6 @@ void StatusData::LoadEnemy(void)
 		length = 0;
 		param++;
 	}
-	file.close();
 
 	for (int i = 0; i < (param - 1); i++)
 	{
@@ -264,25 +292,18 @@ void StatusData::LoadWeapon(void)
 
 	// 行
 	std::string line;
-	std::string path = (PATH_CSV_FILE + PATH_WEAPON);
+	std::string path = (ResourceManager::PATH_CSV + PATH_WEAPON);
 
-	// セーブファイルパス
-	std::ifstream file = std::ifstream(path);
+	// CSVファイルの内容を取得
+	std::string fileContent = ReadCsvFile(path);
+	std::istringstream fileStream(fileContent);
 
 	int length = 0;
 	int param = 0; // 種類
 
 
-	if (!file.is_open())
-	{
-		// ファイル読み込み失敗
-		std::string error = "\ncsvファイルが読み込まれませんでした。\nファイルパス：";
-		error += path;
-		assert(error.c_str());
-	}
-
 	// 行読み込み
-	while (getline(file, line))
+	while (getline(fileStream, line))
 	{
 		std::stringstream ss(line);
 		std::string text;
@@ -309,7 +330,6 @@ void StatusData::LoadWeapon(void)
 		length = 0;
 		param++;
 	}
-	file.close();
 
 	for (int i = 0; i < (param - 1); i++)
 	{

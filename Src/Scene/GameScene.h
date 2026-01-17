@@ -26,7 +26,7 @@ public:
 
 
 	// プレイヤー開始位置
-	static constexpr VECTOR POS_START_PLAYER = { 0.0f, 0.0f, -1750.0f };
+	static constexpr VECTOR POS_START_PLAYER = { 0.0f, 0.0f, -5000.0f };
 
 	// プレイヤー開始時の向き
 	static constexpr float ANGLE_START_PLAYER = 90.0f;
@@ -56,13 +56,16 @@ public:
 
 	const EnemyController& GetEnemyController(void) { return *enemys_; };
 
+	const CollisionManager& GetCollision(void) { return *collisionMng_; };
 
 
 private:
 
 	static constexpr float FOG_START = 2000.0f;
-	static constexpr float FOG_END = (2500.0f + FOG_START);
+	static constexpr float FOG_END = (3000.0f + FOG_START);
 	static constexpr UtilityCommon::Color FOG_COLOR = {85, 85, 85, 1};
+
+	CollisionManager* collisionMng_;
 
 	// ゲーム状態
 	GAME_STATE gameState_;
@@ -79,6 +82,10 @@ private:
 	EnemyController* enemys_;
 
 
+	static constexpr float GAME_TIME = ((60.0f * 0) + 10.0f);
+	float curGameTime_;
+
+
 	/// @brief 再初期化処理
 	void ReInit(void);
 
@@ -91,4 +98,7 @@ private:
 
 	/// @brief ゲームオーバー処理
 	void GameOverProc(void) {};
+
+	void TimeFeed(void);
+	void DrawTimeFeed(void);
 };

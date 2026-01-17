@@ -1,58 +1,56 @@
 #include "Stage.h"
 #include <DxLib.h>
 #include <vector>
-#include "../Actor/Object.h"
+#include <string>
+#include "../Actor/ActorBase.h"
 #include "../../Manager/ResourceManager.h"
 #include "../../Utility/AsoUtility.h"
 #include "../Common/Transform.h"
 
 Stage::Stage(void):
-	Object::Object()
+	ActorBase::ActorBase()
 {
 	Load();
 }
 
 void Stage::LoadPost(void)
 {
-	const float SCALE = 1.5f;
+	transform_->modelId = resMng_.LoadModelDuplicate(ResourceManager::SRC::MODEL_STAGE);
+}
 
-	roadObj_ = new Transform();
-	roadObj_->pos = {0.0f, -15.0f, -00.0f};
-	roadObj_->modelId = resMng_.LoadHandleId(ResourceManager::SRC::MODEL_ROAD);
-	roadObj_->InitTransform(SCALE,
-							Quaternion::Identity(),
-							Quaternion::AngleAxis(AsoUtility::Deg2Rad(-90.0f), AsoUtility::AXIS_Y));
+void Stage::InitPost(void)
+{
+	const float SCALE = 0.5f;
+	constexpr VECTOR STAGE_POS = { 0.0f, 0.0f, -250.0f };
 
-	VECTOR pos = { 0.0f, -15.0f, -250.0f };
-	for (int i = 0; i < 12; i++)
+	transform_->InitTransform(SCALE,
+						      Quaternion::Identity(), Quaternion::Identity(),
+							  STAGE_POS, AsoUtility::VECTOR_ZERO);
+
+	for (int i = 0; i < MV1GetFrameNum(transform_->modelId); i++)
 	{
-		Transform* obj = new Transform();
-		obj->pos = pos;
-		obj->modelId = resMng_.LoadModelDuplicate(ResourceManager::SRC::MODEL_STAGE);
-		obj->InitTransform(SCALE,
-						   Quaternion::Identity(),
-						   Quaternion::AngleAxis(AsoUtility::Deg2Rad(-90.0f), AsoUtility::AXIS_Y));
-		object_.emplace_back(obj);
+		const std::string FRAME_NAME = "Spawn";
 
-		pos.z += ((i % 3 == 0) ? 1600.0f : 1500.0f);
+		// “G¶¬ˆÊ’u‚ÌƒtƒŒ[ƒ€–¼‚ÌÀ•W‚ðŠi”[
+		std::string name = MV1GetFrameName(transform_->modelId, i);
+		if (name.find(FRAME_NAME) != std::string::npos)
+		{
+			VECTOR pos = MV1GetFramePosition(transform_->modelId, i);
+			spawnPos_.emplace_back(pos);
+		}
 	}
 }
 
 void Stage::UpdatePost(void)
 {
-	roadObj_->Update();
-	for (auto& obj : object_)
-	{
-		obj->Update();
-	}
 }
 
 void Stage::DrawPost(void)
 {
-	MV1DrawModel(roadObj_->modelId);
 
-	for (auto& obj : object_)
-	{
-		MV1DrawModel(obj->modelId);
-	}
+}
+
+std::vector<VECTOR>& Stage::GetSpawnFrames(void)
+{
+	return spawnPos_;
 }

@@ -7,9 +7,10 @@ class UtilityCommon
 {
 public:
 
+	// F‚ÌŠ„‡(0`255)
 	struct Color
 	{
-		int r = 0, g = 0, b = 0, a = 1;
+		int r = 0, g = 0, b = 0, a = 255;
 	};
 
 	/// @brief F‚ğ16i”‚Å¶¬
@@ -19,7 +20,16 @@ public:
 	static unsigned int SetColor(COLOR_F _color);
 
 	/// @brief F‚ğ16i”‚Å¶¬
-	static unsigned int SetColor(float _r, float _g, float _b);
+	/// @param _red Ô(0`255)
+	/// @param _green —Î(0`255)
+	/// @param _blue Â(0`255)
+	static unsigned int SetColor(int _red, int _green, int _blue);
+
+	/// @brief F‚ğ16i”‚Å¶¬
+	/// @param _red Ô‚ÌŠ„‡(0.1`1.0)
+	/// @param _green —Î‚ÌŠ„‡(0.1`1.0)
+	/// @param _blue Â‚ÌŠ„‡(0.1`1.0)
+	static unsigned int SetColor(float _red, float _green, float _blue);
 
 
 	/// @brief •¶š—ñ¨intŒ^•ÏŠ·																							

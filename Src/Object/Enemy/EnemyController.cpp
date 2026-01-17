@@ -8,6 +8,7 @@
 #include "./EnemySkeleton.h"
 #include "./EnemyBoss.h"
 #include "../Player/Player.h"
+#include "../Stage/Stage.h"
 #include "../../Common/Camera.h"
 #include "../,./../../Utility/AsoUtility.h"
 #include "../,./../../Application.h"
@@ -15,60 +16,81 @@
 #include "../,./../../Manager/EffectController.h"
 
 
-EnemyController::EnemyController(Player& player) :
-	player_(&player),
-	enemyBoss_(nullptr)
+EnemyController::EnemyController(Player& player, Stage& _stage) :
+	player_(player), stage_(_stage),
+	sceneMng_(SceneManager::GetInstance())
 {
 	enemys_.clear();
+	enemyBossList_.clear();
 }
 
 void EnemyController::Init(void)
 {
 	enemys_.clear();
+	enemyBossList_.clear();
 
-	EnemysSpawn(ENEMY_TYPE::SKELETON, { 0.0f, 0.0f, 250.0f });
-
-	EnemyBossSpawn();
+	EnemysSpawn(ENEMY_TYPE::SKELETON, { 0.0f, 0.0f, -500.0f });
+	
+	for (auto& stagePos : stage_.GetSpawnFrames())
+	{
+		//EnemyBossSpawn(stagePos);
+	}
+	EnemyBossSpawn(stage_.GetSpawnFrames().at(2));
 }
 
 void EnemyController::Update(void)
 {
-	if (enemys_.empty()) return;
-
 	bool isView = false;
-	for (auto& enemyList : enemys_)
+
+	if (!enemys_.empty())
 	{
-		// 敵リストが空の時、スキップ
-		if (enemyList.empty()) { continue; }
-
-		for (auto& enemy : enemyList)
+		for (auto& enemyList : enemys_)
 		{
-			isView = (SceneManager::GetInstance().GetCamera().GetIsCameraClip(enemy->GetFramePos(Object::COLLISION_TYPE::BOTTOM)) &&
-					  SceneManager::GetInstance().GetCamera().GetIsCameraClip(enemy->GetFramePos(Object::COLLISION_TYPE::HEAD)));
-			enemy->SetIsView(isView);
+			// 敵リストが空の時、スキップ
+			if (enemyList.empty()) { continue; }
 
-			if (!isView) { continue; }
+			for (auto& enemy : enemyList)
+			{
+				// カメラ範囲内の敵以外は、スキップ
+				isView = (sceneMng_.GetCamera().GetIsCameraClip(enemy->GetFramePos(Object::COLLISION_TYPE::BOTTOM)) &&
+						  sceneMng_.GetCamera().GetIsCameraClip(enemy->GetFramePos(Object::COLLISION_TYPE::HEAD)));
 
-			enemy->Update();
+				enemy->SetIsView(isView);
+				
+				if (isView)
+				{
+					enemy->Update();
+				}
+			}
 		}
 	}
 
-
-	if (enemyBoss_ != nullptr)
+	// ボス処理
+	for (auto& boss : enemyBossList_)
 	{
-		enemyBoss_->Update();
+		boss->Update();
 	}
 }
 
 void EnemyController::Draw(void)
 {
-	if (enemyBoss_ != nullptr)
+	// ボス表示
+	if (!enemyBossList_.empty())
 	{
-		enemyBoss_->DrawMagicCircle();
-		enemyBoss_->Draw();
-		DrawFormatString(Application::SCREEN_HALF_X, 0, 0xffffff, "ボスのHP：%d", enemyBoss_->GetCurHp());
+		int y = 0;
+		for (auto& boss : enemyBossList_)
+		{
+			boss->DrawMagicCircle();
+
+			if (boss->GetIsDeath()) { continue; }
+
+			boss->Draw();
+			DrawFormatString(Application::SCREEN_HALF_X, y, 0xffffff, "ボスのHP：%d", boss->GetCurHp());
+			//DrawFormatString(Application::SCREEN_HALF_X, y, 0xffffff, "ボスのHP：%d, 魔法陣:%d",
+				//boss->GetCurHp(), boss->GetIsSpawnCircle());
+			y += 16;
+		}
 	}
-	int temp = 0;
 
 	if (!enemys_.empty())
 	{
@@ -80,7 +102,10 @@ void EnemyController::Draw(void)
 			for (auto& enemy : enemyList)
 			{
 				// 敵がカメラ外の時、スキップ
-				if (!enemy->GetIsView()) { continue; }
+				if (!enemy->GetIsView() || enemy->GetIsDeath())
+				{
+					continue;
+				}
 
 				enemy->Draw();
 			}
@@ -119,10 +144,10 @@ void EnemyController::DrawDebug(void)
 
 void EnemyController::Release(void)
 {
-	if (enemyBoss_ != nullptr)
+	for (auto& boss : enemyBossList_)
 	{
-		enemyBoss_->Release();
-		delete enemyBoss_;
+		boss->Release();
+		delete boss;
 	}
 
 	if (!enemys_.empty())
@@ -141,24 +166,31 @@ void EnemyController::Release(void)
 	}
 }
 
-bool EnemyController::GetIsDefeatBoss(void)
+bool EnemyController::GetIsActiveBoss(void)
 {
-	// ボスが存在しないとき、false
-	if (!GetIsActiveBoss()) { return false; }
+	bool isActive = false;
+	for (auto& boss : enemyBossList_)
+	{
+		if (boss->GetCurHp() > 0)
+		{
+ 			isActive = true;
+			break;
+		}
+	}
 
-	return (enemyBoss_->GetCurHp() <= 0);
+	return isActive;
 }
 
-void EnemyController::EnemyBossSpawn(void)
+void EnemyController::EnemyBossSpawn(const VECTOR& _pos)
 {
-	if (enemyBoss_) { return; }
+	EnemyBoss* boss = new EnemyBoss(player_, 500.0f);
+	boss->Load();
+	boss->Init(_pos, SPAWN_ROT_Y);
 
-	enemyBoss_ = new EnemyBoss(*player_);
-
-	// 敵を初期化して返す
-	enemyBoss_->Load();
-	enemyBoss_->Init(EnemyBoss::SPAWN_POS, SPAWN_ROT_Y);
+	// ボス格納
+	enemyBossList_.emplace_back(boss);
 }
+
 
 void EnemyController::EnemysSpawn(ENEMY_TYPE _type, const VECTOR& _posField)
 {
@@ -234,7 +266,7 @@ Enemy& EnemyController::EnemySpawn(ENEMY_TYPE type, const VECTOR& _pos)
 	
 	if (type == ENEMY_TYPE::SKELETON)
 	{
-		enemy = new EnemySkeleton(*player_);
+		enemy = new EnemySkeleton(player_);
 	}
 	else if (type == ENEMY_TYPE::SKELETON_WARRIOR)
 	{

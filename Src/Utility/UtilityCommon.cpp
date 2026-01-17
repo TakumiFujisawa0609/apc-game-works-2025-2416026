@@ -221,14 +221,15 @@ unsigned int UtilityCommon::SetColor(COLOR_F _color)
 {
     return SetColor(_color.r, _color.g, _color.b);
 }
-unsigned int UtilityCommon::SetColor(float _r, float _g, float _b)
+unsigned int UtilityCommon::SetColor(int _red, int _green, int _blue)
 {
-    int red, green, blue;
-    red = static_cast<int>(_r);
-    green = static_cast<int>(_g);
-    blue = static_cast<int>(_b);
+    return GetColor(_red, _green, _blue);
+}
 
-    return GetColor(red, green, blue);
+unsigned int UtilityCommon::SetColor(float _red, float _green, float _blue)
+{
+    COLOR_F color = { _red, _green, _blue };
+    return GetColor(color.r, color.g, color.b);
 }
 
 bool UtilityCommon::WrapValue(VECTOR& _vec, const VECTOR& _maxVec, const VECTOR& _minVec)

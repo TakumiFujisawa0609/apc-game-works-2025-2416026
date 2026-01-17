@@ -10,7 +10,9 @@
 GameExit::GameExit(void):
 	select_(SELECT::NONE),
 	isEnd_(false),
-	isActiveMenu_(false)
+	isActiveMenu_(false),
+	sceneMng_(SceneManager::GetInstance()),
+	input_(InputManager::GetInstance())
 {
 	Init();
 }
@@ -33,19 +35,15 @@ void GameExit::Init(void)
 void GameExit::Update(void)
 {
 	/*　更新処理　*/
-	SoundManager* sound = &SoundManager::GetInstance();
-	SceneManager* scene = &SceneManager::GetInstance();
 
-	if (!sound || !scene) { return; }
-
-	if (InputManager::GetInstance().IsTrgDown(InputManager::TYPE::PAUSE))
+	if (input_.IsTrgDown(InputManager::TYPE::PAUSE))
 	{
 		isActiveMenu_ = ((!isActiveMenu_) ? true : false);
 
 		if (isActiveMenu_)
 		{
 			// 音量を通常に戻す
-			sound->SetVolumeMaster(SoundManager::VOLUME_MASTER_MAX);
+			SoundManager::GetInstance().SetVolumeMaster(SoundManager::VOLUME_MASTER_MAX);
 		}
 		else
 		{
@@ -53,10 +51,15 @@ void GameExit::Update(void)
 			select_ = SELECT::NO;
 
 			// 音量を半減
-			sound->SetVolumeMaster(sound->GetVolumeMaster() / 2);
+			SoundManager::GetInstance().
+				SetVolumeMaster(SoundManager::GetInstance().GetVolumeMaster() / 2);
 		}
 
 	}
+
+	// 一時停止時、マウスカーソル無効化解除
+	input_.SetCursorMode((!isActiveMenu_) ? Input::CURSOR_MODE::CONFINED_SIDE
+										 : Input::CURSOR_MODE::NONE);
 
 	if (isActiveMenu_)
 	{
@@ -76,7 +79,7 @@ void GameExit::Update(void)
 			{
 				isActiveMenu_ = false;
 
-				switch (scene->GetSceneId())
+				switch (sceneMng_.GetSceneId())
 				{
 					case SceneManager::SCENE_ID::TITLE:
 					{
@@ -88,7 +91,7 @@ void GameExit::Update(void)
 					case SceneManager::SCENE_ID::GAME:
 					{
 						// タイトルに戻る
-						scene->ChangeScene(SceneManager::SCENE_ID::TITLE);
+						sceneMng_.ChangeScene(SceneManager::SCENE_ID::TITLE);
 					}
 					break;
 				}
@@ -108,8 +111,7 @@ void GameExit::Draw(void)
 	if (!isActiveMenu_) { return; }
 
 	Font& font = Font::GetInstance();
-	SceneManager& scene = SceneManager::GetInstance();
-
+	
 	// 画面の中央座標
 	int midX = Application::SCREEN_HALF_X;
 	int midY = Application::SCREEN_HALF_Y;
@@ -142,7 +144,7 @@ void GameExit::Draw(void)
 	// メニューテキスト表示
 	const char* text = TEXT_LABEL_END;
 
-	if (scene.GetSceneId() != SceneManager::SCENE_ID::TITLE)
+	if (sceneMng_.GetSceneId() != SceneManager::SCENE_ID::TITLE)
 	{
 		// タイトル遷移テキスト
 		text = TEXT_LABEL_TITLE;
@@ -195,10 +197,10 @@ void GameExit::Release(void)
 bool GameExit::IsSelect(void)
 {
 	bool ret = false;
-	if (InputManager::GetInstance().IsTrgDown(InputManager::TYPE::SELECT_LEFT) ||
-		InputManager::GetInstance().IsTrgDown(InputManager::TYPE::SELECT_RIGHT) ||
-		InputManager::GetInstance().IsTrgDown(InputManager::TYPE::SELECT_UP) ||
-		InputManager::GetInstance().IsTrgDown(InputManager::TYPE::SELECT_DOWN))
+	if (input_.IsTrgDown(InputManager::TYPE::SELECT_LEFT) ||
+		input_.IsTrgDown(InputManager::TYPE::SELECT_RIGHT) ||
+		input_.IsTrgDown(InputManager::TYPE::SELECT_UP) ||
+		input_.IsTrgDown(InputManager::TYPE::SELECT_DOWN))
 	{
 		ret = true;
 	}

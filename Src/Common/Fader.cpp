@@ -4,7 +4,13 @@
 #include "../Application.h"
 #include "Fader.h"
 
-Fader::Fader(void)
+Fader::Fader(void) :
+    state_(FADE_STATE::NONE),
+    alpha_(0.0f),
+    loadTime_(0.0f),
+    isPreEnd_(false),
+    isEnd_(false)
+
 {
 
 }

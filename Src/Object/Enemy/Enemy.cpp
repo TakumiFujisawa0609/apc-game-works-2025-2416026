@@ -55,7 +55,7 @@ void Enemy::SetParam(void)
 						scale * (1.0f - SCALE_DIFF) };
 	paramChara_.radius = status_.GetRadius();
 
-	paramChara_.hp = status_.GetMaxHp();
+	paramChara_.hp	  = status_.GetMaxHp();
 	paramChara_.power = status_.GetPower();
 	paramChara_.speed = status_.GetSpeed();
 	paramChara_.speedAcc = status_.GetSpeedAcc();
@@ -81,6 +81,7 @@ void Enemy::Update(void)
 	// HP０で死亡状態アニメーション終了とき、処理終了
 	if (paramEnemy_.animState == ANIM_STATE::DEATH &&
 		anim_->IsEnd() && paramChara_.hp <= 0) { return; }
+		
 
 	if (paramChara_.isView &&
 		paramEnemy_.actionState != ACTION_STATE::SPAWN)
@@ -211,9 +212,9 @@ void Enemy::UpdateStateAtk(void)
 	}
 }
 
-void Enemy::ChangeActionState(ACTION_STATE state)
+void Enemy::ChangeActionState(ACTION_STATE _state)
 {
-	paramEnemy_.actionState = state;
+	ACTION_STATE state = _state;
 	ANIM_STATE animState = ANIM_STATE::NONE;
 	bool isLoop = false;
 
@@ -223,7 +224,7 @@ void Enemy::ChangeActionState(ACTION_STATE state)
 		animState = ANIM_STATE::SPAWN;
 
 		// 無敵時間をランダムで割り当て
-		paramChara_.timeInv = SPAWN_TIME + GetRand(SPAWN_TIME_RANGE);
+		paramChara_.timeInv = (SPAWN_TIME + GetRand(SPAWN_TIME_RANGE));
 	}
 
 	else if (state == ACTION_STATE::IDLE)
@@ -253,9 +254,21 @@ void Enemy::ChangeActionState(ACTION_STATE state)
 
 	else if (state == ACTION_STATE::KNOCK)
 	{
-		// HPによってダメージ演出を変える
-		animState = ((paramChara_.hp > 0) ? ANIM_STATE::HIT_2 : ANIM_STATE::DEATH);
+		animState = ANIM_STATE::HIT_2;
 	}
+
+	
+	// HPによってダメージ演出を変える
+	if (paramChara_.hp <= 0 ||
+		state == ACTION_STATE::DEATH)
+	{
+		isLoop = false;
+		animState = ANIM_STATE::DEATH;
+		state = ACTION_STATE::DEATH;
+	}
+
+	// 状態遷移
+	paramEnemy_.actionState = state;
 
 	// アニメーション再生
 	ChangeAnimState(animState, isLoop);
@@ -264,14 +277,12 @@ void Enemy::ChangeActionState(ACTION_STATE state)
 
 void Enemy::DrawPost(void)
 {
-	SceneManager& scene = SceneManager::GetInstance();
-
 	// HPが0で撃破アニメーション終了の時、処理終了
 	if (paramEnemy_.animState == ANIM_STATE::DEATH &&
 		anim_->IsEnd() && paramChara_.hp <= 0) { return; }
 
 #ifdef _DEBUG
-	if (scene.GetIsDebugMode())
+	if (sceneMng_.GetIsDebugMode())
 	{
 		UtilityCommon::Color color = { 255, 255, 255 };
 
@@ -319,6 +330,18 @@ bool Enemy::GetIsCollisionActive(void)
 		paramEnemy_.actionState == ACTION_STATE::SPAWN)
 	{
 		ret = false;
+	}
+	return ret;
+}
+
+bool Enemy::GetIsDeath(void)
+{
+	bool ret = false;
+	if (paramChara_.hp <= 0 &&
+		paramEnemy_.actionState == ACTION_STATE::DEATH &&
+		anim_->IsEnd())
+	{
+		ret = true;
 	}
 	return ret;
 }

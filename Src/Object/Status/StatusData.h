@@ -28,9 +28,6 @@ public:
 		MAX,
 	};
 
-	// CSVファイルパス
-	const std::string PATH_CSV_FILE = "Data/CSV/";
-
 	// セーブデータのハンドル
 	const char* PATH_PLAYER = "PlayerData.csv";
 	const char* PATH_PLAYER_MOTION = "PlayerMotionData.csv";
@@ -102,6 +99,8 @@ private:
 	StatusData& operator=(const StatusData&) = delete;
 	StatusData(StatusData&&) = delete;
 	StatusData& operator=(StatusData&&) = delete;
+
+	std::string ReadCsvFile(const std::string& _path);
 
 	// 各csvファイル読み込み
 	void LoadPlayerStatus(void);
