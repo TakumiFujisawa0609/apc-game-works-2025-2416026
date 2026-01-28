@@ -4,45 +4,28 @@
 #include <string>
 
 
-Resource::Resource(void)
+Resource::Resource(void):
+	resType_(LOAD_TYPE::NONE), path_(""),
+	numX_(-1), numY_(-1),
+	sizeX_(-1), sizeY_(-1),
+	handleId_(-1), handleIds_(nullptr)
 {
-	resType_ = LOAD_TYPE::NONE; // 読み込むファイル種類
-	path_	 = "";				// 読み込み先
-
-	numX_  = numY_  = -1; // 画像数
-	sizeX_ = sizeY_ = -1; // 画像サイズ
-
-	handleId_  = -1;	  // 読み込みハンドルID
-	handleIds_ = nullptr; // 読み込み複数画像ハンドルID
 }
 
-Resource::Resource(LOAD_TYPE type, const std::string& path)
+Resource::Resource(LOAD_TYPE type, const std::string& path):
+	resType_(type), path_(path),
+	numX_(-1), numY_(-1),
+	sizeX_(-1), sizeY_(-1),
+	handleId_(-1), handleIds_(nullptr)
 {
-	resType_ = type; // 読み込みファイル種類
-	path_	 = path; // 読み込み先
-
-	numX_  = numY_  = -1; // 画像数
-	sizeX_ = sizeY_ = -1; // 画像サイズ
-
-	handleId_  = -1;	  // 読み込みハンドルID
-	handleIds_ = nullptr; // 読み込み複数画像ハンドルID
 }
 
-Resource::Resource(LOAD_TYPE type, const std::string& path, int numX, int numY, int sizeX, int sizeY)
+Resource::Resource(LOAD_TYPE type, const std::string& path, int numX, int numY, int sizeX, int sizeY):
+	resType_(type), path_(path),
+	numX_(numX), numY_(numY),
+	sizeX_(sizeX), sizeY_(sizeY),
+	handleId_(-1), handleIds_(nullptr)
 {
-	resType_ = type; // 読み込みファイル種類
-	path_	 = path; // 読み込み先
-
-	// 画像数
-	numX_ = numX;
-	numY_ = numY;
-
-	// 画像サイズ
-	sizeX_ = sizeX;
-	sizeY_ = sizeY;
-
-	handleId_  = -1;	  // 読み込みハンドルID
-	handleIds_ = nullptr; // 読み込み複数画像ハンドルID
 }
 
 

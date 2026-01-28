@@ -14,6 +14,7 @@
 #include "./InputManager.h"
 #include "./EffectController.h"
 #include "./ResourceManager.h"
+#include "./SoundManager.h"
 #pragma endregion
 
 
@@ -30,6 +31,7 @@ void SceneManager::CreateInstance(void)
 }
 
 SceneManager::SceneManager(void):
+	sound_(SoundManager::GetInstance()),
 	curScene_(nullptr),
 	sceneId_(SCENE_ID::NONE),
 	waitSceneId_(SCENE_ID::NONE),
@@ -267,30 +269,42 @@ void SceneManager::DoChangeState(SCENE_ID nextScene)
 		curScene_->Release();
 		delete curScene_;
 		curScene_ = nullptr;
+
+		// BGM全停止
+		sound_.StopAll();
 	}
+
+	SoundManager::SRC bgmSrc = SoundManager::SRC::NONE;
 
 	// シーン状態遷移
 	switch (sceneId_)
 	{
 	case SCENE_ID::TITLE:
 		curScene_ = new TitleScene();
+		bgmSrc = SoundManager::SRC::BGM_TITLE;
 		break;
 
 	case SCENE_ID::GAME:
 		curScene_ = new GameScene();
+		bgmSrc = SoundManager::SRC::BGM_GAME;
 		break;
 
 	case SCENE_ID::CLEAR:
 		curScene_ = new GameClearScene();
+		bgmSrc = SoundManager::SRC::BGM_CLEAR;
 		break;
 
 	default:
-		assert("シーンが未割当です。");
+#ifdef _DEBUG
+		OutputDebugString("\nシーンが未割当です。\n");
+		assert(false);
+#endif
 		break;
 
 	}
 
 	curScene_->Init(); // 現在シーン初期化
+	bool temp = sound_.Play(bgmSrc, true);
 
 	waitSceneId_ = SCENE_ID::NONE; // 待機シーン状態 無効化
 }

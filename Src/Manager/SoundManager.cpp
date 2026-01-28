@@ -7,7 +7,7 @@
 
 SoundManager* SoundManager::instance_ = nullptr;
 
-const std::string SoundManager::PATH_BGM_TITLE = ResourceManager::PATH_BGM + "BGMTitle.mp3";
+const std::string SoundManager::PATH_BGM_TITLE = ResourceManager::PATH_BGM + "TitleBGM.mp3";
 const std::string SoundManager::PATH_BGM_GAME  = ResourceManager::PATH_BGM + "GameBGM.mp3";
 
 const std::string SoundManager::PATH_SE_CLICK  = ResourceManager::PATH_SE + "Click.mp3";
@@ -54,8 +54,8 @@ void SoundManager::SetSounds(void)
 
 	//Å@BGM
 
-	//SetSound(SRC::BGM_TITLE, PATH_BGM_TITLE, Sound::TYPE::SOUND_2D, VOLUME_TITLE);
-	//SetSound(SRC::BGM_GAME, PATH_BGM_GAME, Sound::TYPE::SOUND_2D, VOLUME_GAME);
+	SetSound(SRC::BGM_TITLE, PATH_BGM_TITLE, Sound::TYPE::SOUND_2D, VOLUME_TITLE);
+	SetSound(SRC::BGM_GAME, PATH_BGM_GAME, Sound::TYPE::SOUND_2D, VOLUME_GAME);
 
 }
 void SoundManager::SetSound(SoundManager::SRC _src, const std::string& path, Sound::TYPE type, float maxVolume)

@@ -8,6 +8,7 @@ class SceneBase;
 class Camera;
 class EffectController;
 class Perform;
+class SoundManager;
 
 class SceneManager
 {
@@ -120,6 +121,7 @@ private:
 	// 演出
 	Perform* perform_;
 
+	SoundManager& sound_;
 
 	// 静的インスタンス
 	static SceneManager* instance_;

@@ -41,7 +41,7 @@ protected:
 	ResourceManager& resMng_;
 	SceneManager& sceneMng_;
 
-	static constexpr float STATE_WAIT_TIME = 1.0f;
+	static constexpr float STATE_WAIT_TIME = 0.5f;
 	float stateWaitTime_;
 
 	/// <summary>

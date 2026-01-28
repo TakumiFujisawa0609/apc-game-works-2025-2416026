@@ -86,8 +86,9 @@ void EnemyController::Draw(void)
 
 			boss->Draw();
 			DrawFormatString(Application::SCREEN_HALF_X, y, 0xffffff, "ボスのHP：%d", boss->GetCurHp());
-			//DrawFormatString(Application::SCREEN_HALF_X, y, 0xffffff, "ボスのHP：%d, 魔法陣:%d",
-				//boss->GetCurHp(), boss->GetIsSpawnCircle());
+			DrawFormatString(Application::SCREEN_HALF_X, y, 0xffffff, "ボスのHP：%d, 魔法陣:%d, modelId(%d)",
+				boss->GetCurHp(), boss->GetIsSpawnCircle(),
+				boss->GetTransform().modelId);
 			y += 16;
 		}
 	}

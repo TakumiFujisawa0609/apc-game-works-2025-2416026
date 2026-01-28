@@ -49,8 +49,6 @@ void TitleScene::Init(void)
 	isViewInfo_ = false; // óVÇ—ï˚ï\é¶
 	stateWaitTime_ = STATE_WAIT_TIME;
 
-	//SoundManager::GetInstance().Play(SoundManager::SRC::BGM_TITLE, true);
-
 	selectScale_ = 0.35f;
 	isPvActive_ = false;
 	pvTime_ = 0.0f;
@@ -355,7 +353,6 @@ void TitleScene::PromotionVideo(void)
 			// ç≈èâÇ©ÇÁçƒê∂
 			SeekMovieToGraph(pv_, 0);
 			PlayMovieToGraph(pv_);
-			//SoundManager::GetInstance().Stop(SoundManager::SRC::BGM_TITLE);
 		}
 	}
 	if (isPvActive_)
@@ -366,7 +363,6 @@ void TitleScene::PromotionVideo(void)
 			PauseMovieToGraph(pv_);
 			isPvActive_ = false;
 			pvTime_ = 0.0f;
-			//SoundManager::GetInstance().Play(SoundManager::SRC::BGM_TITLE, true);
 		}
 	}
 }

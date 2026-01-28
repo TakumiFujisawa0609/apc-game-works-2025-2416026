@@ -11,7 +11,7 @@
 ResourceManager* ResourceManager::instance_ = nullptr;
 
 // リソースファイルのパス
-#ifndef _DEBUG
+#ifdef _DEBUG
 const std::string PATH_DATA = "Data/";
 
 // 暗号化済みのリソースフォルダパス

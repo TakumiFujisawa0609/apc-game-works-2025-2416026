@@ -39,8 +39,8 @@ void InputManager::Init(void)
 	RegisterTrigger(TYPE::PLAYER_MOVE_BACK, { KEY_INPUT_W }, { }, { STICK::L_STICK_UP });
 	RegisterTrigger(TYPE::PLAYER_MOVE_FRONT, { KEY_INPUT_S }, { }, { STICK::L_STICK_DOWN });
 
-	RegisterTrigger(TYPE::PLAYER_ATTACK_JUB, { }, { BTN::RB_TOP }, { }, MOUSE::CLICK_LEFT);
-	RegisterTrigger(TYPE::PLAYER_ATTACK_STRONG, { }, { BTN::RB_BOTTOM }, { }, MOUSE::CLICK_RIGHT);
+	RegisterTrigger(TYPE::PLAYER_ATTACK_JUB, { }, { BTN::RB_LEFT }, { }, MOUSE::CLICK_LEFT);
+	RegisterTrigger(TYPE::PLAYER_ATTACK_STRONG, { }, { BTN::RB_TOP }, { }, MOUSE::CLICK_RIGHT);
 	RegisterTrigger(TYPE::PLAYER_DASH, { KEY_INPUT_LSHIFT, KEY_INPUT_RSHIFT, }, { BTN::L_STICK }, { });
 
 	RegisterTrigger(TYPE::CAMERA_MOVE_RIGHT, { KEY_INPUT_RIGHT }, { }, { STICK::R_STICK_RIGHT }, MOUSE::MOVE_RIGHT);

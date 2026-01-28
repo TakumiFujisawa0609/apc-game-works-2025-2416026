@@ -15,7 +15,7 @@ public:
 		MODEL,  // 3Dモデル
 		MOVIE,  // 映像ファイル
 		ANIM,   // アニメーションファイル
-		EFFECT  // エフェクト
+		EFFECT, // エフェクト
 	};
 
 
@@ -64,17 +64,9 @@ private:
 
 	// 読み込み先
 	std::string path_;
-
-	union HandleId
-	{
-		int id_;   // ハンドルID
-		int* ids_; // 複数画像のポインタ
-	};
-
-	HandleId handleID_; // ハンドルID
-
 	
-	int handleId_;		// 単一読み込みハンドルID
+	// 単一読み込みハンドルID
+	int handleId_;
 
 
 	/* 複数画像読み込み用 */

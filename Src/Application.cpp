@@ -63,7 +63,11 @@ void Application::Init(void)
 	SetWaitVSyncFlag(false);
 
 	// DX_LIB初期化処理
-	if (DxLib_Init() == -1) assert(false && "\nDxLibが初期化されていません");
+	if (DxLib_Init() == -1)
+	{
+		OutputDebugString("\nDxLibが初期化されていません");
+		assert(false);
+	}
 
 
 	// エフェクト初期化処理

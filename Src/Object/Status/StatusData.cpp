@@ -75,7 +75,8 @@ std::string StatusData::ReadCsvFile(const std::string& path)
 	{
 		std::string error = "\ncsvファイルが読み込まれませんでした。\nファイルパス:";
 		error += path;
-		assert(false && error.c_str());
+		OutputDebugString(error.c_str());
+		assert(false);
 		return "";
 	}
 
@@ -92,12 +93,15 @@ std::string StatusData::ReadCsvFile(const std::string& path)
 	{
 		std::string error = "\ncsvファイルが読み込まれませんでした。\nファイルパス:";
 		error += path;
-		assert(false && error.c_str());
+		OutputDebugString(error.c_str());
+		assert(false);
 		return "";
 	}
 
+	// バッファ確保
 	int fileSize = FileRead_size(path.c_str());
 	char* buffer = new char[fileSize + 1];
+
 	FileRead_read(buffer, fileSize, fileHandle);
 	buffer[fileSize] = '\0';
 	FileRead_close(fileHandle);
@@ -362,7 +366,8 @@ void StatusData::SaveCSV(void)
 	std::ofstream outputFile(DATA_HANDLE);
 	if (!outputFile.is_open())
 	{
-		assert(false && w"\ncsvファイルが開かれませんでした。\n");
+		OutputDebugString(w"\ncsvファイルが開かれませんでした。\n");
+		assert(false);
 	}
 
 	for (int y = 0; y < SAVE_LENGTH; ++y)

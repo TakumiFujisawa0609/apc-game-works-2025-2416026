@@ -63,9 +63,6 @@ void GameScene::Init(void)
 
 	// フォグの開始距離
 	SetFogStartEnd(FOG_START, FOG_END);
-
-	// BGM再生
-	//SoundManager::GetInstance().Play(SoundManager::SRC::BGM_GAME,true, true);
 }
 void GameScene::ReInit(void)
 {
@@ -205,9 +202,6 @@ void GameScene::Release(void)
 	//ステージ解放処理
 	stage_->Release();
 	delete stage_;
-
-	// 全音声停止
-	SoundManager::GetInstance().StopAll();
 }
 
 void GameScene::DrawUI(void)

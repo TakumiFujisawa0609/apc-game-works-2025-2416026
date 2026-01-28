@@ -217,8 +217,8 @@ void Camera::SmoothRotation(void)
 
 void Camera::_UpdateCameraRot(void)
 {
-	const float ROT_PAD_MOUSE = (AsoUtility::Deg2Rad(5.0f));
-	const float ROT_POW_PAD = (AsoUtility::Deg2Rad(0.1f));
+	const float ROT_PAD_MOUSE = (AsoUtility::Deg2Rad(2.5f));
+	const float ROT_POW_PAD = (AsoUtility::Deg2Rad(0.005f));
 	VECTOR rotInput = AsoUtility::VECTOR_ZERO;
 
 	// マウス感度倍率

@@ -10,7 +10,6 @@ void UtilityCommon::ChangeString(const std::string& text, int& target, int minNu
     /* 文字列→int */
 
     std::string txt = text;
-    int num = target;
 
     // 文字列ミス判定フラグ
     bool isCheck = true;
@@ -36,11 +35,13 @@ void UtilityCommon::ChangeString(const std::string& text, int& target, int minNu
 
     if (isCheck)
     {
+        int num = target;
+         
         // 最小値より小さいとき最小値にする
         num = ((target < minNum) ? minNum : target);
 
         // 文字列→int変換
-        num = stoi(text);
+        num = std::stoi(text.c_str());
 
         // 数値に反映
         target = num;
@@ -48,9 +49,10 @@ void UtilityCommon::ChangeString(const std::string& text, int& target, int minNu
     else
     {
         // エラー
-        std::string error = "\n文字列の値に誤りがあります。 ";
+        std::string error = "\n文字列の値に誤りがあります。文字：";
         error += text;
-        assert(error.c_str());
+        OutputDebugString(error.c_str());
+        assert(false);
 
     }
 }
@@ -87,7 +89,7 @@ void UtilityCommon::ChangeString(const std::string& text, int& target)
     if (isCheck)
     {
         // 文字列→int変換
-        num = stoi(text);
+        num = std::stoi(text.c_str());
 
         // 数値に反映
         target = num;
@@ -95,9 +97,10 @@ void UtilityCommon::ChangeString(const std::string& text, int& target)
     else
     {
         // エラー
-        std::string error = "\n文字列の値に誤りがあります。 ";
+        std::string error = "\nint→文字列変換の値に誤りがあります。文字：";
         error += text;
-        assert(error.c_str());
+        OutputDebugString(error.c_str());
+        assert(false);
 
     }
 }
@@ -118,6 +121,9 @@ void UtilityCommon::ChangeString(const std::string& text, float& target, float m
     // マイナス
     const char& minus = *"-";
 
+    // 復帰制御コード
+    const char& backSlash = *"\r";
+
 
     // 文字が空白のとき、最小値の文字列にする
     if (text == "")
@@ -131,7 +137,7 @@ void UtilityCommon::ChangeString(const std::string& text, float& target, float m
     {
         // 数字・小数点・マイナスではない文字列のとき、false
         if (!isdigit(static_cast<unsigned char>(t)) &&
-            t != dot && t != minus)
+            t != dot && t != minus && t != backSlash)
         {
             isCheck = false;
             break;
@@ -152,9 +158,10 @@ void UtilityCommon::ChangeString(const std::string& text, float& target, float m
     else
     {
         // エラー
-        std::string error = "\n文字列の値に誤りがあります。 ";
+        std::string error = "\nfloat→文字列変換の値に誤りがあります。文字：";
         error += text;
-        assert(error.c_str());
+        OutputDebugString(error.c_str());
+        //assert(false);
 
     }
 }
@@ -204,7 +211,7 @@ void UtilityCommon::ChangeString(const std::string& text, float& target)
     else
     {
         // エラー
-        std::string error = "\n文字列の値に誤りがあります。 ";
+        std::string error = "\nfloat→文字列変換の値に誤りがあります。 文字：";
         error += text;
         assert(error.c_str());
 
