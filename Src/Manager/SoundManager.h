@@ -31,20 +31,20 @@ public:
 
 
 	// タイトルBGM音量
-	static constexpr float VOLUME_TITLE = 1.0f;
+	static constexpr float VOLUME_TITLE = 0.85f;
 
 	// ゲームシーンBGM音量
-	static constexpr float VOLUME_GAME = 0.5f;
+	static constexpr float VOLUME_GAME = 0.9f;
 
 
 	// クリックSEの音量
 	static constexpr float VOLUME_CLICK = 0.9f;
 
 	// 弱攻撃SEの音量
-	static constexpr float VOLUME_JUB = 0.9f;
+	static constexpr float VOLUME_JUB = 1.0f;
 
 	// 強攻撃SEの音量
-	static constexpr float VOLUME_STRONG = 1.0f;
+	static constexpr float VOLUME_STRONG = 0.95f;
 
 	// 撃破SEの音量
 	static constexpr float VOLUME_KNOCK = 1.5f;

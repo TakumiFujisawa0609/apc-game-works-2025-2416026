@@ -91,6 +91,7 @@ std::string StatusData::ReadCsvFile(const std::string& path)
 
 	if (fileHandle == 0)
 	{
+		// 読み込み失敗
 		std::string error = "\ncsvファイルが読み込まれませんでした。\nファイルパス:";
 		error += path;
 		OutputDebugString(error.c_str());

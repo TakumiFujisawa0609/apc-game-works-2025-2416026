@@ -86,9 +86,9 @@ void EnemyController::Draw(void)
 
 			boss->Draw();
 			DrawFormatString(Application::SCREEN_HALF_X, y, 0xffffff, "ボスのHP：%d", boss->GetCurHp());
-			DrawFormatString(Application::SCREEN_HALF_X, y, 0xffffff, "ボスのHP：%d, 魔法陣:%d, modelId(%d)",
+			/*DrawFormatString(Application::SCREEN_HALF_X, y, 0xffffff, "ボスのHP：%d, 魔法陣:%d, modelId(%d)",
 				boss->GetCurHp(), boss->GetIsSpawnCircle(),
-				boss->GetTransform().modelId);
+				boss->GetTransform().modelId);*/
 			y += 16;
 		}
 	}
@@ -130,7 +130,7 @@ void EnemyController::DrawDebug(void)
 			if (enemy->GetAnimState() == Enemy::ANIM_STATE::DEATH) { continue; }
 
 			enemy->DrawDebug();
-
+			
 			DrawFormatString(0, y, 0xff0000, "enemy: pos(%.2f,%.2f,%.2f), atkParam(%d), state(%d), anim(%d), hp(%d), inv(%.2f)\n",
 				enemy->GetPos().x, enemy->GetPos().y, enemy->GetPos().z,
 				enemy->GetActionMotion().GetAttackState(),

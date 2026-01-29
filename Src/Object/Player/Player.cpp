@@ -190,14 +190,27 @@ void Player::UpdatePost(void)
 	// 状態更新処理
 	UpdateActionState();
 
+	/* 範囲外の移動制限 */
+	const float RADIUS = 6250.0f;
+	VECTOR limitPos = transform_->pos;
+	limitPos.y = 0.0f;
+	float curRange = VSize(VSub(limitPos, AsoUtility::VECTOR_ZERO));
+
+	// 範囲外の時、ステージ内に戻す
+	if (curRange > RADIUS)
+	{
+		const float REFLECT_POW = 10.0f;
+		transform_->pos = VAdd(transform_->pos,
+			VScale(VNorm(VSub(AsoUtility::VECTOR_ZERO, limitPos)),
+				REFLECT_POW));
+	}
+
+
 	// 回転処理
 	Rotation(isRevert);
 
 	// 行列更新
 	SetMatrixModel();
-
-	// 当たり判定更新
-	//collision_->Update();
 }
 
 

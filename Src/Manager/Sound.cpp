@@ -95,7 +95,7 @@ bool Sound::Play(TIMES times, bool _isPitch, int _pitchRange, bool isForce)
 	{
 		int range = _pitchRange;
 		int rand = GetRand(range + range) - (range / 2);
-		SetCreateSoundPitchRate(static_cast<float>(rand) * (MUSICAL_SCALE_HALF / 2.0f));
+		SetCreateSoundPitchRate(static_cast<float>(rand) * MUSICAL_SCALE_HALF);
 		sound_.handle = LoadSoundMem(sound_.path.c_str());
 	}
 
