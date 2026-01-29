@@ -34,6 +34,7 @@ public:
 
 	const VECTOR& GetSpawnCirclePos(void) { return circlePos_; };
 
+	// –‚–@w‚ª—LŒø‚©”Û‚©
 	bool GetIsSpawnCircle(void) { return isSpawnCircle_; };
 
 

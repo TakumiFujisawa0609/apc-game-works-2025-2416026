@@ -2,6 +2,7 @@
 #include <DxLib.h>
 #include <vector>
 #include <cassert>
+#include <string>
 #include <algorithm>
 #include "../Status/StatusData.h"
 #include "./Enemy.h"
@@ -31,11 +32,24 @@ void EnemyController::Init(void)
 
 	EnemysSpawn(ENEMY_TYPE::SKELETON, { 0.0f, 0.0f, -500.0f });
 	
-	for (auto& stagePos : stage_.GetSpawnFrames())
+	const std::string FRAME_NAME_MOB = "Enemy";
+	const std::string FRAME_NAME_BOSS = "Boss";
+
+	for (auto& [name, pos] : stage_.GetSpawnFrames())
 	{
-		//EnemyBossSpawn(stagePos);
+		// ボス生成
+		if (name.find(FRAME_NAME_BOSS) != std::string::npos)
+		{
+			//EnemyBossSpawn(stagePos);
+		}
+
+		// ザコ敵範囲生成
+		else if (name.find(FRAME_NAME_MOB) != std::string::npos)
+		{
+			EnemysSpawn(ENEMY_TYPE::SKELETON, pos);
+		}
 	}
-	EnemyBossSpawn(stage_.GetSpawnFrames().at(2));
+	EnemyBossSpawn(AsoUtility::VECTOR_ZERO);
 }
 
 void EnemyController::Update(void)
@@ -77,7 +91,7 @@ void EnemyController::Draw(void)
 	// ボス表示
 	if (!enemyBossList_.empty())
 	{
-		int y = 0;
+		int y = 75;
 		for (auto& boss : enemyBossList_)
 		{
 			boss->DrawMagicCircle();
@@ -85,11 +99,16 @@ void EnemyController::Draw(void)
 			if (boss->GetIsDeath()) { continue; }
 
 			boss->Draw();
-			DrawFormatString(Application::SCREEN_HALF_X, y, 0xffffff, "ボスのHP：%d", boss->GetCurHp());
+			if (!boss->GetIsSpawnCircle())
+			{
+				DrawFormatString(Application::SCREEN_HALF_X-50, y,
+					0xffffff, "ボスのHP：%d", boss->GetCurHp());
+			}
+
 			/*DrawFormatString(Application::SCREEN_HALF_X, y, 0xffffff, "ボスのHP：%d, 魔法陣:%d, modelId(%d)",
 				boss->GetCurHp(), boss->GetIsSpawnCircle(),
 				boss->GetTransform().modelId);*/
-			y += 16;
+			y += 24;
 		}
 	}
 
@@ -200,7 +219,7 @@ void EnemyController::EnemysSpawn(ENEMY_TYPE _type, const VECTOR& _posField)
 
 	// 半径
 	const int TYPE = static_cast<int>(_type);
-	const float RANGE = StatusData::GetInstance().GetEnemyStatus(TYPE).GetRadius();
+	const float RANGE = StatusData::GetInstance().GetEnemyStatus(TYPE).GetRadius() * 2;
 
 	float angle = 0;
 	int cnt = 0, listCnt = -1;

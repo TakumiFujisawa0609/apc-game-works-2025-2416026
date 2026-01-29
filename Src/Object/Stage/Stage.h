@@ -1,19 +1,19 @@
 #pragma once
 #include "../Actor/ActorBase.h"
 #include <DxLib.h>
-#include <vector>
+#include <map>
 class Transform;
 
 class Stage : public ActorBase
 {
 public:
 
-	using SpawnPosList = std::vector<VECTOR>;
+	using SpawnPosList = std::map<std::string, VECTOR>;
 	Stage(void);
 
 	~Stage(void) = default;
 
-	std::vector<VECTOR>& GetSpawnFrames(void);
+	std::map<std::string, VECTOR>& GetSpawnFrames(void) { return spawnPos_; };
 
 
 protected:

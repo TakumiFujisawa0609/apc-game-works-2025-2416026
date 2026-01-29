@@ -54,10 +54,6 @@ public:
 	/// @brief ‰ğ•úˆ—
 	void Release(void)override;
 
-	const EnemyController& GetEnemyController(void) { return *enemys_; };
-
-	const CollisionManager& GetCollision(void) { return *collisionMng_; };
-
 
 private:
 
@@ -82,7 +78,7 @@ private:
 	EnemyController* enemys_;
 
 
-	static constexpr float GAME_TIME = ((60.0f * 0) + 30.0f);
+	static constexpr float GAME_TIME = ((60.0f * 3) + 0.0f);
 	float curGameTime_;
 
 

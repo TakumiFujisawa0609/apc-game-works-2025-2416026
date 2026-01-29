@@ -36,7 +36,7 @@ void Stage::InitPost(void)
 		if (name.find(FRAME_NAME) != std::string::npos)
 		{
 			VECTOR pos = MV1GetFramePosition(transform_->modelId, i);
-			spawnPos_.emplace_back(pos);
+			spawnPos_.emplace(name, pos);
 		}
 	}
 }
@@ -48,9 +48,4 @@ void Stage::UpdatePost(void)
 void Stage::DrawPost(void)
 {
 
-}
-
-std::vector<VECTOR>& Stage::GetSpawnFrames(void)
-{
-	return spawnPos_;
 }

@@ -66,7 +66,10 @@ void GameClearScene::Draw(void)
 
 	//フォントの描画
 	const Vector2 TEXT_POS = { Application::SCREEN_HALF_X , Application::SCREEN_HALF_Y + 225 };
-	DrawFontText(TEXT_POS, 30, 0xffffff, "決定でタイトルに戻る", false);
+	if (stateWaitTime_ <= 0.0f)
+	{
+		DrawFontText(TEXT_POS, 30, 0xffffff, "決定でタイトルに戻る", false);
+	}
 
 	/*
 	if (isViewInfo_)
