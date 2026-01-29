@@ -3,7 +3,7 @@
 #include <vector>
 #include <map>
 #include "../Utility/AsoUtility.h"
-
+class ResourceManager;
 
 class EffectController
 {
@@ -61,6 +61,8 @@ private:
 	};
 	std::map<EFFECT_TYPE, Effect*> effects_;
 	
+	ResourceManager& resMng_;
+
 	//EffectBaseî•ñŠi”[
 	//EffectBase* effect_;
 

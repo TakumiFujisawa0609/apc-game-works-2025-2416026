@@ -132,14 +132,14 @@ void ResourceManager::SetResource(void)
 
 
 	// エフェクト
-	res = Resource(Resource::LOAD_TYPE::EFFECT, PATH_EFFECT + "SpawnSkeleton.efkefc");
+	res = Resource(Resource::LOAD_TYPE::EFFECT, PATH_EFFECT + "SpawnSkeleton.efk");
 	resourcesMap_.emplace(SRC::EFFECT_SPAWN_SKELETON, res);
 
 	res = Resource(Resource::LOAD_TYPE::EFFECT, PATH_EFFECT + "SwordSlash.efkefc");
 	resourcesMap_.emplace(SRC::EFFECT_SWORD_SLASH, res);
 
-	res = Resource(Resource::LOAD_TYPE::EFFECT, PATH_EFFECT + "SwordSlash.efkefc");
-	resourcesMap_.emplace(SRC::EFFECT_SWORD_SLASH, res);
+	res = Resource(Resource::LOAD_TYPE::EFFECT, PATH_EFFECT + "SwordHit.efkefc");
+	resourcesMap_.emplace(SRC::EFFECT_SWORD_HIT, res);
 }
 
 

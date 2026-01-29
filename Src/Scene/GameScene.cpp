@@ -107,6 +107,15 @@ void GameScene::Update(void)
 	camera.UpdatePlayerTransform(&player_->GetPos(), &player_->GetRotation());
 	camera.SetTrackingTarget(&player_->GetPos());
 
+	// ゲーム時間減少
+	curGameTime_ -= sceneMng_.GetDeltaTime();
+	if (curGameTime_ <= 0.0f)
+	{
+		// 決定処理後、シーン遷移
+		sceneMng_.ChangeScene(SceneManager::SCENE_ID::TITLE);
+	}
+
+
 	if (gameState_ == GAME_STATE::IDLE)
 	{
 		GameIdleProc();
@@ -129,8 +138,6 @@ void GameScene::Draw(void)
 {
 	/*　描画処理　*/
 	Font& font = Font::GetInstance();
-
-	curGameTime_ -= sceneMng_.GetDeltaTime();
 
 	Vector2 textPos = AsoUtility::VECTOR2_ZERO;
 	Vector2 midPos = { Application::SCREEN_HALF_X, Application::SCREEN_HALF_Y };
@@ -241,5 +248,75 @@ void GameScene::DrawTimeFeed(void)
 {
 	float range = (1.0f - (curGameTime_ / GAME_TIME));
 
-	float progress = curGameTime_ / GAME_TIME;
+	float size = 1.0f;
+
+	// 線分割数
+	const int DRAW_CNT = 30;
+
+	// 各線の太さ
+	const int LINE_SIZE = 5;
+
+	// 最大透過値
+	const int ALPHA_MAX = (255 - 0);
+
+	// 各線の透過値
+	const int ALPHA = (ALPHA_MAX / DRAW_CNT);
+
+	const unsigned int COLOR = 0xffffff;
+
+	const Vector2 POS_SIZE_MAX = { Application::SCREEN_SIZE_X, Application::SCREEN_SIZE_Y};
+	const int OFFSET = 2;
+
+	for (int i = 1; i <= DRAW_CNT; i++)
+	{
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, ALPHA_MAX - (ALPHA * i));
+
+		// 線の太さ
+		size = (LINE_SIZE * range);
+		
+		// 上
+		DrawBox((i * size) - OFFSET, ((i - 1) * size),
+				POS_SIZE_MAX.x - (i * size),
+				(i * size),
+				COLOR, true);
+		// 下        
+		DrawBox((i * size) - OFFSET, (POS_SIZE_MAX.y - (i * size)),
+				POS_SIZE_MAX.x - (i * size),
+				POS_SIZE_MAX.y - ((i + 1) * size),
+				COLOR, true);
+		// 左
+		DrawBox(((i - 1) * size), (i * size) - OFFSET,
+				(i * size),
+				POS_SIZE_MAX.y - ((i - 1) * size) + OFFSET,
+				COLOR, true);
+		// 右
+		DrawBox((POS_SIZE_MAX.x - (i * size)), (i * size) - OFFSET,
+				POS_SIZE_MAX.x - ((i + 1) * size),
+				POS_SIZE_MAX.y - ((i - 1) * size) - OFFSET,
+				COLOR, true);
+
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	}
+
+
+	unsigned int textCol = 0xffffff;
+
+	// 白背景が一定割合を経過後、色を黒にする
+	const float CHANGE_COLOR_TERM = 0.25f;
+	const unsigned int CHANGE_COLOR = 0;
+	textCol = ((range > CHANGE_COLOR_TERM)
+				? CHANGE_COLOR : textCol);
+	
+	// 一定の時間経過語、色を赤にする
+	const float TIME_ALERT = 10.0f;
+	const unsigned int ALERT_COLOR = 0xff0000;
+	textCol = ((curGameTime_ <= TIME_ALERT)
+				? ALERT_COLOR : textCol);
+
+	// カウンタ
+	DrawFormatString(Application::SCREEN_HALF_X - 100,
+					 0,
+					 textCol, "世界の終末まで あと%d分%d秒",
+					 static_cast<int>(curGameTime_ / 60.0f),
+					 static_cast<int>(curGameTime_) % 60 + 1);
 }

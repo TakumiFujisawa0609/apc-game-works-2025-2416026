@@ -54,15 +54,16 @@ void SoundManager::SetSounds(void)
 
 	//　BGM
 
-	SetSound(SRC::BGM_TITLE, PATH_BGM_TITLE, Sound::TYPE::SOUND_2D, VOLUME_TITLE);
-	SetSound(SRC::BGM_GAME, PATH_BGM_GAME, Sound::TYPE::SOUND_2D, VOLUME_GAME);
+	SetSound(SRC::BGM_TITLE, PATH_BGM_TITLE, Sound::TYPE::SOUND_2D, VOLUME_TITLE, true);
+	SetSound(SRC::BGM_GAME, PATH_BGM_GAME, Sound::TYPE::SOUND_2D, VOLUME_GAME, true);
 
 }
-void SoundManager::SetSound(SoundManager::SRC _src, const std::string& path, Sound::TYPE type, float maxVolume)
+void SoundManager::SetSound(SoundManager::SRC _src, const std::string& path,
+							Sound::TYPE type, float maxVolume, bool _isBGM)
 {
 	Sound res;
 
-	res = Sound(type, path);
+	res = Sound(type, path, _isBGM);
 	res.SetMaxVolume(maxVolume);
 	sounds_.emplace(_src, res);
 }
@@ -170,6 +171,26 @@ void SoundManager::StopAll(void)
 		if (!sound.second.IsLoad())
 		{
 			// 未読み込み時、スキップ
+			continue;
+		}
+
+		// リスト内のサウンドを全て停止
+		sound.second.Stop();
+	}
+}
+
+void SoundManager::StopAllChoice(bool _isBGM)
+{
+	/* 指定した種類の音声を停止 */
+
+	if (sounds_.empty()) return;
+
+	for (auto& sound : sounds_)
+	{
+		if (!sound.second.IsLoad() ||
+			!sound.second.IsBGM() == _isBGM)
+		{
+			// 未読み込み時、指定の種類以外スキップ
 			continue;
 		}
 

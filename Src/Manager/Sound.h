@@ -47,6 +47,9 @@ public:
 		// Ä¶‚µ‚Ä‚¢‚é‚©”Û‚©
 		bool isPlayOld;
 
+		// Ä¶‚µ‚Ä‚¢‚é‚©”Û‚©
+		bool isBgm;
+
 		SoundInfo(void)
 		{
 			type = TYPE::NONE;
@@ -57,9 +60,10 @@ public:
 			radius = 0.0f;
 			isPlay = false;
 			isPlayOld = false;
+			isBgm = false;
 		};
 
-		SoundInfo(TYPE _type, const std::string& _path)
+		SoundInfo(TYPE _type, const std::string& _path, bool _isBGM)
 		{
 			type = _type;
 			handle = -1;
@@ -69,13 +73,14 @@ public:
 			radius = 0.0f;
 			isPlay = false;
 			isPlayOld = false;
+			isBgm = _isBGM;
 		};
 	};
 
 
 	Sound(void);
 
-	Sound(TYPE type, const std::string& path);
+	Sound(TYPE type, const std::string& path, bool _isBGM);
 
 	~Sound(void) = default;
 
@@ -132,6 +137,9 @@ public:
 
 	/// @brief Ä¶‚ªI—¹‚µ‚½‚©”»’è
 	bool IsEnd(void);
+
+	/// @brief BGM‚©”»’è
+	bool IsBGM(void);
 
 
 private:

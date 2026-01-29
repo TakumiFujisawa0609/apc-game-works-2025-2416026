@@ -231,7 +231,7 @@ void Player::DrawPost(void)
 
 void Player::DrawDebug(void)
 {
-	DrawFormatString(Application::SCREEN_HALF_X-500, 0, 0xffffff, "プレイヤーのHP:%d", paramChara_.hp);
+	DrawFormatString(Application::SCREEN_HALF_X-500, 0, 0xffff00, "プレイヤーのHP:%d", paramChara_.hp);
 
 #ifdef _DEBUG
 	/*

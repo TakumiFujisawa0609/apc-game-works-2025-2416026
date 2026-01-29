@@ -271,7 +271,7 @@ void SceneManager::DoChangeState(SCENE_ID nextScene)
 		curScene_ = nullptr;
 
 		// BGM全停止
-		sound_.StopAll();
+		sound_.StopAllChoice(true);
 	}
 
 	SoundManager::SRC bgmSrc = SoundManager::SRC::NONE;
@@ -282,15 +282,18 @@ void SceneManager::DoChangeState(SCENE_ID nextScene)
 	case SCENE_ID::TITLE:
 		curScene_ = new TitleScene();
 		bgmSrc = SoundManager::SRC::BGM_TITLE;
+		sound_.Play(bgmSrc, true);
 		break;
 
 	case SCENE_ID::GAME:
 		curScene_ = new GameScene();
 		bgmSrc = SoundManager::SRC::BGM_GAME;
+		sound_.Play(bgmSrc, true);
 		break;
 
 	case SCENE_ID::CLEAR:
 		curScene_ = new GameClearScene();
+		sound_.StopAll();
 		bgmSrc = SoundManager::SRC::BGM_CLEAR;
 		break;
 
@@ -304,7 +307,6 @@ void SceneManager::DoChangeState(SCENE_ID nextScene)
 	}
 
 	curScene_->Init(); // 現在シーン初期化
-	bool temp = sound_.Play(bgmSrc, true);
 
 	waitSceneId_ = SCENE_ID::NONE; // 待機シーン状態 無効化
 }

@@ -115,10 +115,12 @@ public:
 	/// </summary>
 	void Stop(SRC _src);
 
-	/// <summary>
-	/// 全音声を停止
-	/// </summary>
+	/// @brief 全音声を停止
 	void StopAll(void);
+
+	/// @brief 指定の種類の音声を停止
+	/// @param _isBGM (true:BGMを停止, false:SEを停止)
+	void StopAllChoice(bool _isBGM);
 
 	/// <summary>
 	/// 音量を割り当て
@@ -194,5 +196,5 @@ private:
 	/// <param name="path">パス</param>
 	/// <param name="type">再生タイプ</param>
 	/// <param name="maxVolume">最大音量</param>
-	void SetSound(SRC _src, const std::string& path, Sound::TYPE type, float maxVolume);
+	void SetSound(SRC _src, const std::string& path, Sound::TYPE type, float maxVolume, bool _isBGM = false);
 };

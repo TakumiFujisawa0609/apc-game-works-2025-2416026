@@ -82,7 +82,7 @@ private:
 	EnemyController* enemys_;
 
 
-	static constexpr float GAME_TIME = ((60.0f * 0) + 10.0f);
+	static constexpr float GAME_TIME = ((60.0f * 0) + 30.0f);
 	float curGameTime_;
 
 

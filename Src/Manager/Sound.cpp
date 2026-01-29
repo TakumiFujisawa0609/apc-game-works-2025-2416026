@@ -7,8 +7,8 @@ Sound::Sound(void):
 {
 
 }
-Sound::Sound(TYPE type, const std::string& path):
-	sound_(SoundInfo(type, path))
+Sound::Sound(TYPE type, const std::string& path, bool _isBGM):
+	sound_(SoundInfo(type, path, _isBGM))
 
 {
 
@@ -261,4 +261,9 @@ bool Sound::IsEnd(void)
 
 	// 前フレームがtrue,現在フレームがfalse時、true
 	return (!sound_.isPlay && sound_.isPlayOld);
+}
+
+bool Sound::IsBGM(void)
+{
+	return (sound_.isBgm && sound_.handle != -1);
 }

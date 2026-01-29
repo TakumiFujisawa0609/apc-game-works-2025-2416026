@@ -213,10 +213,8 @@ void EnemyController::EnemysSpawn(ENEMY_TYPE _type, const VECTOR& _posField)
 	Enemys list;
 	list.push_back(&EnemySpawn(_type, spawnPos));
 
-	// エフェクト生成
-	/*EffectController& effect = SceneManager::GetInstance().GetEffects();
-	effect.SetEffect(EffectController::EFFECT_TYPE::SPAWN_SKELETON,
-					 spawnPos, { 10.0f, 10.0f, 10.0f });*/
+	spawnPos.y += 1.0f;
+
 	/*
 	const int rangeXZ = 250.0f;
 	float x, z = 0.0f;

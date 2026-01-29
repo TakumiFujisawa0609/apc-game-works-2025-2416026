@@ -7,7 +7,8 @@
 #include "../Manager/SceneManager.h"
 
 
-EffectController::EffectController(void)
+EffectController::EffectController(void):
+	resMng_(ResourceManager::GetInstance())
 {
 	effects_.clear();
 }
@@ -51,19 +52,23 @@ void EffectController::SetEffect(EFFECT_TYPE _type, const VECTOR& _pos, float _a
 
 	switch (_type)
 	{
-		case EFFECT_TYPE::SWORD_SLASH:
-		{
-			effect->handle = ResourceManager::GetInstance().LoadHandleId(ResourceManager::SRC::EFFECT_SWORD_SLASH);
-		}
-		break;
-
 		case EFFECT_TYPE::SPAWN_SKELETON:
 		{
-			effect->handle = ResourceManager::GetInstance().LoadHandleId(ResourceManager::SRC::EFFECT_SPAWN_SKELETON);
+			effect->handle = resMng_.LoadHandleId(ResourceManager::SRC::EFFECT_SPAWN_SKELETON);
 		}
 		break;
 
-		case EffectController::EFFECT_TYPE::NONE:
+		case EFFECT_TYPE::SWORD_SLASH:
+		{
+			effect->handle = resMng_.LoadHandleId(ResourceManager::SRC::EFFECT_SWORD_SLASH);
+		}
+		break;
+		case EFFECT_TYPE::SWORD_HIT:
+		{
+			effect->handle = resMng_.LoadHandleId(ResourceManager::SRC::EFFECT_SWORD_HIT);
+		}
+		break;
+
 		default:
 		{
 			// エフェクトなしの場合は何もしない
