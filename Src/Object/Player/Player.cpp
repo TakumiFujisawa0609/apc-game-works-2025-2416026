@@ -231,9 +231,28 @@ void Player::DrawPost(void)
 
 void Player::DrawDebug(void)
 {
+	DrawString(16, 25, "プレイヤーHP", 0xffff00);
 
-	DrawFormatString(Application::SCREEN_HALF_X - 500, 16,
-					 0xffff00, "プレイヤーのHP:%d", paramChara_.hp);
+	const Vector2 SLIDER_POS = { 135, 16 };
+	const Vector2 SLIDER_SCALE = { 425, 45 };
+	const unsigned int SLIDER_COLOR = UtilityCommon::SetColor(0.0f, 1.0f, 0.0f);
+	const unsigned int SLIDER_COLOR_BACK = UtilityCommon::SetColor(0.5f, 0.5f, 0.5f);
+	unsigned int color = SLIDER_COLOR;
+
+	float hpRate = static_cast<float>(paramChara_.hp) / status_.GetHp();
+	int hpSize = static_cast<int>(SLIDER_SCALE.x * hpRate);
+
+	color = ((hpRate <= 0.5f) ? UtilityCommon::SetColor(1.0f, 1.0f, 0.0f) : color);
+	color = ((hpRate <= 0.25f) ? UtilityCommon::SetColor(1.0f, 0.0f, 0.0f) : color);
+
+	DrawBox(SLIDER_POS.x, SLIDER_POS.y,
+			(SLIDER_POS.x + SLIDER_SCALE.x), (SLIDER_POS.y + SLIDER_SCALE.y),
+			SLIDER_COLOR_BACK, true);
+
+	DrawBox(SLIDER_POS.x, SLIDER_POS.y,
+			(SLIDER_POS.x + hpSize), (SLIDER_POS.y + SLIDER_SCALE.y),
+			color, true);
+
 
 #ifdef _DEBUG
 	/*

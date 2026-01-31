@@ -218,25 +218,37 @@ void UtilityCommon::ChangeString(const std::string& text, float& target)
     }
 }
 
-
-
 unsigned int UtilityCommon::SetColor(Color _color)
 {
-    return SetColor(_color.r, _color.g, _color.b);
-}
-unsigned int UtilityCommon::SetColor(COLOR_F _color)
-{
-    return SetColor(_color.r, _color.g, _color.b);
-}
-unsigned int UtilityCommon::SetColor(int _red, int _green, int _blue)
-{
-    return GetColor(_red, _green, _blue);
+    return GetColor(_color.r, _color.g, _color.b);
 }
 
+unsigned int UtilityCommon::SetColor(COLOR_F _color)
+{
+    if (_color.r > 1.0f || _color.g > 1.0f || _color.b > 1.0f)
+    {
+        OutputDebugString("\nˆø”‚Ì’l‚ª1.0ˆÈã‚É‚È‚Á‚Ä‚¢‚Ü‚·...\n");
+        return GetColor(_color.r, _color.g, _color.b);
+    }
+
+    int r, g, b;
+    r = static_cast<int>(_color.r * COLOR_RATE_MAX);
+    g = static_cast<int>(_color.g * COLOR_RATE_MAX);
+    b = static_cast<int>(_color.b * COLOR_RATE_MAX);
+    return GetColor(r, g, b);
+}
 unsigned int UtilityCommon::SetColor(float _red, float _green, float _blue)
 {
-    COLOR_F color = { _red, _green, _blue };
-    return GetColor(color.r, color.g, color.b);
+    if (_red > 1.0f || _green > 1.0f || _blue > 1.0f)
+    {
+        OutputDebugString("\nˆø”‚Ì’l‚ª1.0ˆÈã‚É‚È‚Á‚Ä‚¢‚Ü‚·...\n");
+        return GetColor(_red, _green, _blue);
+    }
+    int r, g, b;
+    r = static_cast<int>(_red * COLOR_RATE_MAX);
+    g = static_cast<int>(_green * COLOR_RATE_MAX);
+    b = static_cast<int>(_blue * COLOR_RATE_MAX);
+    return GetColor(r, g, b);
 }
 
 bool UtilityCommon::WrapValue(VECTOR& _vec, const VECTOR& _maxVec, const VECTOR& _minVec)

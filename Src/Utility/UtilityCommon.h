@@ -13,17 +13,14 @@ public:
 		int r = 0, g = 0, b = 0, a = 255;
 	};
 
+	
+	static constexpr int COLOR_RATE_MAX = 255;
+
 	/// @brief 色を16進数で生成
 	static unsigned int SetColor(Color _color);
 
 	/// @brief 色を16進数で生成
 	static unsigned int SetColor(COLOR_F _color);
-
-	/// @brief 色を16進数で生成
-	/// @param _red 赤(0～255)
-	/// @param _green 緑(0～255)
-	/// @param _blue 青(0～255)
-	static unsigned int SetColor(int _red, int _green, int _blue);
 
 	/// @brief 色を16進数で生成
 	/// @param _red 赤の割合(0.1～1.0)

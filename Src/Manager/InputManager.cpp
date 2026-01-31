@@ -62,6 +62,9 @@ void InputManager::Init(void)
 
 	RegisterTrigger(TYPE::DEBUG_MODE, { KEY_INPUT_TAB }, { }, { });
 	RegisterTrigger(TYPE::DEBUG_SCENE_CHANGE, { KEY_INPUT_RSHIFT }, { }, { });
+
+	// カーソル非表示
+	ShowCursor(FALSE);
 }
 
 void InputManager::Update(void)

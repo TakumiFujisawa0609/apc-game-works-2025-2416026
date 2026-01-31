@@ -315,7 +315,7 @@ void GameScene::DrawTimeFeed(void)
 
 	// カウンタ
 	DrawFormatString(Application::SCREEN_HALF_X - 125,
-					16,
+					24,
 					 textCol, "世界の終末まで あと%d分%d秒",
 					 static_cast<int>(curGameTime_ / 60.0f),
 					 static_cast<int>(curGameTime_) % 60 + 1);

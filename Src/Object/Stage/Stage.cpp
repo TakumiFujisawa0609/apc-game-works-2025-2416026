@@ -36,6 +36,7 @@ void Stage::InitPost(void)
 		if (name.find(FRAME_NAME) != std::string::npos)
 		{
 			VECTOR pos = MV1GetFramePosition(transform_->modelId, i);
+			pos = VScale(pos, SCALE);
 			spawnPos_.emplace(name, pos);
 		}
 	}

@@ -86,11 +86,6 @@ void CollisionManager::Update(void)
 void CollisionManager::DrawDebug(void)
 {
 #ifdef _DEBUG
-	/*
-	for (auto& chara : colChara_)
-	{
-		chara.second->GetCollision().DrawDebug();
-	}*/
 
 	if (stageColHandle_ != -1)
 	{

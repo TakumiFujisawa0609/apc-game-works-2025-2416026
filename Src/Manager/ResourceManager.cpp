@@ -140,6 +140,10 @@ void ResourceManager::SetResource(void)
 
 	res = Resource(Resource::LOAD_TYPE::EFFECT, PATH_EFFECT + "SwordHit.efkefc");
 	resourcesMap_.emplace(SRC::EFFECT_SWORD_HIT, res);
+
+	// ‰f‘œ
+	res = Resource(Resource::LOAD_TYPE::MOVIE, PATH_MOVIE + "PV.mp4");
+	resourcesMap_.emplace(SRC::MOVIE_PV, res);
 }
 
 

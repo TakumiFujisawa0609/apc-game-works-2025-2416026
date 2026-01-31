@@ -91,10 +91,6 @@ private:
 	// 遊び方の状態番号テキスト位置
 	static constexpr Vector2 INFO_PARAM = { 45, 32 };
 
-	static constexpr int ARROW_WIDTH = 650;
-	static constexpr float ARROW_SCALE = 0.75f;
-	static constexpr float ARROW_PERFORM_TIME = 1.0f;
-
 	// タイトル状態
 	TITLE_STATE state_;
 
@@ -105,6 +101,7 @@ private:
 	bool isViewInfo_;
 
 
+	static constexpr float PV_ACTIVE_TIME = ((60.0f * 1) + 0.0f);
 	int pv_;
 	float pvTime_;
 	float isPvActive_;

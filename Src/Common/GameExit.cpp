@@ -137,7 +137,7 @@ void GameExit::Draw(void)
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, MENU_COLOR.a);
 	DrawBox((midX - MENU_WIDTH), (midY - MENU_HEIGHT),
 			(midX + MENU_WIDTH), (midY + MENU_HEIGHT),
-			UtilityCommon::SetColor(MENU_COLOR), true);
+			GetColor(MENU_COLOR.r, MENU_COLOR.g, MENU_COLOR.r), true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
 

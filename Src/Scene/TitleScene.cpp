@@ -26,9 +26,9 @@ void TitleScene::Load(void)
 	//タイトル画像
 	titleImage_ = resMng_.LoadHandleId(ResourceManager::SRC::IMG_TITLE);
 
-	/*
+	
 	pv_ = resMng_.LoadHandleId(ResourceManager::SRC::MOVIE_PV);
-
+	/*
 	// パッド画像
 	padImage_ = resMng_.LoadHandleId(ResourceManager::SRC::IMAGE_PAD);
 
@@ -57,8 +57,7 @@ void TitleScene::Init(void)
 
 void TitleScene::Update(void)
 {
-	float delta = sceneMng_.GetDeltaTime();
-
+	/*
 	arrowPerformTime_ -= delta;
 	if (arrowPerformTime_ < 0.0f)
 	{
@@ -67,21 +66,28 @@ void TitleScene::Update(void)
 		selectScale_ = ((selectScale_ != 0.5f) ? 0.5f : 0.35f);
 
 		arrowScale_ = ((arrowScale_ != ARROW_SCALE) ? ARROW_SCALE : 1.0f);
-	}
+	}*/
 
-	stateWaitTime_ -= delta;
+	stateWaitTime_ -= sceneMng_.GetDeltaTime();;
 
-	if (InputManager::GetInstance().IsTrgDown(InputManager::TYPE::SELECT_DECISION) && !isPvActive_ &&
-		GetIsActiveState())
+	if (InputManager::GetInstance().IsTrgDown(InputManager::TYPE::SELECT_DECISION))
 	{
-		switch (state_)
+		if (isPvActive_)
 		{
+			isPvActive_ = false;
+			return;
+		}
+
+		else if (GetIsActiveState())
+		{
+			switch (state_)
+			{
 			case TITLE_STATE::START_GAME:
 			{
 				SoundManager::GetInstance().Play(SoundManager::SRC::SE_CLICK, false);
 
 				Application::GetInstance().SetIsExitMenu(true);
-			
+
 				sceneMng_.ChangeScene(SceneManager::SCENE_ID::GAME);
 				return;
 			}
@@ -113,6 +119,7 @@ void TitleScene::Update(void)
 				Application::GetInstance().SetIsGameEnd();
 			}
 			break;
+			}
 		}
 	}
 
@@ -132,7 +139,7 @@ void TitleScene::Update(void)
 	state_ = static_cast<TITLE_STATE>(state);
 
 	// PV
-	//PromotionVideo();
+	PromotionVideo();
 }
 
 void TitleScene::Draw(void)
@@ -149,7 +156,7 @@ void TitleScene::Draw(void)
 
 	if (isViewInfo_)
 	{
-		DrawInfo();
+		//DrawInfo();
 	}
 
 	if (isPvActive_)
@@ -161,11 +168,11 @@ void TitleScene::Draw(void)
 		int strWidth = font.GetDefaultTextWidth("決定でタイトルに戻る");
 
 		int x = (Application::SCREEN_SIZE_X)-425;
-		int y = (Application::SCREEN_SIZE_Y)-64;
+		int y = (Application::SCREEN_SIZE_Y)-40;
 
 		// テキスト描画
 		font.DrawTextA("GameFont", x, y, "決定でタイトルに戻る",
-			0xff5555, 40, Font::FONT_TYPE_ANTIALIASING_EDGE);
+			0xff5555, 30, Font::FONT_TYPE_ANTIALIASING_EDGE);
 	}
 
 #ifdef _DEBUG
@@ -303,10 +310,12 @@ void TitleScene::DrawInfo(void)
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
 	// 矢印
+	/*
 	DrawRotaGraph(midX - ARROW_WIDTH, midY,
 		arrowScale_, 0.0f, arrowImage_, true, true);
 	DrawRotaGraph(midX + ARROW_WIDTH, midY,
 		arrowScale_, 0.0f, arrowImage_, true, false);
+	*/
 
 	if (info_ == INFO_TYPE::PLAY_PAD)
 	{
@@ -341,8 +350,7 @@ void TitleScene::DrawInfo(void)
 
 void TitleScene::PromotionVideo(void)
 {
-	float delta = sceneMng_.GetDeltaTime();
-	pvTime_ += delta;
+	pvTime_ += sceneMng_.GetDeltaTime();
 
 	if (pvTime_ > 60.0f || CheckHitKey(KEY_INPUT_TAB))
 	{
