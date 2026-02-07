@@ -97,7 +97,7 @@ public:
 
 
 private:
-
+	
 	// îwåiêF
 	static constexpr UtilityCommon::Color BACK_COLOR = { 128,128,128 };
 

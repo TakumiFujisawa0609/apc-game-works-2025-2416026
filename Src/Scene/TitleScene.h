@@ -12,17 +12,9 @@ public:
 	enum class TITLE_STATE
 	{
 		START_GAME, // ゲームシーン遷移状態
-		//INFO,       // 遊び方
 		GAME_END,   //ゲーム終了
 
 		MAX, //要素数
-	};
-
-	enum class INFO_TYPE
-	{
-		PLAY_PAD,
-		PLAY_KEY,
-		MAX,
 	};
 
 
@@ -94,13 +86,6 @@ private:
 	// タイトル状態
 	TITLE_STATE state_;
 
-	// 遊び方状態
-	INFO_TYPE info_;
-
-	// 遊び方を表示するか否か
-	bool isViewInfo_;
-
-
 	static constexpr float PV_ACTIVE_TIME = ((60.0f * 1) + 0.0f);
 	int pv_;
 	float pvTime_;
@@ -114,15 +99,6 @@ private:
 	// キーボード画像
 	int keyImage_;
 
-	// ボタン画像
-	int buttonImage_;
-
-	// 矢印画像
-	int arrowImage_;
-
-	float arrowScale_;
-	float arrowPerformTime_;
-
 	float selectScale_;
 
 
@@ -131,12 +107,6 @@ private:
 	/// @param _text テキストの内容
 	/// @param _state 選択状態
 	void DrawTitleText(int& _posY, const char* _text, TITLE_STATE _state);
-
-	/// @brief 遊び方更新
-	void UpdateInfo(void);
-
-	/// @brief 遊び方描画処理
-	void DrawInfo(void);
 
 	void PromotionVideo(void);
 };

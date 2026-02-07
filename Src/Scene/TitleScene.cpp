@@ -15,7 +15,6 @@
 TitleScene::TitleScene(void) :
 	titleImage_(-1),
 	state_(TITLE_STATE::START_GAME),
-	info_(INFO_TYPE::PLAY_PAD),
 	SceneBase()
 {
 	Load();
@@ -26,27 +25,13 @@ void TitleScene::Load(void)
 	//タイトル画像
 	titleImage_ = resMng_.LoadHandleId(ResourceManager::SRC::IMG_TITLE);
 
-	
+	// PV
 	pv_ = resMng_.LoadHandleId(ResourceManager::SRC::MOVIE_PV);
-	/*
-	// パッド画像
-	padImage_ = resMng_.LoadHandleId(ResourceManager::SRC::IMAGE_PAD);
-
-	// キーボード画像
-	keyImage_ = resMng_.LoadHandleId(ResourceManager::SRC::IMAGE_KEYBOARD);
-
-	// ボタン画像
-	buttonImage_ = resMng_.LoadHandleId(ResourceManager::SRC::IMAGE_TITLE_BUTTON);
-
-	// 矢印画像
-	arrowImage_ = res.LoadHandleId(ResourceManager::SRC::IMAGE_ARROW);
-	*/
 }
 
 void TitleScene::Init(void)
 {
  	state_ = TITLE_STATE::START_GAME;
-	isViewInfo_ = false; // 遊び方表示
 	stateWaitTime_ = STATE_WAIT_TIME;
 
 	selectScale_ = 0.35f;
@@ -57,17 +42,6 @@ void TitleScene::Init(void)
 
 void TitleScene::Update(void)
 {
-	/*
-	arrowPerformTime_ -= delta;
-	if (arrowPerformTime_ < 0.0f)
-	{
-		arrowPerformTime_ = ARROW_PERFORM_TIME;
-
-		selectScale_ = ((selectScale_ != 0.5f) ? 0.5f : 0.35f);
-
-		arrowScale_ = ((arrowScale_ != ARROW_SCALE) ? ARROW_SCALE : 1.0f);
-	}*/
-
 	stateWaitTime_ -= sceneMng_.GetDeltaTime();;
 
 	if (InputManager::GetInstance().IsTrgDown(InputManager::TYPE::SELECT_DECISION))
@@ -80,45 +54,28 @@ void TitleScene::Update(void)
 
 		else if (GetIsActiveState())
 		{
+			SoundManager::GetInstance().Play(SoundManager::SRC::SE_CLICK, false);
+
 			switch (state_)
 			{
-			case TITLE_STATE::START_GAME:
-			{
-				SoundManager::GetInstance().Play(SoundManager::SRC::SE_CLICK, false);
+				case TITLE_STATE::START_GAME:
+				{
+					SoundManager::GetInstance().Play(SoundManager::SRC::SE_CLICK, false);
 
-				Application::GetInstance().SetIsExitMenu(true);
+					Application::GetInstance().SetIsExitMenu(true);
 
-				sceneMng_.ChangeScene(SceneManager::SCENE_ID::GAME);
-				return;
-			}
-			break;
+					sceneMng_.ChangeScene(SceneManager::SCENE_ID::GAME);
+					return;
+				}
+				break;
 
-			/*
-			case TITLE_STATE::INFO:
-			{
-				// 遊び方描画フラグ変更処理
-				isViewInfo_ = true;
 
-				Application::GetInstance().SetIsExitMenu(false);
-
-				info_ = INFO_TYPE::PLAY_PAD;
-
-				// 演出時間割り当て
-				arrowPerformTime_ = ARROW_PERFORM_TIME;
-
-				// 矢印の大きさ割り当て
-				arrowScale_ = ARROW_SCALE;
-			}
-			break;*/
-
-			case TITLE_STATE::GAME_END:
-			{
-				SoundManager::GetInstance().Play(SoundManager::SRC::SE_CLICK, false);
-
-				// ゲーム終了処理
-				Application::GetInstance().SetIsGameEnd();
-			}
-			break;
+				case TITLE_STATE::GAME_END:
+				{
+					// ゲーム終了処理
+					Application::GetInstance().SetIsGameEnd();
+				}
+				break;
 			}
 		}
 	}
@@ -126,13 +83,9 @@ void TitleScene::Update(void)
 
 	int state = static_cast<int>(state_);
 
-	if (!isViewInfo_ && !isPvActive_)
+	if (!isPvActive_)
 	{
 		ChangeState(state, static_cast<int>(TITLE_STATE::GAME_END), static_cast<int>(TITLE_STATE::MAX));
-	}
-	else
-	{
-		UpdateInfo();
 	}
 
 	// 状態割り当て
@@ -153,11 +106,6 @@ void TitleScene::Draw(void)
 
 	//フォントの描画
 	DrawFont();
-
-	if (isViewInfo_)
-	{
-		//DrawInfo();
-	}
 
 	if (isPvActive_)
 	{
@@ -222,22 +170,6 @@ void TitleScene::DrawFont(void)
 
 	// ゲーム終了テキスト
 	DrawTitleText(yOffset, "ゲーム終了", TITLE_STATE::GAME_END);
-
-	// 描画ブレンドモードをノーブレンドにする
-	SetDrawBlendMode(DX_BLENDMODE_INVSRC, 200);
-
-	int y = Application::SCREEN_HALF_Y + TEXT_POS.y + 10;
-	DrawRotaGraph(Application::SCREEN_HALF_X,
-		(y - (95 / 4) - 5 + (TEXT_POS_Y_OFFSET * static_cast<int>(state_))),
-		selectScale_, AsoUtility::Deg2Rad(-90.0), arrowImage_, true);
-
-	// 矢印位置
-	DrawRotaGraph(Application::SCREEN_HALF_X,
-		(y + (95 / 2) + (TEXT_POS_Y_OFFSET * static_cast<int>(state_))),
-		selectScale_, AsoUtility::Deg2Rad(90.0), arrowImage_, true);
-
-	// 描画ブレンドモードをノーブレンドにする
-	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 
 void TitleScene::DrawOperation(void)
@@ -264,88 +196,6 @@ void TitleScene::DrawTitleText(int& _posY, const char* _text, TitleScene::TITLE_
 
 	// フォントのテキスト描画
 	DrawFontText(pos, size, color, _text, (state_ == _state));
-}
-
-void TitleScene::UpdateInfo(void)
-{
-	float delta = sceneMng_.GetDeltaTime();
-
-	// 選択処理
-	int info = static_cast<int>(info_);
-	ChangeState(info, (static_cast<int>(INFO_TYPE::MAX) - 1), static_cast<int>(INFO_TYPE::MAX));
-	// 状態割り当て
-	info_ = static_cast<INFO_TYPE>(info);
-
-
-	if (InputManager::GetInstance().IsTrgDown(InputManager::TYPE::SELECT_CANCEL))
-	{
-		// 終了メニュー有効化
-		Application::GetInstance().SetIsExitMenu(true);
-
-		// 遊び方非表示
-		isViewInfo_ = false;
-	}
-}
-
-void TitleScene::DrawInfo(void)
-{
-	/*　遊び方描画　*/
-	Font& font = Font::GetInstance();
-
-	int x = 0;
-	int y = 0;
-	// 中心座標
-	int midX = Application::SCREEN_HALF_X;
-	int midY = Application::SCREEN_HALF_Y;
-
-	// 背景 半透明描画
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, INFO_COLOR.a);
-
-	// 背景
-	DrawBox(INFO_SIZE.x, INFO_SIZE.y,
-		(midX * 2) - INFO_SIZE.x,
-		(midY * 2) - INFO_SIZE.y,
-		UtilityCommon::SetColor(INFO_COLOR), true);
-
-	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-
-	// 矢印
-	/*
-	DrawRotaGraph(midX - ARROW_WIDTH, midY,
-		arrowScale_, 0.0f, arrowImage_, true, true);
-	DrawRotaGraph(midX + ARROW_WIDTH, midY,
-		arrowScale_, 0.0f, arrowImage_, true, false);
-	*/
-
-	if (info_ == INFO_TYPE::PLAY_PAD)
-	{
-		// パッド画像
-		DrawRotaGraph(midX, midY, 1.0, 0.0, padImage_, true);
-	}
-	else if (info_ == INFO_TYPE::PLAY_KEY)
-	{
-		// キーボード画像
-		DrawRotaGraph(midX, midY, 1.0, 0.0, keyImage_, true);
-	}
-
-
-	x = (midX - INFO_PARAM.x);
-	y = (((midY * 2) - INFO_SIZE.y) - INFO_PARAM.y);
-
-	// テキスト描画
-	int now = static_cast<int>(info_) + 1;
-	int max = static_cast<int>(INFO_TYPE::MAX);
-	std::string text = (std::to_string(now) + " / " + std::to_string(max));
-	font.DrawTextA(Font::FONT_GAME, x, y, text.c_str(),
-		0xFFFFFF, -1, Font::FONT_TYPE_ANTIALIASING);
-
-
-	x = (INFO_SIZE.x + INFO_OFFSET.x);
-	y = (INFO_SIZE.y + INFO_OFFSET.y);
-
-	// テキスト描画
-	font.DrawTextA(Font::FONT_GAME, x, y, "※ ※ ※ ※　 このゲームはコントローラ操作を推奨しています。　※ ※ ※ ※",
-		0xFF0000, -1, Font::FONT_TYPE_ANTIALIASING);
 }
 
 void TitleScene::PromotionVideo(void)

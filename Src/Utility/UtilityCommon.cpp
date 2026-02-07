@@ -5,43 +5,45 @@
 #include "./AsoUtility.h"
 
 
-void UtilityCommon::ChangeString(const std::string& text, int& target, int minNum)
+void UtilityCommon::ChangeString(const std::string& _text, int& target, int minNum)
 {
     /* 文字列→int */
 
-    std::string txt = text;
-
-    // 文字列ミス判定フラグ
-    bool isCheck = true;
+    std::string txt = "";
 
     // マイナス
     const char& minus = *"-";
 
-
-    // 文字が空白のとき、最小値の文字列にする
-    if (text == "") { txt = std::to_string(minNum); }
-
-
-    for (char t : txt)
+    // 文字が空白のとき、最小値にする
+    if (_text == "" || _text == " ")
     {
-        // 数字・マイナスではない文字列のとき、false
+        target = minNum;
+        return;
+    }
+
+    for (char t : _text)
+    {
+        // 数字・マイナスではない文字列の時、終了
         if (!std::isdigit(static_cast<unsigned char>(t)) &&
             t != minus)
         {
-            isCheck = false;
             break;
         }
+
+        // 文字に現在の単語を追加 (文章の末尾の余分な文字対策)
+        txt += t;
     }
+    
 
-    if (isCheck)
-    {
-        int num = target;
-         
-        // 最小値より小さいとき最小値にする
-        num = ((target < minNum) ? minNum : target);
 
+    
+    if (!txt.empty())
+    {    
         // 文字列→int変換
-        num = std::stoi(text.c_str());
+        int num = stoi(txt);
+
+        // 最小値より小さいとき最小値にする
+        num = ((num < minNum) ? minNum : num);
 
         // 数値に反映
         target = num;
@@ -50,7 +52,7 @@ void UtilityCommon::ChangeString(const std::string& text, int& target, int minNu
     {
         // エラー
         std::string error = "\n文字列の値に誤りがあります。文字：";
-        error += text;
+        error += _text;
         OutputDebugString(error.c_str());
         assert(false);
 
@@ -61,35 +63,40 @@ void UtilityCommon::ChangeString(const std::string& text, int& target)
 {
     /* 文字列→int */
 
-    std::string txt = text;
-    int num = target;
-
-    // 文字列ミス判定フラグ
-    bool isCheck = true;
+    std::string txt = "";
 
     // マイナス
     const char& minus = *"-";
 
 
     // 文字が空白のとき、0にする
-    if (text == "") { txt = std::to_string(0); }
-
-
-    for (char t : txt)
+    if (text == "" || text == " ")
     {
-        // 数字・マイナスではない文字列のとき、false
+        target = 0;
+        return;
+    }
+
+    for (char t : text)
+    {
+        // 数字・マイナスではない文字列のとき、終了
         if (!isdigit(static_cast<unsigned char>(t)) &&
             t != minus)
         {
-            isCheck = false;
             break;
         }
-    }
 
-    if (isCheck)
+        // 文字に現在の単語を追加 (文章の末尾の余分な文字対策)
+        txt += t;
+    }
+    
+
+    if (!txt.empty())
     {
         // 文字列→int変換
-        num = std::stoi(text.c_str());
+        int num = stoi(txt);
+
+        // 最小値より小さいとき最小値にする
+        num = ((num < 0) ? 0 : num);
 
         // 数値に反映
         target = num;
@@ -109,11 +116,7 @@ void UtilityCommon::ChangeString(const std::string& text, float& target, float m
 {
     /* 文字列→float */
 
-    std::string txt = text;
-    float num = target;
-
-    // 文字列ミス判定フラグ
-    bool isCheck = true;
+    std::string txt = "";
 
     // 小数点
     const char& dot = *".";
@@ -121,36 +124,34 @@ void UtilityCommon::ChangeString(const std::string& text, float& target, float m
     // マイナス
     const char& minus = *"-";
 
-    // 復帰制御コード
-    const char& backSlash = *"\r";
-
 
     // 文字が空白のとき、最小値の文字列にする
-    if (text == "")
+    if (text == "" || text == " ")
     {
-        txt = std::to_string(minNum);
+        target = minNum;
         return;
     }
 
-
     for (auto t : text)
     {
-        // 数字・小数点・マイナスではない文字列のとき、false
+        // 数字・小数点・マイナスではない文字列のとき、終了
         if (!isdigit(static_cast<unsigned char>(t)) &&
-            t != dot && t != minus && t != backSlash)
+            t != dot && t != minus)
         {
-            isCheck = false;
             break;
         }
+
+        // 文字に現在の単語を追加 (文章の末尾の余分な文字対策)
+        txt += t;
     }
 
-    if (isCheck)
+    if (!txt.empty())
     {
-        // 最小値より小さいとき最小値にする
-        num = ((target < minNum) ? minNum : target);
-
         // 文字列→float変換
-        num = stof(text);
+        float num = stof(txt);
+
+        // 最小値より小さいとき最小値にする
+        num = ((num < minNum) ? minNum : num);
 
         // 数値に反映
         target = num;
@@ -161,7 +162,7 @@ void UtilityCommon::ChangeString(const std::string& text, float& target, float m
         std::string error = "\nfloat→文字列変換の値に誤りがあります。文字：";
         error += text;
         OutputDebugString(error.c_str());
-        //assert(false);
+        assert(false);
 
     }
 }
@@ -171,12 +172,7 @@ void UtilityCommon::ChangeString(const std::string& text, float& target)
     /* 文字列→float */
 
     /* 文字列→float */
-    std::string txt = text;
-
-    // 文字列ミス判定フラグ
-    bool isCheck = true;
-
-    float num = target;
+    std::string txt = "";
 
     // 小数点
     const char& dot = *".";
@@ -186,24 +182,33 @@ void UtilityCommon::ChangeString(const std::string& text, float& target)
 
 
     // 文字が空白のとき、0にする
-    if (text == "") { txt = std::to_string(0); }
+    if (text == "" || text == " ")
+    {
+        txt = std::to_string(0.0f);
+        return;
+    }
 
 
     for (auto t : text)
     {
-        // 数字・小数点・マイナスではない文字列のとき、false
+        // 数字・小数点・マイナスではない文字列のとき、終了
         if (!isdigit(static_cast<unsigned char>(t)) &&
             t != dot && t != minus)
         {
-            isCheck = false;
             break;
         }
+
+        // 文字に現在の単語を追加 (文章の末尾の余分な文字対策)
+        txt += t;
     }
 
-    if (isCheck)
+    if (!txt.empty())
     {
         // 文字列→float変換
-        num = stof(text);
+        float num = stof(txt);
+
+        // 最小値より小さいとき最小値にする
+        num = ((num < 0.0f) ? 0.0f : num);
 
         // 数値に反映
         target = num;
@@ -218,17 +223,16 @@ void UtilityCommon::ChangeString(const std::string& text, float& target)
     }
 }
 
-unsigned int UtilityCommon::SetColor(Color _color)
+
+unsigned int UtilityCommon::SetColor(UtilityCommon::Color _color)
 {
     return GetColor(_color.r, _color.g, _color.b);
 }
-
 unsigned int UtilityCommon::SetColor(COLOR_F _color)
 {
     if (_color.r > 1.0f || _color.g > 1.0f || _color.b > 1.0f)
     {
         OutputDebugString("\n引数の値が1.0以上になっています...\n");
-        return GetColor(_color.r, _color.g, _color.b);
     }
 
     int r, g, b;
@@ -237,6 +241,7 @@ unsigned int UtilityCommon::SetColor(COLOR_F _color)
     b = static_cast<int>(_color.b * COLOR_RATE_MAX);
     return GetColor(r, g, b);
 }
+
 unsigned int UtilityCommon::SetColor(float _red, float _green, float _blue)
 {
     if (_red > 1.0f || _green > 1.0f || _blue > 1.0f)

@@ -67,7 +67,7 @@ std::string StatusData::ReadCsvFile(const std::string& path)
 {
 	std::string content;
 
-#ifndef _DEBUG
+#ifdef _DEBUG
 	// デバッグビルド：通常のファイルシステムから読み込み
 	std::ifstream file(path);
 
